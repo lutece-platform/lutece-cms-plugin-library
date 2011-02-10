@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<document>
+<properties>
+	<title>Sample</title>
+</properties>
+<body>
+
+<section name="Defining a media linked to image document
+type"><subsection name="Media attribute types"><p>There are three media
+attribute types:</p>
+<ul><li><p><i>user filled</i>
+: this kind of attribute is filled by user at link insertion. It is not
+associated with a document attibute.</p>
+</li>
+<li><p><i>text document provided</i>
+: this kind of attribute is automatically filled with the text value of a
+document attribute. It can be modified by the user during link selection.</p>
+</li>
+<li><p><i>binary document provided</i>
+: this kind of attribute is automatically filled with the url of a binary
+resource. It cannot be modified.</p>
+</li>
+</ul>
+</subsection>
+<subsection name="Media attributes"><p>For this media, we define four
+attributes:</p>
+<ul><li><p>src : defines the url to the content</p>
+</li>
+<li><p>alt : the alternatives text if the content cannot be found</p>
+</li>
+<li><p>height : the image height</p>
+</li>
+<li><p>width : the image width</p>
+</li>
+</ul>
+<p>Those attributes are used to create the HTML representation of this media.
+This representation depends on the XSL Stylesheet provided with the media.
+Here is a sample stylesheet for our media :</p>
+<source>&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
+
+&lt;xsl:template match=&quot;media&quot;&gt;
+        &lt;img src=&quot;{src}&quot; alt=&quot;{alt}&quot; height=&quot;{height}&quot; width=&quot;{width}&quot;/&gt;
+&lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;</source>
+<p>Notice that the variables {src}, {alt}, {height} and {width} match the
+media attribute codes.</p>
+</subsection>
+<subsection name="Mapping definition"><p>Now we have to create one or more
+mappings that associate our four attributes with image document type
+attributes. This is done by adding a new mapping and associating media
+attribute with document type attributes.</p>
+</subsection>
+</section>
+
+</body>
+</document>

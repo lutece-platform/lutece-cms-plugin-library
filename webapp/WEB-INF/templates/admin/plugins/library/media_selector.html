@@ -1,0 +1,88 @@
+<div class="insert-service">
+<h3>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h3>
+<div class="highlight-box">
+
+<form method="post" name="filter" action="jsp/admin/plugins/library/SelectMedia.jsp">
+<p>${spaces_browser}</p>
+<input type="hidden" name="plugin_name" value="${plugin_name}" />
+	<input type="hidden" name="input" value="${input}" />
+	<input type="hidden" name="media_type" value="${mediatype.mediaId}" />
+
+	<#-- LUTECE-1108: Use Freemarker comments to disable #i18n lookup. -->
+	<#-- input type="submit" value="#i18n{library.insertservice.filter.button}" class="button" /> -->
+</form>
+</div>
+
+<form method="post" name="pagination" action="jsp/admin/plugins/library/SelectMedia.jsp">
+	<input type="hidden" name="plugin_name" value="${plugin_name}" />
+	<input type="hidden" name="input" value="${input}" />
+	<input type="hidden" name="media_type" value="${mediatype.mediaId}" />
+	<input type="hidden" name="space_id" value="${selected_space}" />
+    <@pagination paginator=paginator />
+    #i18n{library.insertservice.nbitemsperpage} :
+    <select name="nb_items">
+        <#list [ 10 , 20 , 50 , 100 ] as nb>
+        <#if nb_items = nb >
+        <option selected="selected" value="${nb}">${nb}</option>
+        <#else>
+        <option value="${nb}">${nb}</option>
+        </#if>
+        </#list>
+    </select>
+    <input type="submit" class="button" value="#i18n{library.insertservice.buttonItemsPerPage}" />
+</form>
+
+<form method="post" name="fenvoi" action="jsp/admin/plugins/library/EditSelectedMedia.jsp">
+	<input type="hidden" name="plugin_name" value="${plugin_name}" />
+	<input type="hidden" name="input" value="${input}" />
+	<input type="hidden" name="media" value="${mediatype.mediaId}" />
+	<input type="hidden" name="id_document" value="" />
+	<input type="hidden" name="id_mapping" value="" />
+	
+	<table>
+	<tr>
+		<th colspan="2">#i18n{library.insertservice.header.name}</th>
+	<#assign hashAttributes = {} />
+	<#list media_attributes as attribute>
+		<#assign hashAttributes = hashAttributes + { attribute.code:attribute.typeId } />
+		<th>${attribute.description}</th>
+	</#list>
+	</tr>
+	<#list all_documents as mappingdocument>
+		<#assign mapping_id = mappingdocument.first />
+		<#assign document = mappingdocument.second />
+		<tr>
+			<td><a class="bullet-link" href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();">${document.title}</a></td>
+			<td><img height="32" width="32" src="${document.thumbnail}"/></td>
+			<#list media_attributes as attribute>
+				<td>
+				<#assign attributes_associations = all_attributes_associations[mapping_id] />
+				<#if attributes_associations[attribute.code]?has_content>
+					<#assign doctype_code = attributes_associations[attribute.code]>
+					<#if hashAttributes[attribute.code] = 0>
+						<!-- ATTRIBUTE_TYPE_TEXT_USER -->
+					<#elseif hashAttributes[attribute.code] = 1> 
+						<!-- ATTRIBUTE_TYPE_TEXT_DOCUMENT -->
+						<#if (document.getAttribute(doctype_code).textValue)?has_content >
+							${document.getAttribute(doctype_code).textValue}
+						</#if>
+					<#elseif hashAttributes[attribute.code] = 2>
+						<!-- ATTRIBUTE_TYPE_BINARY -->
+						<#if (document.getAttribute(doctype_code))?has_content >
+							<#assign attributeId = document.getAttribute(doctype_code).id >
+							<#assign url = "document?id=" + document.id + "&amp;id_attribute=" + attributeId >
+							<a href="${url}"><img src="images/admin/skin/plugins/document/actions/view.png" alt="#i18n{library.insertservice.clicktopreview}" title="#i18n{library.insertservice.clicktopreview}" /></a>
+						</#if>
+					</#if>
+				</#if>
+				</td>
+			</#list>
+		</tr>
+	</#list>
+	</table>
+    <br />
+    <input type="button" value="#i18n{library.insertservice.cancel.button}" onclick="javascript:history.go(-1);" class="button"/>
+
+</form>
+
+</div>

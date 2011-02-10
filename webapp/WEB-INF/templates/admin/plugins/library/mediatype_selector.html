@@ -1,0 +1,23 @@
+<div class="insert-service">
+
+<form method="post" name="fenvoi" action="jsp/admin/plugins/library/SelectMedia.jsp">
+	<input type="hidden" name="plugin_name" value="${plugin_name}" />
+	<input type="hidden" name="input" value="${input}" />
+	<input type="hidden" name="media_type" value="" />
+	<h3>#i18n{library.insertservice.selectMediaType}</h3>
+	<table>
+	<tr>
+		<th>#i18n{library.insertservice.mediaName}</th>
+		<th>#i18n{library.insertservice.description}</th>
+	</tr>
+	<#list mediatypes as mediatype>
+		<tr>
+			<td><a class="bullet-link" href="javascript:document.fenvoi.media_type.value='${mediatype.mediaId}'; document.fenvoi.submit();">${mediatype.name}</a></td>
+			<td>${mediatype.description}</td>
+		</tr>
+	</#list>
+    <tr><td colspan="2"><input type="button" value="#i18n{library.insertservice.cancel.button}" onclick="javascript:history.go(-1);" class="button"/></td></tr>
+	</table>
+</form>
+
+</div>

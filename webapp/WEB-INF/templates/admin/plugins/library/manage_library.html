@@ -1,0 +1,30 @@
+<div class="content-box" >
+    <h2>#i18n{library.manage_library.table.title}</h2>
+    
+    <table>
+    <tr>
+      <th>#i18n{library.manage_library.table.column.title.code}</th>
+      <th>#i18n{library.manage_library.table.column.title.description}</th>
+      <th>#i18n{library.manage_library.table.column.title.actions}</th>
+    </tr>
+    <#list media_list as media >
+	    <tr>
+		    <td><a href="jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}" class="bullet-link" >${media.name}</a></td>
+		    <td>${media.description}</td>
+		    
+		    <td>
+
+				<a href="jsp/admin/plugins/library/RemoveMedia.jsp?media_id=${media.mediaId}">
+			    	<img src="images/admin/skin/actions/delete.png" alt="#i18n{library.manage_library.action.delete}" />
+			    </a>
+
+		    </td>
+	    </tr>
+	 </#list>
+    </table>
+    
+    <form action="jsp/admin/plugins/library/CreateMedia.jsp" method="post" >
+		<input type="submit" class="button"  value="#i18n{library.manage_library.button.create}" />
+	</form>
+    
+</div>

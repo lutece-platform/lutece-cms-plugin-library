@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" ?>
+<document>
+<properties>
+	<title>Exemple d'utilisation</title>
+</properties>
+<body>
+
+<section name="Définition d'un média lié à un type de document
+Image"><subsection name="Type d'attributs de média"><p>Il y a trois types
+d'attributs de média :</p>
+<ul><li><p><i>saisis par l'utilisateur</i>
+: ce type d'attribut est renseigné par l'utilisateur lors de l'insertion du
+lien. Il n'est associé à aucun attribut de document.</p>
+</li>
+<li><p><i>texte fourni par le document</i>
+: ce type d'attribut est automatiquement renseigné avec la valeur texte d'un
+attribut de document. Il peut être modifié par l'utilisateur au moment de
+l'insertion du lien.</p>
+</li>
+<li><p><i>binaire fourni par le document</i>
+: ce type d'attribut est automatiquement renseigné avec l'url de la ressource
+binaire de l'attribut de document. Il ne peut pas être modifié.</p>
+</li>
+</ul>
+</subsection>
+<subsection name="Attributs de média"><p>Pour l'exemple du média, nous
+définissons quatre attributs:</p>
+<ul><li><p>src : représente l'url de la ressource</p>
+</li>
+<li><p>alt : le texte alternatif de l'image</p>
+</li>
+<li><p>height : la hauteur de l'image</p>
+</li>
+<li><p>width : la largeur de l'image</p>
+</li>
+</ul>
+<p>Ces attributs sont utilisés pour créer la représentation HTML du media.
+Cette représentation est basée sur la feuille de style XSL fournie à la
+création du média. Voici un exemple de feuille de style pour notre
+media:</p>
+<source>&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
+
+&lt;xsl:template match=&quot;media&quot;&gt;
+        &lt;img src=&quot;{src}&quot; alt=&quot;{alt}&quot; height=&quot;{height}&quot; width=&quot;{width}&quot;/&gt;
+&lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;</source>
+<p>Notez que les variables {src}, {alt}, {height} et {width} correspondent aux
+codes des attributs du media.</p>
+</subsection>
+<subsection name="Définition d'un mapping"><p>Il faut maintenant créer un ou
+plusieurs mappings afin d'associer les attributs de notre media avec des
+attributs de document. Cela est fait en créant un nouveau mapping et en
+associant les attributs avec des attributs de types de documents présent dans
+les listes déroulantes de l'interface.</p>
+</subsection>
+</section>
+
+</body>
+</document>

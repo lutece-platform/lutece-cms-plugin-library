@@ -1,0 +1,50 @@
+<div class="content-box" >
+   <h2>#i18n{library.modify_attribute.form.label}</h2> 
+   
+   <form method="post" action="jsp/admin/plugins/library/DoModifyAttribute.jsp" name="modify_attribute">                           
+       
+		<p>
+            <label for="attribute_code" >#i18n{library.modify_attribute.code}&nbsp;*&nbsp;:</label>
+            <input type="text" id="attribute_code" name="attribute_code" value="${attribute.code}" size="100" maxlength="250"/>			
+        </p>
+        <p>
+            <label for="attribute_description" >#i18n{library.modify_attribute.description}&nbsp;*&nbsp;:</label>
+            <input type="text" id="attribute_description" name="attribute_description" value="${attribute.description}" size="100" maxlength="250"/>			
+        </p>
+        <p>
+            <label for="attribute_type" >#i18n{library.modify_attribute.type}&nbsp;*&nbsp;:</label>
+            <@comboWithParams name="attribute_type" default_value="${attribute.typeId}" additionalParameters="onChange=\"javascript:displayDefaultValue();\"" items=attribute_type_list />
+        </p>
+        <#assign typeIdWithDefaultValue = 0 />
+        <script type="text/javascript">
+        	function displayDefaultValue(  )
+        	{
+	        	var attribute_type = document.getElementById("attribute_type");
+	        	var attribute_default_value = document.getElementById("attribute_default_value");
+
+        		if( attribute_type.options[attribute_type.selectedIndex].value == "${typeIdWithDefaultValue}")
+        		{
+        			attribute_default_value.disabled = false;
+        		}
+        		else
+        		{
+	        		attribute_default_value.value = "";
+	        		attribute_default_value.disabled = true;
+        		}
+        	}
+        </script>
+        <p>
+            <label for="attribute_default_value" >#i18n{library.create_attribute.defaultValue}&nbsp;*&nbsp;:</label>
+            <input type="text" id="attribute_default_value" name="attribute_default_value" value="${attribute.defaultValue}" 
+            	size="100" maxlength="100" <#if attribute.typeId != typeIdWithDefaultValue>disabled="disabled "</#if>/>
+        </p>
+       
+        <p>
+        	<input type="hidden" id="media_id" name="media_id" value="${attribute.mediaId}" />
+        	<input type="hidden" id="attribute_id" name="attribute_id" value="${attribute.attributeId}" />
+            <input type="submit" value="#i18n{library.modify_attribute.button.validate}" class="button" />
+            <input class="button" type="button" onclick="javascript:history.go(-1)" value="#i18n{library.modify_attribute.button.cancel}" />
+        </p>							 
+    </form>	
+    
+</div>

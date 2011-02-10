@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<plug-in>
+    <!-- Plugin Informations -->
+    <name>library</name>
+    <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
+    <version>2.1.1</version>
+    <documentation></documentation>
+    <installation></installation>
+    <changes></changes>
+    <user-guide></user-guide>
+    <description>library.plugin.description</description>
+    <provider>library.plugin.provider</provider>
+    <provider-url>http://lutece.paris.fr</provider-url>
+    <icon-url>images/admin/skin/plugins/library/library.png</icon-url>
+    <copyright>Copyright 2001-2008 Mairie de Paris</copyright>
+    <core-version-dependency>
+		<min-core-version>2.3.0</min-core-version>
+		<max-core-version></max-core-version>	
+	</core-version-dependency>
+    <db-pool-required>1</db-pool-required>
+        
+    <!-- Administration interface parameters -->
+    <admin-features>
+        <admin-feature>
+            <feature-id>LIBRARY_MANAGEMENT</feature-id>
+            <feature-title>library.adminFeature.library_management.name</feature-title>
+            <feature-description>library.adminFeature.library_management.description</feature-description>
+            <feature-level>0</feature-level>
+            <feature-url>jsp/admin/plugins/library/ManageLibrary.jsp</feature-url>
+            <feature-icon-url>images/admin/skin/plugins/library/manage_library.png</feature-icon-url>
+        </admin-feature> 
+    </admin-features>   
+
+	<!-- Links Service -->
+	<insert-services>
+		<insert-service>
+	    <insert-service-id>librarylinkservice</insert-service-id>
+	    <insert-service-bean-class>fr.paris.lutece.plugins.library.web.LibraryInsertServiceJspBean</insert-service-bean-class>
+	    <insert-service-name>library.insertservice.name</insert-service-name>
+	    <insert-service-label>library.insertservice.label</insert-service-label>
+		</insert-service>        
+	</insert-services>
+	<insert-services>
+		<insert-service>
+	    <insert-service-id>libraryuploadlinkservice</insert-service-id>
+	    <insert-service-bean-class>fr.paris.lutece.plugins.library.web.UploadInsertServiceJspBean</insert-service-bean-class>
+	    <insert-service-name>library.uploadinsertservice.name</insert-service-name>
+	    <insert-service-label>library.uploadinsertservice.label</insert-service-label>
+		</insert-service>        
+	</insert-services>
+</plug-in>

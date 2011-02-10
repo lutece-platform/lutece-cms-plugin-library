@@ -1,0 +1,24 @@
+<div class="content-box" >
+   <h2>#i18n{library.create_media.form.label}</h2> 
+   
+   <form method="post" action="jsp/admin/plugins/library/DoCreateMedia.jsp" name="create_media" enctype="multipart/form-data">                           
+        <p>
+            <label for="media_name" >#i18n{library.create_media.code}&nbsp;*&nbsp;:</label>
+            <input type="text" id="media_name" name="media_name" value="" size="100" maxlength="250"/>			
+        </p>
+        <p>
+            <label for="media_description" >#i18n{library.create_media.description}&nbsp;*&nbsp;:</label>
+            <input type="text" id="media_description" name="media_description" value="" size="100" maxlength="250"/>			
+        </p>
+        <p>				
+        	<label for="media_stylesheet">#i18n{library.media.creation.label.stylesheet}&nbsp;*&nbsp;:</label>
+       		<input type="file" id="media_stylesheet" name="media_stylesheet" value="" />
+       	</p>
+
+        <p>
+            <input type="submit" value="#i18n{library.create_media.button.validate}" class="button" />
+            <input class="button" type="button" onclick="javascript:history.go(-1)" value="#i18n{library.create_media.button.cancel}" />
+        </p>							 
+    </form>	
+    
+</div>

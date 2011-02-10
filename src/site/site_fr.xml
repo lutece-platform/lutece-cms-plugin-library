@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Lutece library plugin">
+   <version />
+    <body>
+        <menu name="Plugin library">
+            <item name="Introduction" href="index.html"/>
+        </menu>
+        
+        <menu name="Manuel">
+        	<item name="Exemple d'utlisation" href="sample.html" />
+        </menu>
+        
+        <menu name="Téléchargements" inherit="bottom" >
+			     <item name="Versions stables" href="../../../stable_builds/plugins/plugin-library/"/>
+			     <item name="Nightly builds" href="../../../nightly_builds/plugins/plugin-library/" />
+		</menu>
+
+		<menu ref="reports" />
+        
+    </body>
+</project>

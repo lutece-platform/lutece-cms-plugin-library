@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <document>
+      <properties>
+          <title>
+              Introduction
+          </title>
+      </properties>
+      <body>
+        <section name="Plugin library">
+            <subsection name="Introduction">
+                <p>
+                	Ce plugin permet d'insérer dans un bloc de texte riche des éléments multimédias
+                	provenant de la base du plugin document.
+                </p>
+                <p>
+                	Une fois installé, un service d'insertion apparait dans la liste lorsque l'utilisateur
+                	clique sur le bouton L de l'éditeur de texte riche. 
+                </p> 
+            </subsection>
+            <subsection name="Configuration">
+                <p>
+                L'interface de backoffice permet de définir une correspondance entre les objets présentés
+                dans le service insertion et les types de document figurants dans la base documentarie.
+                </p>
+                <p>
+                Ce plugin est une extention du plugin document.
+                </p> 
+            </subsection>
+        </section>	  
+	  </body>
+  </document>

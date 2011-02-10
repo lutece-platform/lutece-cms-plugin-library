@@ -1,0 +1,37 @@
+<div class="content-box" >
+   <h2>#i18n{library.create_mapping.form.label}</h2> 
+   
+    <p>#i18n{library.create_mapping.documentType.label} : 
+    	<strong>${document_type.code} (${document_type.name})</strong>
+    </p>
+  
+   
+   <form method="post" action="jsp/admin/plugins/library/DoCreateMapping.jsp" name="create_mapping">                           
+       <#list media.mediaAttributeList as attribute >
+        
+	        <p> 
+	            <#if attribute.associableWithDocument >
+	            	<label for="document_attribute_id_${attribute.attributeId}" >${attribute.code} : </label>
+		            <select id="document_attribute_id_${attribute.attributeId}" name="document_attribute_id_${attribute.attributeId}" >			
+						
+						<#list document_type.attributes as documentAttribute >	
+			      				<option value="${documentAttribute.id}" >${documentAttribute.name}</option>
+			    		</#list>		
+		    		</select>
+		    	<#else>
+		    			<label for="" >${attribute.code} : </label>
+		    			<em>#i18n{library.create_mapping.attribute.text.noChoiceAvailable}</em> 
+		    	 </#if>	
+	        </p>
+	     
+	    </#list>
+	         
+        <p>
+            <input type="submit" value="#i18n{library.create_mapping.button.validate}"  class="button" />
+            <input type="hidden" name="media_id" value="${media.mediaId}" />
+            <input type="hidden" name="document_type" value="${document_type.code}" />
+            <input class="button" type="button" onclick="javascript:history.go(-1)" value="#i18n{library.create_mapping.button.cancel}" />
+        </p>							 
+    </form>	
+    
+</div>

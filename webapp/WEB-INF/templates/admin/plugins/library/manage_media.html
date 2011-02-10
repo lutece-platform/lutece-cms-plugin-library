@@ -1,0 +1,73 @@
+<div class="content-box" >
+   <h2>#i18n{library.manage_media.form.modify.title} "${media.name}"</h2> 
+   
+   <form method="post" action="jsp/admin/plugins/library/DoModifyMedia.jsp" name="modify_media" enctype="multipart/form-data">        
+        <input type="hidden" name="media_id" value="${media.mediaId}" />                      
+        <p>
+            <label for="media_name" >#i18n{library.manage_media.form.modify.code}&nbsp;*&nbsp;:</label>
+            <input type="text" id="media_name" name="media_name" value="${media.name}" size="100" maxlength="250"/>			
+        </p>
+        <p>
+            <label for="media_description" >#i18n{library.manage_media.form.modify.description}&nbsp;*&nbsp;:</label>
+            <input type="text" id="media_description" name="media_description" value="${media.description}" size="100" maxlength="250"/>			
+        </p>				
+        <p>				
+        	<label for="media_stylesheet">#i18n{library.media.creation.label.stylesheet}&nbsp;*&nbsp;:</label>
+       		<input type="file" id="media_stylesheet" name="media_stylesheet" value="" />
+       	</p>
+       
+        <p>
+            <input type="submit" value="#i18n{library.manage_media.form.modify.button.validate}" class="button" />
+        </p>							 
+    </form>	
+    
+</div>
+
+<div class="content-box" >
+    <h2>#i18n{library.manage_media.table.attributes.title} "${media.name}"</h2> 
+   
+<#if media.mediaAttributeList?has_content>
+
+<table>
+    <tr>
+      <th>#i18n{library.manage_media.table.attributes.column.code}</th>
+      <th>#i18n{library.manage_media.table.attributes.column.description}</th>
+      <th>#i18n{library.manage_media.table.attributes.column.type}</th>
+      <th>#i18n{library.manage_media.table.attributes.column.actions}</th>
+    </tr>
+   
+		    	<#list media.mediaAttributeList as attribute >
+		    	 <tr>
+		    		<td><a href="jsp/admin/plugins/library/ModifyAttribute.jsp?attribute_id=${attribute.attributeId}" class="bullet-link" >${attribute.code}</a></td> 
+		    		<td>${attribute.description}</td>
+		    		<td>${attribute.typeLabel}</td>
+		    		<td>
+
+						<a href="jsp/admin/plugins/library/RemoveAttribute.jsp?media_id=${media.mediaId}&attribute_id=${attribute.attributeId}">
+			    			<img src="images/admin/skin/actions/delete.png" alt="#i18n{library.manage_media.delete.attribute}" />
+			    		</a>
+
+		    		</td>
+		    	</tr>
+		    	</#list>
+    </table>
+</#if>
+    
+    <form action="jsp/admin/plugins/library/CreateAttribute.jsp" method="post" >
+		<p>
+			<input type="hidden" name="media_id" value="${media.mediaId}" />
+			<input type="submit" class="button"  value="#i18n{library.manage_media.add.attribute}" />
+		</p>
+	</form>
+    
+</div>
+
+<div class="content-box" >
+   <h2>#i18n{library.manage_media.mapping.management.title} "${media.name}"</h2>
+    <form action="jsp/admin/plugins/library/ManageMappings.jsp" method="post" >
+		<p>
+			<input type="hidden" name="media_id" value="${media.mediaId}" />
+			<input type="submit" class="button"  value="#i18n{library.manage_media.mapping.management.link}" />
+		</p>
+	</form>
+</div>
