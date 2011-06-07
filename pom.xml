@@ -10,7 +10,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>plugin-library</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>2.1.1-SNAPSHOT</version>
+    <version>2.1.1</version>
     <name>Lutece library plugin</name>
 
     <repositories>
@@ -43,8 +43,8 @@
         <jiraComponentId>10059</jiraComponentId>
     </properties>
     <scm>
-        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/cms/plugin-library</connection>
-        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/cms/plugin-library</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/trunk/plugins/cms/plugin-library</url>
+        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/tags/plugin-library-2.1.1</connection>
+        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/tags/plugin-library-2.1.1</developerConnection>
+        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/tags/plugin-library-2.1.1</url>
     </scm>
 </project>
