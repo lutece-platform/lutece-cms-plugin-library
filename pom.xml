@@ -39,8 +39,8 @@
 
     <properties>
         <componentName>library</componentName>
-        <jiraProjectName>LUTECE</jiraProjectName>
-        <jiraComponentId>10059</jiraComponentId>
+        <jiraProjectName>LIBRARY</jiraProjectName>
+        <jiraComponentId>10169</jiraComponentId>
     </properties>
     <scm>
         <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/cms/plugin-library</connection>
