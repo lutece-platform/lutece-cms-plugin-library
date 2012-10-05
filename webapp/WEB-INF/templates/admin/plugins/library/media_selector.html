@@ -1,18 +1,14 @@
 <div class="insert-service">
 <h3>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h3>
-<div class="highlight-box">
-
 <form method="post" name="filter" action="jsp/admin/plugins/library/SelectMedia.jsp">
 <p>${spaces_browser}</p>
 <input type="hidden" name="plugin_name" value="${plugin_name}" />
-	<input type="hidden" name="input" value="${input}" />
-	<input type="hidden" name="media_type" value="${mediatype.mediaId}" />
-
-	<#-- LUTECE-1108: Use Freemarker comments to disable #i18n lookup. -->
-	<#-- input type="submit" value="#i18n{library.insertservice.filter.button}" class="button" /> -->
+<input type="hidden" name="input" value="${input}" />
+<input type="hidden" name="media_type" value="${mediatype.mediaId}" />
+<#-- LUTECE-1108: Use Freemarker comments to disable #i18n lookup. -->
+<#-- input type="submit" value="#i18n{library.insertservice.filter.button}" class="button" /> -->
 </form>
 </div>
-
 <form method="post" name="pagination" action="jsp/admin/plugins/library/SelectMedia.jsp">
 	<input type="hidden" name="plugin_name" value="${plugin_name}" />
 	<input type="hidden" name="input" value="${input}" />
@@ -31,14 +27,12 @@
     </select>
     <input type="submit" class="button" value="#i18n{library.insertservice.buttonItemsPerPage}" />
 </form>
-
 <form method="post" name="fenvoi" action="jsp/admin/plugins/library/EditSelectedMedia.jsp">
 	<input type="hidden" name="plugin_name" value="${plugin_name}" />
 	<input type="hidden" name="input" value="${input}" />
 	<input type="hidden" name="media" value="${mediatype.mediaId}" />
 	<input type="hidden" name="id_document" value="" />
 	<input type="hidden" name="id_mapping" value="" />
-	
 	<table>
 	<tr>
 		<th colspan="2">#i18n{library.insertservice.header.name}</th>
@@ -80,9 +74,4 @@
 		</tr>
 	</#list>
 	</table>
-    <br />
-    <input type="button" value="#i18n{library.insertservice.cancel.button}" onclick="javascript:history.go(-1);" class="button"/>
-
 </form>
-
-</div>
