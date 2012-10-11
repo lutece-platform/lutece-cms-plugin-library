@@ -1,13 +1,12 @@
 <div class="insert-service">
-
-<form method="post"  action="jsp/admin/plugins/library/CreateMediaByInsert.jsp">
+<fieldset>
+<legend>#i18n{library.insertservice.selectSpace}</legend>
+<form class="form" method="post"  action="jsp/admin/plugins/library/CreateMediaByInsert.jsp">
 	<input type="hidden" name="plugin_name" value="${plugin_name}" />
 	<input type="hidden" name="input" value="${input}" />
 	<input type="hidden" name="media_type" value="${mediatype}" />
-	<h3>#i18n{library.insertservice.selectSpace}</h3>
 	 ${spaces_tree}
-	 
-	<input type="submit" />
+	<button class="btn btn-primary" type="submit" >Valider</button>
 </form>
-
+</fieldset>
 </div>

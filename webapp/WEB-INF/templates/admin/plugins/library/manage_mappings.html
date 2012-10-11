@@ -1,71 +1,73 @@
-<div class="content-box" >
-   
-   <p>
-   		<a href="jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}">
-			#i18n{library.manage_mappings.action.back} "${media.name}"
-		</a>
-   </p>
-   
+<div class="row-fluid" >
+	<div class="span12" >
     <#if mapping_list?has_content>
-   
-    <h2>#i18n{library.manage_mappings.table.title}</h2>
+	<fieldset>
+	<legend>
+		#i18n{library.manage_mappings.table.title}
+		<a class="btn pull-right" href="jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}">
+			<i class="icon-remove-circle"></i>&nbsp;#i18n{library.manage_mappings.action.back}
+		</a>
+	</legend>
      
-    <table>
-    <tr>
-      <th width="10%" >#i18n{library.manage_mappings.table.column.title.type}</th>
-      <th width="45%" >#i18n{library.manage_mappings.table.column.title.mappings}</th>
-      <th width="35%" >#i18n{library.manage_mappings.table.column.title.comments}</th>
-      <th width="10%" >#i18n{library.manage_mappings.table.column.title.actions}</th>
-    </tr>
-    <#list mapping_list as mapping >
+    <table class="table table-striped table-condensed">
+		<tr>
+		  <th>#i18n{library.manage_mappings.table.column.title.type}</th>
+		  <th>#i18n{library.manage_mappings.table.column.title.mappings}</th>
+		  <th>#i18n{library.manage_mappings.table.column.title.comments}</th>
+		  <th>#i18n{library.manage_mappings.table.column.title.actions}</th>
+		</tr>
+		<#list mapping_list as mapping >
 	    <tr>
-		    <td><a href="jsp/admin/plugins/library/ModifyMapping.jsp?mapping_id=${mapping.idMapping}" class="bullet-link" >${mapping.codeDocumentType}</a></td>
+		    <td>${mapping.codeDocumentType}</td>
 		    <td>
-		    		 <#if mapping.attributeAssociationList?has_content>
+		    	<#if mapping.attributeAssociationList?has_content>
 		    		 <#assign attributeAssociationLength = mapping.attributeAssociationList?size />
 			    	 <#list mapping.attributeAssociationList as mappingAttribute >
 			    	 	${mappingAttribute.associationLabel}<br/>
 			    	 </#list> 	
 			    	 <#else>
 			    	  <#assign attributeAssociationLength = 0 />
-			    	 
-			    	 </#if>
+			    </#if>
 		    </td>
 		    <td>
-		    		<#assign nbAttributesToMap = 0 >  
-		    		<#list media.mediaAttributeList as attribute >
+		    	<#assign nbAttributesToMap = 0 >  
+		    	<#list media.mediaAttributeList as attribute >
 		    		 <#if attribute.associableWithDocument >
 		    		   		<#assign nbAttributesToMap = nbAttributesToMap + 1>
 		    		  </#if>
-		    		</#list> 
-		    	
-		    			
-		    		<#if attributeAssociationLength < nbAttributesToMap >
-		    		 <span class="alert">#i18n{library.manage_mappings.control.title} : </span>
-					 #i18n{library.manage_mappings.control.text}
-		    		 </#if>
-		    		
-		    
+		    	</#list> 
+		    	<#if attributeAssociationLength < nbAttributesToMap >
+		    		 <span class="label label-warning">#i18n{library.manage_mappings.control.title} : #i18n{library.manage_mappings.control.text}</span>
+				</#if>
 		    </td>
 		    <td>
-			    <a href="jsp/admin/plugins/library/RemoveMapping.jsp?mapping_id=${mapping.idMapping}">
-			    	<img src="images/admin/skin/actions/delete.png" alt="#i18n{library.manage_mappings.action.delete}" />
-			    </a>
-		    </td>
+				<a class="btn btn-primary btn-mini" href="jsp/admin/plugins/library/ModifyMapping.jsp?mapping_id=${mapping.idMapping}"  title="null" >
+					<i class="icon-edit icon-white"></i>
+				</a>
+			    <a class="btn btn-danger btn-mini" href="jsp/admin/plugins/library/RemoveMapping.jsp?mapping_id=${mapping.idMapping}"  title="null" >
+					<i class="icon-trash icon-white"></i>
+				</a>
+			</td>
 	    </tr>
 	 </#list>
     </table>
-    
+    </fieldset>
     </#if>
- </div>   
- <div class="content-box" >   
-    <h2>#i18n{library.manage_mappings.form.create.title}</h2>
-    <form action="jsp/admin/plugins/library/CreateMapping.jsp" method="post" >
-    	<p>
-    		<label for="document_type" >#i18n{library.manage_mappings.form.create.documentType} :</label>
-    		<@combo name="document_type" default_value="" items=document_type_list />
-    		<input type="hidden" name="media_id" value="${media.mediaId}" />
-			<input type="submit" class="button"  value="#i18n{library.manage_mappings.form.create.validate}" />
-		</p>
-	</form>
+    <fieldset>
+	<legend>#i18n{library.manage_mappings.form.create.title}</legend>
+		<form class="form-horizontal" action="jsp/admin/plugins/library/CreateMapping.jsp" method="post" >
+		<input type="hidden" name="media_id" value="${media.mediaId}" />
+		<div class="control-group">
+			<label class="control-label" for="document_type" >#i18n{library.manage_mappings.form.create.documentType} :</label>
+				<div class="controls">
+					<@combo name="document_type" default_value="" items=document_type_list />
+			</div>
+		</div>
+		<div class="form-actions">
+			<button class="btn btn-primary" type="submit" ><i class="icon-ok icon-white"></i>&nbsp;#i18n{library.manage_mappings.form.create.validate}</button>
+			
+		</div>
+		</form>
+	</fieldset>
+	</div>
 </div>

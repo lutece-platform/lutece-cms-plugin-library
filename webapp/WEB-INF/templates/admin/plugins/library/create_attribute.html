@@ -1,48 +1,54 @@
-<div class="content-box" >
-   <h2>#i18n{library.create_attribute.form.label}</h2> 
-   
-   <form method="post" action="jsp/admin/plugins/library/DoCreateAttribute.jsp" name="create_attribute">                           
-       
-		<p>
-            <label for="attribute_code" >#i18n{library.create_attribute.code}&nbsp;*&nbsp;:</label>
-            <input type="text" id="attribute_code" name="attribute_code" value="" size="100" maxlength="250"/>			
-        </p>
-        <p>
-            <label for="attribute_description" >#i18n{library.create_attribute.description}&nbsp;*&nbsp;:</label>
-            <input type="text" id="attribute_description" name="attribute_description" value="" size="100" maxlength="250"/>			
-        </p>
-        <p>
-            <label for="attribute_type" >#i18n{library.create_attribute.type}&nbsp;*&nbsp;:</label>
-            <@comboWithParams name="attribute_type" default_value="" additionalParameters="onChange=\"javascript:displayDefaultValue();\"" items=attribute_type_list />
-        </p>
-        <#assign typeIdWithDefaultValue = 0 />
-        <script type="text/javascript">
-        	function displayDefaultValue(  )
-        	{
-	        	var attribute_type = document.getElementById("attribute_type");
-	        	var attribute_default_value = document.getElementById("attribute_default_value");
-
-        		if( attribute_type.options[attribute_type.selectedIndex].value == "${typeIdWithDefaultValue}")
-        		{
-        			attribute_default_value.disabled = false;
-        		}
-        		else
-        		{
-	        		attribute_default_value.value = "";
-	        		attribute_default_value.disabled = true;
-        		}
-        	}
-        </script>
-        <p>
-            <label for="attribute_default_value" >#i18n{library.create_attribute.defaultValue}&nbsp;*&nbsp;:</label>
-            <input type="text" id="attribute_default_value" name="attribute_default_value" value="" 
-            	size="100" maxlength="250" />
-        </p>
-        <p>
-        	<input type="hidden" id="media_id" name="media_id" value="${mediaId}" />
-            <input type="submit" value="#i18n{library.create_attribute.button.validate}" class="button" />
-            <input class="button" type="button" onclick="javascript:history.go(-1)" value="#i18n{library.create_attribute.button.cancel}" />
-        </p>							 
-    </form>	
-    
+<div class="row-fluid" >
+	<div class="span12">
+		<fieldset>                           
+		<legend>#i18n{library.create_attribute.form.label}</legend> 
+			<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoCreateAttribute.jsp" name="create_attribute">			<input type="hidden" id="media_id" name="media_id" value="${mediaId}" />
+			<div class="control-group">
+			<label class="control-label" for="attribute_code" >#i18n{library.create_attribute.code}&nbsp;*&nbsp;:</label>
+				<div class="controls">
+					<input type="text" id="attribute_code" name="attribute_code" value="" size="100" maxlength="250"/>
+				</div>
+			</div>			
+			<div class="control-group">
+			<label class="control-label" for="attribute_description" >#i18n{library.create_attribute.description}&nbsp;*&nbsp;:</label>
+				<div class="controls">
+					<input type="text" id="attribute_description" name="attribute_description" value="" size="100" maxlength="250"/>
+				</div>
+			</div>			
+			<div class="control-group">
+			<label class="control-label" for="attribute_type" >#i18n{library.create_attribute.type}&nbsp;*&nbsp;:</label>
+				<div class="controls">
+					<@comboWithParams name="attribute_type" default_value="" additionalParameters="onChange=\"javascript:displayDefaultValue();\"" items=attribute_type_list />
+				</div>
+			</div>
+			<div class="control-group">
+			<label class="control-label" for="attribute_default_value" >#i18n{library.create_attribute.defaultValue}&nbsp;*&nbsp;:</label>
+				<div class="controls">
+					<input type="text" id="attribute_default_value" name="attribute_default_value" value="" size="100" maxlength="250" />
+				</div>
+			</div>
+			<div class="form-actions">
+				<button class="btn btn-primary" type="submit" >
+					<i class="icon-ok icon-white"></i>&nbsp;#i18n{library.create_attribute.button.validate}
+				</button>
+				<a class="btn" href="jsp/admin/plugins/library/ManageMedia.jsp?media_id=${mediaId}" >
+					<i class="icon-remove-circle"></i>&nbsp;#i18n{library.create_attribute.button.cancel}
+				</a>
+			</div>
+			</fieldset>
+			</form>	
+    </div>
 </div>
+<#assign typeIdWithDefaultValue = 0 />
+<script type="text/javascript">
+function displayDefaultValue(  ){
+var attribute_type = document.getElementById("attribute_type");
+var attribute_default_value = document.getElementById("attribute_default_value");
+if( attribute_type.options[attribute_type.selectedIndex].value == "${typeIdWithDefaultValue}"){
+		attribute_default_value.disabled = false;
+	} else {
+		attribute_default_value.value = "";
+		attribute_default_value.disabled = true;
+    }
+}
+</script>
