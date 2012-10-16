@@ -1,14 +1,15 @@
 <div class="insert-service">
-<h3>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h3>
+<h4>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h4>
 <form class="form" method="post" name="filter" action="jsp/admin/plugins/library/SelectMedia.jsp">
+<div class="clearfix">
 ${spaces_browser}
+</div>
 <input type="hidden" name="plugin_name" value="${plugin_name}" />
 <input type="hidden" name="input" value="${input}" />
 <input type="hidden" name="media_type" value="${mediatype.mediaId}" />
 <#-- LUTECE-1108: Use Freemarker comments to disable #i18n lookup. -->
 <#-- input type="submit" value="#i18n{library.insertservice.filter.button}" class="btn btn-primary" /> -->
 </form>
-</div>
 <form class="form" method="post" name="pagination" action="jsp/admin/plugins/library/SelectMedia.jsp">
 	<input type="hidden" name="plugin_name" value="${plugin_name}" />
 	<input type="hidden" name="input" value="${input}" />
@@ -16,7 +17,7 @@ ${spaces_browser}
 	<input type="hidden" name="space_id" value="${selected_space}" />
     <@pagination paginator=paginator />
     #i18n{library.insertservice.nbitemsperpage} :
-    <select name="nb_items">
+    <select name="nb_items" class="input-mini">
         <#list [ 10 , 20 , 50 , 100 ] as nb>
         <#if nb_items = nb >
         <option selected="selected" value="${nb}">${nb}</option>
@@ -25,9 +26,9 @@ ${spaces_browser}
         </#if>
         </#list>
     </select>
-   <button class="btn btn-primary" type="submit" >#i18n{library.insertservice.buttonItemsPerPage}</button>
+   <button class="btn btn-primary btn-mini" type="submit" title="#i18n{library.insertservice.buttonItemsPerPage}"><i class="icon-ok icon-white"></i></button>
 </form>
-<form class="form-horizontal" method="post" name="fenvoi" action="jsp/admin/plugins/library/EditSelectedMedia.jsp">
+<form class="form" method="post" name="fenvoi" action="jsp/admin/plugins/library/EditSelectedMedia.jsp">
 	<fieldset>
 	<input type="hidden" name="plugin_name" value="${plugin_name}" />
 	<input type="hidden" name="input" value="${input}" />
@@ -47,11 +48,15 @@ ${spaces_browser}
 		<#assign mapping_id = mappingdocument.first />
 		<#assign document = mappingdocument.second />
 		<tr>
-			<td><a class="btn btn-primary btn-mini" href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="null" >
-	<i class="icon-question-sign icon-white"></i>
-	</a>
-</td>
-			<td><img height="32" width="32" src="${document.thumbnail}"/></td>
+			<td>
+				
+				<a class="btn btn-mini" href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.validate}" >
+					<i class="icon-ok-circle"></i>
+				</a>
+				&nbsp;${document.title}
+			</td>
+			<td>
+			<img class="img-polaroid thumblist-wide" src="${document.thumbnail}"/></td>
 			<#list media_attributes as attribute>
 				<td>
 				<#assign attributes_associations = all_attributes_associations[mapping_id] />
@@ -70,9 +75,9 @@ ${spaces_browser}
 							<#assign attributeId = document.getAttribute(doctype_code).id >
 							<#assign url = "document?id=" + document.id + "&amp;id_attribute=" + attributeId >
 							<a class="btn btn-primary btn-mini" href="${url}"  title="#i18n{library.insertservice.clicktopreview}" >
-	<i class="icon-question-sign icon-white"></i>
-	</a>
-
+								<i class="icon-eye-open icon-white"></i>
+							</a>
+							&nbsp;#i18n{library.insertservice.clicktopreview}
 						</#if>
 					</#if>
 				</#if>
@@ -81,5 +86,5 @@ ${spaces_browser}
 		</tr>
 	</#list>
 	</table>
-</fieldset>
 </form>
+</div>

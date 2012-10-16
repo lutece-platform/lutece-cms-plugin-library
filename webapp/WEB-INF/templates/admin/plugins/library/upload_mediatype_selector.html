@@ -13,13 +13,14 @@
 	<#list mediatypes as mediatype>
 		<tr>
 			<td><a class="btn btn-primary btn-mini" href="javascript:document.fenvoi.media_type.value='${mediatype.mediaId}'; document.fenvoi.submit();"  title="null" >
-	<i class="icon-question-sign icon-white"></i>
-	</a>
-</td>
+				<i class="icon-ok icon-white"></i>
+			</a>
+			</td>
 			<td>${mediatype.description}</td>
 		</tr>
 	</#list>
-    <tr><td colspan="2"><button class="btn btn-primary" onclick="javascript:history.go(-1);" >#i18n{library.insertservice.cancel.button}</button>
+    <tr><td colspan="2">
+	<button class="btn" onclick="javascript:history.go(-1);" ><i class="icon-remove-circle"></i>&nbsp;#i18n{library.insertservice.cancel.button}</button>
 	</td></tr>
 	</table>
 </fieldset>
