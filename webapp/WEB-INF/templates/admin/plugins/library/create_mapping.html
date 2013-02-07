@@ -27,9 +27,13 @@
 			</#if>	
 		</#list>
 		<div class="form-actions">
-			<button class="btn btn-primary" type="submit" >#i18n{library.create_mapping.button.validate}</button>
-			<button class="btn btn-primary" onclick="javascript:history.go(-1)" >#i18n{library.create_mapping.button.cancel}</button>
-		</div>
+			<button class="btn btn-primary btn-small" type="submit" >
+				<i class="icon-ok icon-white"></i>&nbsp;#i18n{library.create_mapping.button.validate}
+			</button>
+			<a class="btn btn-small" href="jsp/admin/plugins/library/ManageLibrary.jsp" >
+				<i class="icon-remove-circle"></i>&nbsp;#i18n{library.create_mapping.button.cancel}
+			</a>
+		</div>   
 		</form>	
     </fieldset>
     </div>

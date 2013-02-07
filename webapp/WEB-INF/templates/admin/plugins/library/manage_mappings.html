@@ -41,10 +41,10 @@
 				</#if>
 		    </td>
 		    <td>
-				<a class="btn btn-primary btn-mini" href="jsp/admin/plugins/library/ModifyMapping.jsp?mapping_id=${mapping.idMapping}"  title="null" >
+				<a class="btn btn-primary btn-small" href="jsp/admin/plugins/library/ModifyMapping.jsp?mapping_id=${mapping.idMapping}"  title="null" >
 					<i class="icon-edit icon-white"></i>
 				</a>
-			    <a class="btn btn-danger btn-mini" href="jsp/admin/plugins/library/RemoveMapping.jsp?mapping_id=${mapping.idMapping}"  title="null" >
+			    <a class="btn btn-danger btn-small" href="jsp/admin/plugins/library/RemoveMapping.jsp?mapping_id=${mapping.idMapping}"  title="null" >
 					<i class="icon-trash icon-white"></i>
 				</a>
 			</td>
@@ -64,8 +64,9 @@
 			</div>
 		</div>
 		<div class="form-actions">
-			<button class="btn btn-primary" type="submit" ><i class="icon-ok icon-white"></i>&nbsp;#i18n{library.manage_mappings.form.create.validate}</button>
-			
+			<button class="btn btn-primary btn-small" type="submit" >
+				<i class="icon-ok icon-white"></i>&nbsp;#i18n{library.manage_mappings.form.create.validate}
+			</button>
 		</div>
 		</form>
 	</fieldset>

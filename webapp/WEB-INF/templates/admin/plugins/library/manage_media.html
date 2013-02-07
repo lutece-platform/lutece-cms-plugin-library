@@ -23,8 +23,8 @@
 			</div>
 		</div>
        	<div class="form-actions">
-			<button class="btn btn-primary" type="submit" ><i class="icon-ok icon-white"></i>&nbsp;#i18n{library.manage_media.form.modify.button.validate}</button>
-			<a class="btn" href="jsp/admin/plugins/library/ManageLibrary.jsp" >
+			<button class="btn btn-primary btn-small" type="submit" ><i class="icon-ok icon-white"></i>&nbsp;#i18n{library.manage_media.form.modify.button.validate}</button>
+			<a class="btn btn-small" href="jsp/admin/plugins/library/ManageLibrary.jsp" >
 					<i class="icon-remove-circle"></i>&nbsp;#i18n{library.create_attribute.button.cancel}
 			</a>
 		</div>
@@ -34,11 +34,11 @@
 	<legend>#i18n{library.manage_media.table.attributes.title} "${media.name}"
 		<form class="form-inline pull-right" action="jsp/admin/plugins/library/ManageMappings.jsp" method="post" >
 			<input type="hidden" name="media_id" value="${media.mediaId}" />
-			<button class="btn btn-primary" type="submit" ><i class="icon-cog icon-white"></i>&nbsp;#i18n{library.manage_media.mapping.management.link}</button>
+			<button class="btn btn-primary btn-small" type="submit" ><i class="icon-cog icon-white"></i>&nbsp;#i18n{library.manage_media.mapping.management.link}</button>
 		</form>
 		<form class="form-inline pull-right spaced" action="jsp/admin/plugins/library/CreateAttribute.jsp" method="post" >
 			<input type="hidden" name="media_id" value="${media.mediaId}" />
-			<button class="btn btn-primary" type="submit" ><i class="icon-plus icon-white"></i>&nbsp;#i18n{library.manage_media.add.attribute}</button>
+			<button class="btn btn-primary btn-small" type="submit" ><i class="icon-plus icon-white"></i>&nbsp;#i18n{library.manage_media.add.attribute}</button>
 		</form>
 	</legend> 
 	<#if media.mediaAttributeList?has_content>
@@ -55,10 +55,10 @@
 		    <td>${attribute.description}</td>
 		    <td>${attribute.typeLabel}</td>
 		    <td>
-				<a class="btn btn-primary btn-mini" href="jsp/admin/plugins/library/ModifyAttribute.jsp?attribute_id=${attribute.attributeId}"  title="null" >
+				<a class="btn btn-primary btn-small" href="jsp/admin/plugins/library/ModifyAttribute.jsp?attribute_id=${attribute.attributeId}"  title="null" >
 					<i class="icon-edit icon-white"></i>
 				</a>
-				<a class="btn btn-danger btn-mini" href="jsp/admin/plugins/library/RemoveAttribute.jsp?media_id=${media.mediaId}&attribute_id=${attribute.attributeId}"  title="null" >
+				<a class="btn btn-danger btn-small" href="jsp/admin/plugins/library/RemoveAttribute.jsp?media_id=${media.mediaId}&attribute_id=${attribute.attributeId}"  title="null" >
 					<i class="icon-trash icon-white"></i>
 				</a>
 			</td>

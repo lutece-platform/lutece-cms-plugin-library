@@ -7,32 +7,36 @@
 			<input type="hidden" id="media_id" name="media_id" value="${attribute.mediaId}" />
 			<input type="hidden" id="attribute_id" name="attribute_id" value="${attribute.attributeId}" />
 			<div class="control-group">
-			<label class="control-label" for="attribute_code" >#i18n{library.modify_attribute.code}&nbsp;*&nbsp;:</label>
+			<label class="control-label" for="attribute_code" >#i18n{library.modify_attribute.code}&nbsp;*</label>
 				<div class="controls">
-					<input type="text" id="attribute_code" name="attribute_code" value="${attribute.code}" size="100" maxlength="250"/>
+					<input type="text" id="attribute_code" name="attribute_code" value="${attribute.code}" class="input-xxlarge" maxlength="250"/>
 				</div>
 			</div>			
 			<div class="control-group">
-			<label class="control-label" for="attribute_description" >#i18n{library.modify_attribute.description}&nbsp;*&nbsp;:</label>
+			<label class="control-label" for="attribute_description" >#i18n{library.modify_attribute.description}&nbsp;*</label>
 				<div class="controls">
-					<input type="text" id="attribute_description" name="attribute_description" value="${attribute.description}" size="100" maxlength="250"/>
+					<input type="text" id="attribute_description" name="attribute_description" value="${attribute.description}" class="input-xxlarge" maxlength="250"/>
 				</div>
 			</div>			
 			<div class="control-group">
-			<label class="control-label" for="attribute_type" >#i18n{library.modify_attribute.type}&nbsp;*&nbsp;:</label>
+			<label class="control-label" for="attribute_type" >#i18n{library.modify_attribute.type}&nbsp;*</label>
 				<div class="controls">
 					<@comboWithParams name="attribute_type" default_value="${attribute.typeId}" additionalParameters="onChange=\"javascript:displayDefaultValue();\"" items=attribute_type_list />
 				</div>
 			</div>
 			<div class="control-group">
-			<label class="control-label" for="attribute_default_value" >#i18n{library.create_attribute.defaultValue}&nbsp;*&nbsp;:</label>
+			<label class="control-label" for="attribute_default_value" >#i18n{library.create_attribute.defaultValue}&nbsp;*</label>
 				<div class="controls">
-					<input type="text" id="attribute_default_value" name="attribute_default_value" value="${attribute.defaultValue}" size="100" maxlength="100" <#if attribute.typeId != typeIdWithDefaultValue>disabled="disabled "</#if>/>
+					<input type="text" id="attribute_default_value" name="attribute_default_value" value="${attribute.defaultValue}" class="input-xxlarge" maxlength="100" <#if attribute.typeId != typeIdWithDefaultValue>disabled="disabled "</#if>/>
 				</div>
 			</div>
 			<div class="form-actions">
-				<button class="btn btn-primary" type="submit" ><i class="icon-ok icon-white"></i>&nbsp;#i18n{library.modify_attribute.button.validate}</button>
-				<button class="btn" onclick="javascript:history.go(-1)" ><i class="icon-remove-circle"></i>&nbsp;#i18n{library.modify_attribute.button.cancel}</button>
+				<button class="btn btn-primary" type="submit" >
+					<i class="icon-ok icon-white"></i>&nbsp;#i18n{library.modify_attribute.button.validate}
+				</button>
+				<a class="btn btn-small" href="jsp/admin/plugins/library/ManageMedia.jsp?media_id=${mediaId}" >
+					<i class="icon-remove-circle"></i>&nbsp;#i18n{library.modify_attribute.button.cancel}
+				</a>
 			</div>	
 			</form>	
 		</fieldset>
