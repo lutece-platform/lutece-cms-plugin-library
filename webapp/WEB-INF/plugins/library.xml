@@ -2,7 +2,7 @@
     <!-- Plugin Informations -->
     <name>library</name>
     <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
-    <version>3.0.1</version>
+    <version>4.0.0</version>
     <documentation/>
     <installation/>
     <changes/>
