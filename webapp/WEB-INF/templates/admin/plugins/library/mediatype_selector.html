@@ -1,17 +1,21 @@
 <div class="insert-service">
-	<form class="form-inline" method="post" name="fenvoi" action="jsp/admin/plugins/library/SelectMedia.jsp">
-	<input type="hidden" name="plugin_name" value="${plugin_name}" />
-	<input type="hidden" name="input" value="${input}" />
-	<input type="hidden" name="media_type" value="" />
-	<ul class="nav nav-list">
-		<li class="nav-header">#i18n{library.insertservice.selectMediaType}</li>
-		<#list mediatypes as mediatype>
-		<li>
-			<a href="javascript:document.fenvoi.media_type.value='${mediatype.mediaId}'; document.fenvoi.submit();" title="${mediatype.name}">
-				<i class="icon-chevron-right"></i>&nbsp;&nbsp;${mediatype.description}
-			</a>
-		</li>
-	</#list>
-	</ul>
-</form>
+	<div class="row">
+		<div class="col-md-12">
+			<form class="form-inline" method="post" name="fenvoi" action="jsp/admin/plugins/library/SelectMedia.jsp">
+			<input type="hidden" name="plugin_name" value="${plugin_name}">
+			<input type="hidden" name="input" value="${input}">
+			<input type="hidden" name="media_type" value="">
+				<ul class="nav nav-list">
+					<li class="nav-header">#i18n{library.insertservice.selectMediaType}</li>
+					<#list mediatypes as mediatype>
+					<li>
+						<a href="javascript:document.fenvoi.media_type.value='${mediatype.mediaId}'; document.fenvoi.submit();" title="${mediatype.name}">
+							<i class="glyphicon glyphicon-chevron-right"></i>&nbsp;&nbsp;${mediatype.description}
+						</a>
+					</li>
+				</#list>
+				</ul>
+			</form>
+		</div>
+	</div>
 </div>

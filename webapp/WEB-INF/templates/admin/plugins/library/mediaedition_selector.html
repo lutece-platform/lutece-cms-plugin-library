@@ -1,83 +1,83 @@
-<div class="insert-service">
-	<h4>#i18n{library.insertservice.editMedia} ${mediatype.name}</h4>
-		<form class="form-inline" method="post" name="fenvoi" action="${jsp_insert}">
-		<input type="hidden" name="plugin_name" value="${plugin_name}" />
-		<input type="hidden" name="input" value="${input}" />
-		<input type="hidden" name="media" value="${mediatype.mediaId}" />
-		<input type="hidden" name="id_document" value="" />
-		<div class="control-group">
-		<label class="control-label" for="title">#i18n{library.insertservice.title} :</label>
-			<span id="title">${document.title}</span>
-			<div class="control-group">
-			<label class="control-label" for="thumbnail">#i18n{library.insertservice.preview} :</label>
-			<img id="thumbnail" class="img-polaroid thumblist-wide" src="${document.thumbnail}"/>
-			<#list media_attributes as attribute>
-				<#assign field_name = attribute.code>
-				<#if attribute.typeId = 0>
-					<div class="control-group">
-					<label class="control-label" for="${field_name}">${attribute.description} :</label>
-					<!-- ATTRIBUTE_TYPE_TEXT_USER -->
-						<div class="controls">
-							<input type="text" name="${field_name}" id="${field_name}" value="${attribute.defaultValue}" />
+<div class="row">
+	<div class="col-md-12">
+		<form class="form" method="post" name="fenvoi" action="${jsp_insert}">
+		<input type="hidden" name="plugin_name" value="${plugin_name}">
+		<input type="hidden" name="input" value="${input}">
+		<input type="hidden" name="media" value="${mediatype.mediaId}">
+		<input type="hidden" name="id_document" value="">
+		<fieldset>
+			<legend>${document.title}</legend>
+			<div class="row">
+					<div class="col-md-5">
+						<div class="form-group">
+							<label for="thumbnail">#i18n{library.insertservice.preview}</label>
+							<img id="thumbnail" class="img-polaroid thumblist-wide" src="${document.thumbnail}" alt="${document.title}" >
 						</div>
 					</div>
-				<#elseif attribute.typeId = 3>
-					<div class="control-group">
-					<label class="control-label" for="${field_name}">${attribute.description} :</label>
-					<!-- ATTRIBUTE_TYPE_TITLE_DOCUMENT -->
-					<#if document.title?has_content >
-						<div class="controls">
-							<input type="text" name="${field_name}" id="${field_name}" value="${document.title}" />
+					<div class="col-md-7">
+						<#list media_attributes as attribute>
+							<#assign field_name = attribute.code>
+							<#if attribute.typeId = 0>
+								<!-- ATTRIBUTE_TYPE_TEXT_USER -->
+								<div class="form-group">	
+									<label for="${field_name}">${attribute.description} </label>
+									<input type="text" class="input-normal" name="${field_name}" id="${field_name}" value="${attribute.defaultValue}">
+								</div>	
+							<#elseif attribute.typeId = 3>
+								<#if document.title?has_content >
+									<!-- ATTRIBUTE_TYPE_TITLE_DOCUMENT -->
+									<div class="form-group">
+										<label for="${field_name}">${attribute.description} </label>
+										<input type="text"  class="input-normal" name="${field_name}" id="${field_name}" value="${document.title}">
+									</div>
+								</#if>
+							<#elseif attribute.typeId = 4>
+								<!-- ATTRIBUTE_TYPE_SUMMARY_DOCUMENT -->
+								<#if document.summary?has_content >
+									<div class="form-group">
+										<label for="${field_name}">${attribute.description} </label>
+										<textarea type="text" name="${field_name}" id="${field_name}" cols="60" rows="2" >${document.summary}</textarea>
+									</div>
+								<#else>
+									- 
+								</#if>
+							<#elseif attributes_associations[attribute.code]?has_content>
+								<#assign doctype_code = attributes_associations[attribute.code]>
+								<#if attribute.typeId = 1>
+									<!-- ATTRIBUTE_TYPE_TEXT_DOCUMENT -->
+									<#if document.getAttribute(doctype_code)?exists && document.getAttribute(doctype_code).textValue?has_content>
+										<div class="form-group">
+											<label for="${field_name}">${attribute.description} </label>
+											<textarea name="${field_name}" id="${field_name}">${document.getAttribute(doctype_code).textValue?xml}</textarea>
+										</div>	
+									</#if>
+								<#elseif attribute.typeId = 2>
+									<!-- ATTRIBUTE_TYPE_BINARY -->
+									<#if document.getAttribute(doctype_code)?has_content >
+										<#assign attributeId = document.getAttribute(doctype_code).id >
+										<#assign url = "document?id=" + document.id + "&amp;id_attribute=" + attributeId >
+										<div class="form-group">
+											<label for="${field_name}">Voir le document [Nouvelle fenêtre] </label>
+											<input type="hidden" name="${field_name}" id="${field_name}" value="${url}">
+											<a href="${url}" target="_blank" class="btn btn-link" title="Voir">
+												${url}
+											</a>
+										</div>
+									</#if>
+								</#if>
+							</#if>
+						</#list>
+						<div class="form-group">
+							<button class="btn btn-primary" type="submit">
+								<i class="glyphicon glyphicon-ok"></i>&nbsp;#i18n{library.insertservice.insertlink.button}
+							</button>
+							<button class="btn btn-default" onclick="javascript:history.go(-1);">
+								<i class="glyphicon glyphicon-remove-circle"></i>&nbsp;#i18n{library.insertservice.cancel.button}
+							</button>
 						</div>
 					</div>
-					</#if>
-				<#elseif attribute.typeId = 4>
-					<!-- ATTRIBUTE_TYPE_SUMMARY_DOCUMENT -->
-					<#if document.summary?has_content >
-						<div class="control-group">
-						<label class="control-label" for="${field_name}">${attribute.description} :</label>
-							<div class="controls">
-								<textarea type="text" name="${field_name}" id="${field_name}" cols="60" rows="2" >${document.summary}</textarea>
-							</div>
-						</div>
-					<#else>
-						- 
-					</#if>
-				<#elseif attributes_associations[attribute.code]?has_content>
-					<#assign doctype_code = attributes_associations[attribute.code]>
-					<#if attribute.typeId = 1>
-						<!-- ATTRIBUTE_TYPE_TEXT_DOCUMENT -->
-						<#if document.getAttribute(doctype_code)?exists && document.getAttribute(doctype_code).textValue?has_content >
-							<div class="control-group">
-							<label class="control-label" for="${field_name}">${attribute.description} :</label>
-								<div class="controls">
-									<textarea name="${field_name}" id="${field_name}">${document.getAttribute(doctype_code).textValue?xml}</textarea>
-								</div>
-							</div>
-						</#if>
-					<#elseif attribute.typeId = 2>
-						<!-- ATTRIBUTE_TYPE_BINARY -->
-						<#if document.getAttribute(doctype_code)?has_content >
-							<#assign attributeId = document.getAttribute(doctype_code).id >
-							<#assign url = "document?id=" + document.id + "&amp;id_attribute=" + attributeId >
-							<div class="control-group">
-							<label class="control-label" for="${field_name}"><#if attribute.description?has_content >${attribute.description}<#else>Pas description</#if> :</label>
-								<div class="controls">
-									<input type="hidden" name="${field_name}" id="${field_name}" value="${url}" />
-									<a href="${url}" class="btn btn-link">${url}</a>
-								</div>
-							</div>	
-					</#if>
-				</#if>
-			</#if>
-		</#list>
-		<div class="form-actions">
-			<button class="btn btn-primary" type="submit">
-				<i class="icon-ok icon-white"></i>&nbsp;#i18n{library.insertservice.insertlink.button}
-			</button>
-			<button class="btn" onclick="javascript:history.go(-1);">
-				<i class="icon-remove-circle"></i>&nbsp;#i18n{library.insertservice.cancel.button}
-			</button>
-		</div>
-		</form>
+				</div>
+			</fieldset>
+			</form>
+	</div>
 </div>

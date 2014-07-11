@@ -1,90 +1,79 @@
-<div class="insert-service">
-<h4>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h4>
-<form class="form" method="post" name="filter" action="jsp/admin/plugins/library/SelectMedia.jsp">
-<div class="clearfix">
-${spaces_browser}
+<div class="row">
+	<div class="col-md-6 col-xs-6">
+		<h4>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h4>
+	</div>
+	<div class="col-md-6 col-xs-6">
+		<form class="form-inline" method="post" name="pagination" action="jsp/admin/plugins/library/SelectMedia.jsp">
+			<input type="hidden" name="plugin_name" value="${plugin_name}" />
+			<input type="hidden" name="input" value="${input}" />
+			<input type="hidden" name="media_type" value="${mediatype.mediaId}" />
+			<input type="hidden" name="space_id" value="${selected_space}" />
+			<input type="hidden" name="browser_id_space" value="${selected_space}" />
+			<div class="input-group">
+				<span class="input-group-addon">
+					#i18n{library.insertservice.nbitemsperpage}
+				</span>
+				<select name="nb_items" class="form-control">
+					<#list [ 10 , 20 , 50 , 100 ] as nb>
+						<#if nb_items = nb >
+							<option selected="selected" value="${nb}">${nb}</option>
+						<#else>
+							<option value="${nb}">${nb}</option>
+						</#if>
+					</#list>
+				</select>
+				 <span class="input-group-btn">
+					<button class="btn btn-default" type="submit" title="#i18n{library.insertservice.buttonItemsPerPage}">
+						<i class="glyphicon glyphicon-ok"></i>
+					</button>
+				</span>	
+			</div>
+		</form>
+	</div>
 </div>
-<input type="hidden" name="plugin_name" value="${plugin_name}" />
-<input type="hidden" name="input" value="${input}" />
-<input type="hidden" name="media_type" value="${mediatype.mediaId}" />
-<#-- LUTECE-1108: Use Freemarker comments to disable #i18n lookup. -->
-<#-- input type="submit" value="#i18n{library.insertservice.filter.button}" class="btn btn-primary" /> -->
-</form>
-<form class="form" method="post" name="pagination" action="jsp/admin/plugins/library/SelectMedia.jsp">
-	<input type="hidden" name="plugin_name" value="${plugin_name}" />
-	<input type="hidden" name="input" value="${input}" />
-	<input type="hidden" name="media_type" value="${mediatype.mediaId}" />
-	<input type="hidden" name="space_id" value="${selected_space}" />
-    <@pagination paginator=paginator />
-    #i18n{library.insertservice.nbitemsperpage} :
-    <select name="nb_items" class="input-mini">
-        <#list [ 10 , 20 , 50 , 100 ] as nb>
-        <#if nb_items = nb >
-        <option selected="selected" value="${nb}">${nb}</option>
-        <#else>
-        <option value="${nb}">${nb}</option>
-        </#if>
-        </#list>
-    </select>
-   <button class="btn btn-primary btn-mini" type="submit" title="#i18n{library.insertservice.buttonItemsPerPage}"><i class="icon-ok icon-white"></i></button>
-</form>
-<form class="form" method="post" name="fenvoi" action="jsp/admin/plugins/library/EditSelectedMedia.jsp">
-	<fieldset>
-	<input type="hidden" name="plugin_name" value="${plugin_name}" />
-	<input type="hidden" name="input" value="${input}" />
-	<input type="hidden" name="media" value="${mediatype.mediaId}" />
-	<input type="hidden" name="id_document" value="" />
-	<input type="hidden" name="id_mapping" value="" />
-	<table class="table table-striped table-condensed">
-	<tr>
-		<th colspan="2">#i18n{library.insertservice.header.name}</th>
-	<#assign hashAttributes = {} />
-	<#list media_attributes as attribute>
-		<#assign hashAttributes = hashAttributes + { attribute.code:attribute.typeId } />
-		<th>${attribute.description}</th>
-	</#list>
-	</tr>
-	<#list all_documents as mappingdocument>
-		<#assign mapping_id = mappingdocument.first />
-		<#assign document = mappingdocument.second />
-		<tr>
-			<td>
-				
-				<a class="btn btn-mini" href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.validate}" >
-					<i class="icon-ok-circle"></i>
-				</a>
-				&nbsp;${document.title}
-			</td>
-			<td>
-			<img class="img-polaroid thumblist-wide" src="${document.thumbnail}"/></td>
-			<#list media_attributes as attribute>
-				<td>
-				<#assign attributes_associations = all_attributes_associations[mapping_id] />
-				<#if attributes_associations[attribute.code]?has_content>
-					<#assign doctype_code = attributes_associations[attribute.code]>
-					<#if hashAttributes[attribute.code] = 0>
-						<!-- ATTRIBUTE_TYPE_TEXT_USER -->
-					<#elseif hashAttributes[attribute.code] = 1> 
-						<!-- ATTRIBUTE_TYPE_TEXT_DOCUMENT -->
-						<#if (document.getAttribute(doctype_code).textValue)?has_content >
-							${document.getAttribute(doctype_code).textValue}
-						</#if>
-					<#elseif hashAttributes[attribute.code] = 2>
-						<!-- ATTRIBUTE_TYPE_BINARY -->
-						<#if (document.getAttribute(doctype_code))?has_content >
-							<#assign attributeId = document.getAttribute(doctype_code).id >
-							<#assign url = "document?id=" + document.id + "&amp;id_attribute=" + attributeId >
-							<a class="btn btn-primary btn-mini" href="${url}"  title="#i18n{library.insertservice.clicktopreview}" >
-								<i class="icon-eye-open icon-white"></i>
-							</a>
-							&nbsp;#i18n{library.insertservice.clicktopreview}
-						</#if>
-					</#if>
-				</#if>
-				</td>
-			</#list>
-		</tr>
-	</#list>
-	</table>
-</form>
+<div class="row">
+	<div class="col-md-4 col-sm-4 col-xs-4">
+		<form class="form" method="post" name="filter" action="jsp/admin/plugins/library/SelectMedia.jsp">
+		<input type="hidden" name="plugin_name" value="${plugin_name}">
+		<input type="hidden" name="input" value="${input}">
+		<input type="hidden" name="media_type" value="${mediatype.mediaId}">
+		<input type="hidden" name="space_id" value="${selected_space}">
+		<div class="form-group">
+			${spaces_browser}
+		</div>
+		<#-- LUTECE-1108: Use Freemarker comments to disable #i18n lookup. -->
+		<#-- input type="submit" value="#i18n{library.insertservice.filter.button}" class="btn btn-primary" /> -->
+		</form>
+	</div>
+	<div class="col-md-7 col-xs-7">
+		<form class="form" method="post" name="fenvoi" id="fenvoi" action="jsp/admin/plugins/library/EditSelectedMedia.jsp">
+			<input type="hidden" name="plugin_name" value="${plugin_name}">
+			<input type="hidden" name="input" value="${input}">
+			<input type="hidden" name="media" value="${mediatype.mediaId}">
+			<input type="hidden" name="id_document" id="id_document" value="">
+			<input type="hidden" name="id_mapping" id="id_mapping" value="">
+			<input type="hidden" name="space_id" value="${selected_space}">
+			<div class="row">
+			<#list all_documents as mappingdocument>
+				<#assign mapping_id = mappingdocument.first />
+				<#assign document = mappingdocument.second />
+					<div class="col-sm-6 col-md-4">
+						<div class="thumbnail">
+							<img src="${document.thumbnail}&nocache" data-src="${document.thumbnail}&nocache" class="thumbnail" alt="${document.title}" title="${document.title} - ${document.type}">
+							<div class="caption">
+								<p>
+								<a href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.validate}" >
+									<span class="badge">${document.id}</span>
+									<small><#if document.title?length &gt; 50>${document.title?substring(0,50)}...<#else>${document.title}</#if></small></p>
+								</a>
+								<p>
+								<a class="btn btn-default center-block" id="btn-select" data-mapping="${mapping_id}" data-document="${document.id}" href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.validate}" >
+									<i class="glyphicon glyphicon-ok"></i> #i18n{library.create_media.button.validate}
+								</a>
+							</p>
+							</div>
+						</div>
+					</div>
+			</#list>			</div>		</form>
+	</div>
 </div>
