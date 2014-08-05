@@ -45,6 +45,7 @@ public class LibraryMedia
     private String _strDescription;
     private Collection<MediaAttribute> _colMediaAttribute;
     private StyleSheet _stylesheet;
+    private boolean _bIsMultipleMedia;
 
     public Collection<MediaAttribute> getMediaAttributeList(  )
     {
@@ -100,5 +101,15 @@ public class LibraryMedia
     {
         _stylesheet = new StyleSheet(  );
         _stylesheet.setSource( bytes );
+    }
+
+    public boolean getIsMultipleMedia(  )
+    {
+        return _bIsMultipleMedia;
+    }
+
+    public void setIsMultipleMedia( boolean bIsMultipleMedia )
+    {
+        this._bIsMultipleMedia = bIsMultipleMedia;
     }
 }

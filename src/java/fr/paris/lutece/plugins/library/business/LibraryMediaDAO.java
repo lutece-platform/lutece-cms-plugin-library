@@ -44,10 +44,10 @@ public class LibraryMediaDAO implements ILibraryMediaDAO
 {
     private static final String SQL_QUERY_NEW_PK = " SELECT max( id_media ) FROM library_media ";
     private static final String SQL_QUERY_REMOVE_MEDIA = "DELETE FROM library_media WHERE id_media= ?";
-    private static final String SQL_QUERY_INSERT_MEDIA = "INSERT INTO library_media (id_media ,name ,description, stylesheet) VALUES ( ? , ? , ? , ? )";
-    private static final String SQL_QUERY_SELECT_MEDIA = "SELECT id_media, name, description, stylesheet FROM library_media WHERE id_media= ?";
-    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_media, name, description FROM library_media";
-    private static final String SQL_QUERY_UPDATE_MEDIA = "UPDATE library_media SET name=?, description=?, stylesheet=? WHERE id_media=?";
+    private static final String SQL_QUERY_INSERT_MEDIA = "INSERT INTO library_media (id_media ,name ,description, is_multiple_media, stylesheet) VALUES ( ? , ? , ? , ? , ? )";
+    private static final String SQL_QUERY_SELECT_MEDIA = "SELECT id_media, name, description, is_multiple_media, stylesheet FROM library_media WHERE id_media= ?";
+    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_media, name, description, is_multiple_media FROM library_media";
+    private static final String SQL_QUERY_UPDATE_MEDIA = "UPDATE library_media SET name=?, description=?, is_multiple_media = ?, stylesheet=? WHERE id_media=?";
 
     public void delete( int nMediaId, Plugin plugin )
     {
@@ -59,12 +59,15 @@ public class LibraryMediaDAO implements ILibraryMediaDAO
 
     public void insert( LibraryMedia media, Plugin plugin )
     {
+        media.setMediaId( newPrimaryKey( plugin ) );
+
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_MEDIA, plugin );
 
-        daoUtil.setInt( 1, newPrimaryKey( plugin ) );
+        daoUtil.setInt( 1, media.getMediaId(  ) );
         daoUtil.setString( 2, media.getName(  ) );
         daoUtil.setString( 3, media.getDescription(  ) );
-        daoUtil.setBytes( 4, media.getStyleSheet(  ).getSource(  ) );
+        daoUtil.setBoolean( 4, media.getIsMultipleMedia(  ) );
+        daoUtil.setBytes( 5, media.getStyleSheet(  ).getSource(  ) );
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
     }
@@ -82,7 +85,8 @@ public class LibraryMediaDAO implements ILibraryMediaDAO
             media.setMediaId( daoUtil.getInt( 1 ) );
             media.setName( daoUtil.getString( 2 ) );
             media.setDescription( daoUtil.getString( 3 ) );
-            media.setStyleSheetBytes( daoUtil.getBytes( 4 ) );
+            media.setIsMultipleMedia( daoUtil.getBoolean( 4 ) );
+            media.setStyleSheetBytes( daoUtil.getBytes( 5 ) );
         }
 
         daoUtil.free(  );
@@ -102,6 +106,7 @@ public class LibraryMediaDAO implements ILibraryMediaDAO
             media.setMediaId( daoUtil.getInt( 1 ) );
             media.setName( daoUtil.getString( 2 ) );
             media.setDescription( daoUtil.getString( 3 ) );
+            media.setIsMultipleMedia( daoUtil.getBoolean( 4 ) );
             colMedia.add( media );
         }
 
@@ -115,14 +120,16 @@ public class LibraryMediaDAO implements ILibraryMediaDAO
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_MEDIA, plugin );
         daoUtil.setString( 1, media.getName(  ) );
         daoUtil.setString( 2, media.getDescription(  ) );
-        daoUtil.setBytes( 3, media.getStyleSheet(  ).getSource(  ) );
-        daoUtil.setInt( 4, media.getMediaId(  ) );
+        daoUtil.setBoolean( 3, media.getIsMultipleMedia(  ) );
+        daoUtil.setBytes( 4, media.getStyleSheet(  ).getSource(  ) );
+        daoUtil.setInt( 5, media.getMediaId(  ) );
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
     }
 
     /**
      * Generates a new primary key
+     * @param plugin The plugin
      * @return The new primary key
      */
     public int newPrimaryKey( Plugin plugin )

@@ -33,17 +33,6 @@
  */
 package fr.paris.lutece.plugins.library.web;
 
-import java.io.FileInputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.lang.StringEscapeUtils;
-
 import fr.paris.lutece.plugins.document.business.Document;
 import fr.paris.lutece.plugins.document.business.DocumentType;
 import fr.paris.lutece.plugins.document.business.DocumentTypeHome;
@@ -58,12 +47,12 @@ import fr.paris.lutece.plugins.document.service.DocumentService;
 import fr.paris.lutece.plugins.document.service.DocumentTypeResourceIdService;
 import fr.paris.lutece.plugins.document.service.spaces.DocumentSpacesService;
 import fr.paris.lutece.plugins.library.business.LibraryMapping;
+import fr.paris.lutece.plugins.library.business.LibraryMapping.AttributeAssociation;
 import fr.paris.lutece.plugins.library.business.LibraryMappingHome;
 import fr.paris.lutece.plugins.library.business.LibraryMedia;
 import fr.paris.lutece.plugins.library.business.LibraryMediaHome;
 import fr.paris.lutece.plugins.library.business.MediaAttribute;
 import fr.paris.lutece.plugins.library.business.MediaAttributeHome;
-import fr.paris.lutece.plugins.library.business.LibraryMapping.AttributeAssociation;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AdminUserService;
 import fr.paris.lutece.portal.service.html.XmlTransformerService;
@@ -82,6 +71,18 @@ import fr.paris.lutece.util.UniqueIDGenerator;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.xml.XmlUtil;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+
 /**
  * UploadInsertServiceJspBean
  * Used for uploading document
@@ -90,17 +91,17 @@ import fr.paris.lutece.util.xml.XmlUtil;
 public class UploadInsertServiceJspBean extends InsertServiceJspBean implements InsertServiceSelectionBean
 {
     private static final long serialVersionUID = -7071548876864568789L;
-    private static final String PARAMETER_PLUGIN_NAME = "plugin_name";    
-    
+    private static final String PARAMETER_PLUGIN_NAME = "plugin_name";
+
     //TEMPLATES
-    private static final String TEMPLATE_MEDIATYPE_SELECTOR = "admin/plugins/library/upload_mediatype_selector.html"; 
+    private static final String TEMPLATE_MEDIATYPE_SELECTOR = "admin/plugins/library/upload_mediatype_selector.html";
     private static final String TEMPLATE_SPACE_SELECTOR = "admin/plugins/library/upload_space_selector.html";
     private static final String TEMPLATE_MEDIA_CREATOR = "admin/plugins/library/media_creator.html";
     private static final String TEMPLATE_EDIT_MEDIA = "admin/plugins/library/mediaedition_selector.html";
-   
+
     //JSP
-    private static final String JSP_INSERT_MEDIA = "jsp/admin/plugins/library/DoInsertMediaByUpload.jsp";    
-    
+    private static final String JSP_INSERT_MEDIA = "jsp/admin/plugins/library/DoInsertMediaByUpload.jsp";
+
     //MARKS
     private static final String MARK_FIELDS = "fields";
     private static final String MARK_DOCUMENT_TYPE = "document_type";
@@ -118,14 +119,14 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     private static final String MARK_SPACE_ID = "space_id";
     private static final String MARK_LOCALE = "locale";
     private static final String MARK_WEBAPP_URL = "webapp_url";
-    
+
     //PARAMETERS
     private static final String PARAMETER_DOCUMENT_TYPE_CODE = "document_type_code";
     private static final String PARAMETER_INPUT = "input";
     private static final String PARAMETER_MEDIA_TYPE = "media_type";
-    private static final String PARAMETER_MEDIA_ID = "media";    
+    private static final String PARAMETER_MEDIA_ID = "media";
     private static final String PARAMETER_SPACE_ID = "space_id";
-    
+
     //TAGS
     private static final String XML_TAG_MEDIA = "media";
     private static final String XSL_UNIQUE_PREFIX_ID = UniqueIDGenerator.getNewId(  ) + "library-";
@@ -133,24 +134,23 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     private static final String SPACE_TREE_XSL_UNIQUE_PREFIX = UniqueIDGenerator.getNewId(  ) + "SpacesTree";
     private static final String PATH_XSL = "/WEB-INF/plugins/library/xsl/";
     private static final String FILE_TREE_XSL = "document_spaces_tree.xsl";
-    
-    
+
     //MESSAGE
-    private static final String MESSAGE_DOCUMENT_ERROR = "library.uploadinsertservice.message.documentError"; 
-    private static final String MESSAGE_NOT_AUTHORIZED = "library.uploadinsertservice.message.notAuthorized"; 
-    
+    private static final String MESSAGE_DOCUMENT_ERROR = "library.uploadinsertservice.message.documentError";
+    private static final String MESSAGE_NOT_AUTHORIZED = "library.uploadinsertservice.message.notAuthorized";
+
     private static final String SPACE_ID_SESSION = "spaceIdSession";
-    
-  
+
     private AdminUser _user;
     private Plugin _plugin;
     private String _input;
-    
-	/**
-	 * Get the select type of document page
-	 * @param request the request
-	 * @return the page
-	 */
+
+    /**
+     * Get the select type of document page
+     * @param request the request
+     * @return the page
+     */
+    @Override
     public String getInsertServiceSelectorUI( HttpServletRequest request )
     {
         init( request );
@@ -162,7 +162,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MEDIATYPE_SELECTOR, _user.getLocale(  ), model );
 
         return template.getHtml(  );
-    } 
+    }
 
     private void init( HttpServletRequest request )
     {
@@ -171,7 +171,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         _plugin = PluginService.getPlugin( strPluginName );
         _input = request.getParameter( PARAMETER_INPUT );
     }
-    
+
     private HashMap<String, Object> getDefaultModel(  )
     {
         HashMap<String, Object> model = new HashMap<String, Object>(  );
@@ -180,10 +180,10 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         return model;
     }
-    
+
     /**
      * Return the form for creating a document
-     * @param request
+     * @param request The request
      * @return a form with needed fields
      */
     public String getCreateMedia( HttpServletRequest request )
@@ -192,7 +192,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         String strMediaType = request.getParameter( PARAMETER_MEDIA_TYPE );
 
-        String strSpaceId = request.getParameter(PARAMETER_SPACE_ID );
+        String strSpaceId = request.getParameter( PARAMETER_SPACE_ID );
         int nSpaceId = -1;
 
         if ( ( strSpaceId != null ) && ( strSpaceId.length(  ) > 0 ) )
@@ -209,27 +209,26 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
                 nSpaceId = nSpaceIdTmp.intValue(  );
             }
         }
-        
+
         LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaType ), _plugin );
-        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( mediaType.getMediaId(  ),
-                _plugin );
-        
+        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( mediaType.getMediaId( ), _plugin );
+
         DocumentType documentType = DocumentTypeHome.findByPrimaryKey( mapping.getCodeDocumentType(  ) );
-        
-        if( ( nSpaceId == -1 ) || ( !DocumentService.getInstance(  )
-                .isAuthorizedAdminDocument( nSpaceId,
-                		documentType.getCode(  ), DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) ) )
+
+        if ( ( nSpaceId == -1 )
+                || ( !DocumentService.getInstance( ).isAuthorizedAdminDocument( nSpaceId, documentType.getCode( ),
+                        DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) ) )
         {
-        	return getSelectSpace( request );
+            return getSelectSpace( request );
         }
-        
+
         HashMap<String, Object> model = getDefaultModel(  );
         model.put( MARK_DOCUMENT_TYPE, documentType.getCode(  ) );
         model.put( MARK_FIELDS,
-                DocumentService.getInstance(  )
-                               .getCreateForm( documentType.getCode(  ), _user.getLocale(  ), AppPathService.getBaseUrl( request ) ) );
-        model.put( MARK_METADATA,  new DublinCoreMetadata(  ) );
-        model.put( MARK_MEDIA,  mediaType.getMediaId(  ) );
+                DocumentService.getInstance( ).getCreateForm( documentType.getCode( ), _user.getLocale( ),
+                        AppPathService.getBaseUrl( request ) ) );
+        model.put( MARK_METADATA, new DublinCoreMetadata( ) );
+        model.put( MARK_MEDIA, mediaType.getMediaId( ) );
         model.put( MARK_INPUT, _input );
         model.put( MARK_SPACE_ID, nSpaceId );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
@@ -239,7 +238,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         return template.getHtml(  );
     }
-    
+
     /**
      * Return a page with space for selection
      * @param request the request
@@ -248,21 +247,20 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     public String getSelectSpace( HttpServletRequest request )
     {
         init( request );
-        
+
         String strMediaType = request.getParameter( PARAMETER_MEDIA_TYPE );
 
         LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaType ), _plugin );
-        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( mediaType.getMediaId(  ),
-                _plugin );
-        
+        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( mediaType.getMediaId( ), _plugin );
+
         DocumentType documentType = DocumentTypeHome.findByPrimaryKey( mapping.getCodeDocumentType(  ) );
-        
+
         // Spaces       
         String strXmlSpaces = DocumentSpacesService.getInstance(  ).getXmlSpacesList( _user, documentType.getCode(  ) );
-        
-        FileInputStream fis = AppPathService.getResourceAsStream( PATH_XSL, FILE_TREE_XSL );       
+
+        FileInputStream fis = AppPathService.getResourceAsStream( PATH_XSL, FILE_TREE_XSL );
         Source sourceXsl = new StreamSource( fis );
-        
+
         String strSpaceIdRequest = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID );
         int nSpaceId = -1;
 
@@ -280,17 +278,25 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
                 nSpaceId = nSpaceIdTmp.intValue(  );
             }
         }
-        
+
         HashMap<String, String> htXslParameters = new HashMap<String, String>(  );
-        htXslParameters.put( XSL_PARAMETER_CURRENT_SPACE, nSpaceId+"" );
+        htXslParameters.put( XSL_PARAMETER_CURRENT_SPACE, nSpaceId + "" );
 
         XmlTransformerService xmlTransformerService = new XmlTransformerService(  );
         String strSpacesTree = xmlTransformerService.transformBySourceWithXslCache( strXmlSpaces, sourceXsl,
                 SPACE_TREE_XSL_UNIQUE_PREFIX, htXslParameters, null );
+        try
+        {
+            fis.close( );
+        }
+        catch ( IOException e )
+        {
+            AppLogService.error( e.getMessage( ), e );
+        }
         DocumentSpace currentSpace = DocumentSpaceHome.findByPrimaryKey( nSpaceId );
-        
+
         HashMap<String, Object> model = getDefaultModel(  );
-      
+
         model.put( MARK_INPUT, _input );
         model.put( MARK_SPACES_TREE, strSpacesTree );
         model.put( MARK_SPACE, currentSpace );
@@ -300,7 +306,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         return template.getHtml(  );
     }
-    
+
     /**
      * Perform the creation of a document
      * @param request The HTTP request
@@ -308,31 +314,32 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
      */
     public String doCreateDocument( HttpServletRequest request )
     {
-        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;       
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
         String strDocumentTypeCode = request.getParameter( PARAMETER_DOCUMENT_TYPE_CODE );
         String strSpaceIdRequest = request.getParameter( PARAMETER_SPACE_ID );
         int nSpaceId;
         try
         {
-        	 nSpaceId = Integer.parseInt( strSpaceIdRequest );
+            nSpaceId = Integer.parseInt( strSpaceIdRequest );
         }
-        catch ( NumberFormatException e ) 
+        catch ( NumberFormatException e )
         {
-        	nSpaceId = -1;
-		}       
+            nSpaceId = -1;
+        }
 
         if ( !DocumentService.getInstance(  )
-                                 .isAuthorizedAdminDocument( nSpaceId,
-                    strDocumentTypeCode, DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) )
+.isAuthorizedAdminDocument( nSpaceId, strDocumentTypeCode,
+                DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) )
         {
-        	return AdminMessageService.getMessageUrl( request, MESSAGE_NOT_AUTHORIZED, AdminMessage.TYPE_ERROR );
+            return AdminMessageService.getMessageUrl( request, MESSAGE_NOT_AUTHORIZED, AdminMessage.TYPE_ERROR );
         }
 
         Document document = new Document(  );
         document.setCodeDocumentType( strDocumentTypeCode );
 
-        String strError = DocumentService.getInstance(  ).getDocumentData( multipartRequest, document, _user.getLocale(  ) );
+        String strError = DocumentService.getInstance( )
+                .getDocumentData( multipartRequest, document, _user.getLocale( ) );
 
         if ( strError != null )
         {
@@ -340,26 +347,26 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         }
 
         document.setSpaceId( nSpaceId );
-        document.setStateId( 1 );        
+        document.setStateId( 1 );
         document.setCreatorId( _user.getUserId(  ) );
 
         try
         {
-            DocumentService.getInstance(  )
-            	.createDocument( document, _user );
+            DocumentService.getInstance( ).createDocument( document, _user );
             DocumentAction action = DocumentActionHome.findByPrimaryKey( DocumentAction.ACTION_VALIDATE );
             DocumentService.getInstance(  )
-            	.validateDocument( document, _user, action.getFinishDocumentState(  ).getId(  ) );
+                    .validateDocument( document, _user, action.getFinishDocumentState( ).getId( ) );
         }
         catch ( DocumentException e )
         {
-        	 return AdminMessageService.getMessageUrl( request, MESSAGE_DOCUMENT_ERROR,
-        	            new String[] { I18nService.getLocalizedString( e.getI18nMessage(  ),  _user.getLocale(  ) ) }, AdminMessage.TYPE_ERROR );
+            return AdminMessageService.getMessageUrl( request, MESSAGE_DOCUMENT_ERROR,
+                    new String[] { I18nService.getLocalizedString( e.getI18nMessage( ), _user.getLocale( ) ) },
+                    AdminMessage.TYPE_ERROR );
         }
 
         return getEditSelectedMedia( request, document );
     }
-    
+
     /**
      * Insert the link to the document into the current editor
      * @param request the request
@@ -410,7 +417,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         return insertUrl( request, _input, strHtml );
     }
-    
+
     /**
      * Return the page for edition of the created document
      * @param request the request
@@ -418,16 +425,17 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
      * @return the form with document parameters
      */
     public String getEditSelectedMedia( HttpServletRequest request, Document document )
-    {        
+    {
 
         String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
 
         LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaTypeId ), _plugin );
         mediaType.setMediaAttributeList( MediaAttributeHome.findAllAttributesForMedia( mediaType.getMediaId(  ), _plugin ) );
-     
-        Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ), _plugin );
-        LibraryMapping mapping = (LibraryMapping) allMappings.iterator(  ).next(  );
-        
+
+        Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId( ),
+                _plugin );
+        LibraryMapping mapping = allMappings.iterator( ).next( );
+
         Map<String, Object> model = getDefaultModel(  );
         model.put( MARK_MEDIA_TYPE, mediaType );
         model.put( MARK_MEDIA_TYPE_ATTRIBUTES, mediaType.getMediaAttributeList(  ) );
@@ -439,7 +447,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         return template.getHtml(  );
     }
-    
+
     private Map<String, String> getAttributesFromMapping( LibraryMapping m )
     {
         HashMap<String, String> result = new HashMap<String, String>(  );

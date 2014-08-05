@@ -47,6 +47,7 @@ import fr.paris.lutece.plugins.library.business.LibraryMedia;
 import fr.paris.lutece.plugins.library.business.LibraryMediaHome;
 import fr.paris.lutece.plugins.library.business.MediaAttribute;
 import fr.paris.lutece.plugins.library.business.MediaAttributeHome;
+import fr.paris.lutece.plugins.library.business.SelectedMedia;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AdminUserService;
 import fr.paris.lutece.portal.service.html.XmlTransformerService;
@@ -54,6 +55,7 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.insert.InsertServiceJspBean;
 import fr.paris.lutece.portal.web.insert.InsertServiceSelectionBean;
@@ -64,9 +66,11 @@ import fr.paris.lutece.util.url.UrlItem;
 import fr.paris.lutece.util.xml.XmlUtil;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,54 +78,77 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 
+/**
+ * Library insert service JSP Bean
+ */
 public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements InsertServiceSelectionBean
 {
     private static final long serialVersionUID = -7071548876864568789L;
-    private static final String PARAMETER_PLUGIN_NAME = "plugin_name";
-    private static final String MARK_MEDIA_TYPES = "mediatypes";
+
+    // Templates
     private static final String TEMPLATE_MEDIATYPE_SELECTOR = "admin/plugins/library/mediatype_selector.html";
     private static final String TEMPLATE_MEDIA_SELECTOR = "admin/plugins/library/media_selector.html";
+    private static final String TEMPLATE_MEDIA_SELECTOR_MULTIPLE = "admin/plugins/library/media_selector_multiple.html";
+    private static final String TEMPLATE_EDIT_MEDIA = "admin/plugins/library/mediaedition_selector.html";
+    private static final String TEMPLATE_EDIT_MEDIA_MULTIPLE = "admin/plugins/library/mediaedition_selector_multiple.html";
+
+    // Parameters
+    private static final String PARAMETER_PLUGIN_NAME = "plugin_name";
     private static final String PARAMETER_MEDIA_TYPE = "media_type";
+    private static final String PARAMETER_MEDIA_ID = "media";
+    private static final String PARAMETER_DOCUMENT_ID = "id_document";
+    private static final String PARAMETER_SPACE_ID = "space_id";
+    private static final String PARAMETER_INPUT = "input";
+    private static final String PARAMETER_MAPPING_ID = "id_mapping";
+    private static final String PARAMETER_NB_ITEMS_PER_PAGE = "nb_items";
+    private static final String PARAMETER_PAGE_INDEX = "page_index";
+    private static final String PARAMETER_REMOVE_SELECTED = "remove_selected";
+    private static final String PARAMETER_MOVE_UP = "move_up";
+
+    // JSP
+    private static final String JSP_INSERT_MEDIA = "jsp/admin/plugins/library/DoInsertMedia.jsp";
+    private static final String JSP_MEDIA_TYPE_SELECTION = "jsp/admin/plugins/library/SelectMedia.jsp";
+    private static final String JSP_MEDIA_EDIT_SELECTED = "jsp/admin/plugins/library/EditSelectedMedia.jsp";
+
+    // Marks
+    private static final String MARK_MEDIA_DOC = "document";
+    private static final String MARK_JSP_INSERT = "jsp_insert";
+    private static final String MARK_MEDIA_TYPES = "mediatypes";
     private static final String MARK_MEDIA_TYPE = "mediatype";
     private static final String MARK_MEDIA_TYPE_ATTRIBUTES = "media_attributes";
     private static final String MARK_MEDIA_ATTRIBUTES_ASSOCIATIONS = "attributes_associations";
-    private static final String TEMPLATE_EDIT_MEDIA = "admin/plugins/library/mediaedition_selector.html";
-    private static final String PARAMETER_MEDIA_ID = "media";
-    private static final String PARAMETER_DOCUMENT_ID = "id_document";
-    private static final String MARK_MEDIA_DOC = "document";
-    private static final String MARK_JSP_INSERT = "jsp_insert";
-    
-    //JSP
-    private static final String JSP_INSERT_MEDIA = "jsp/admin/plugins/library/DoInsertMedia.jsp";
-    private static final String JSP_MEDIA_TYPE_SELECTION = "jsp/admin/plugins/library/SelectMedia.jsp";
-    
-    //private static final String MARK_SPACES = "spaces";
     private static final String MARK_SPACES_BROWSER = "spaces_browser";
-    private static final String PARAMETER_SPACE_ID = "space_id";
     private static final String MARK_SELECTED_SPACE = "selected_space";
     private static final String MARK_PREVIEW_TYPE = "preview_type";
-    private static final String PARAMETER_INPUT = "input";
-    private static final String XML_TAG_MEDIA = "media";
+    private static final String MARK_PAGINATOR = "paginator";
+    private static final String MARK_NB_ITEMS_PER_PAGE = "nb_items_per_page";
+    private static final String MARK_SELECTED_MEDIAS = "selected_medias";
     private static final String MARK_ALL_MEDIA_ATTRIBUTES_ASSOCIATIONS = "all_attributes_associations";
     private static final String MARK_ALL_DOCUMENTS = "all_documents";
-    private static final String PARAMETER_MAPPING_ID = "id_mapping";
-    private static final int APPROVED_DOCUMENT_STATE = 3;
+    private static final String MARK_MEDIA_DOC_LIST = "document_list";
+
+    // Constants
+    private static final String XML_TAG_MEDIA_LIST = "mediaList";
+    private static final String XML_TAG_MEDIA = "media";
     private static final String DEFAULT_RESULTS_PER_PAGE = "10";
-    private static final String PARAMETER_NB_ITEMS_PER_PAGE = "nb_items";
     private static final String PROPERTY_RESULTS_PER_PAGE = "library.nbdocsperpage";
-    private static final String PARAMETER_PAGE_INDEX = "page_index";
-    private static final String DEFAULT_PAGE_INDEX = "1";
-    private static final String MARK_PAGINATOR = "paginator";
     private static final String SPACE_ID_SESSION = "spaceIdSession";
+    private static final String DEFAULT_PAGE_INDEX = "1";
     private static final String XSL_UNIQUE_PREFIX_ID = UniqueIDGenerator.getNewId(  ) + "library-";
+    private static final int APPROVED_DOCUMENT_STATE = 3;
+
+    // Local session variables
     private AdminUser _user;
     private Plugin _plugin;
     private String _input;
     private int _nNbItemsPerPage;
+    private String _strCurrentPageIndex;
+    private List<SelectedMedia> _listSelectedMedia;
 
     public String getInsertServiceSelectorUI( HttpServletRequest request )
     {
         init( request );
+        _listSelectedMedia = null;
 
         Collection<LibraryMedia> libraryMedia = LibraryMediaHome.findAllMedia( _plugin );
         HashMap<String, Object> model = getDefaultModel(  );
@@ -132,29 +159,6 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         return template.getHtml(  );
     }
 
-    /*public String getSpaceBrowser( HttpServletRequest request )
-    {
-        init( request );
-    
-        Map<String, Object> model = new HashMap<String, Object>(  );
-        String strSpaceId = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID );
-    
-        if ( ( strSpaceId != null ) && !strSpaceId.equals( "" ) )
-        {
-                return getSelectSlideshow(request);
-        }
-    
-        Locale locale = AdminUserService.getLocale( request );
-        // Spaces browser
-        model.put( MARK_SPACES_BROWSER, DocumentSpacesService.getInstance(  ).getSpacesBrowser( request, _user, locale, true, true ) );
-        String strBaseUrl = AppPathService.getBaseUrl( request );
-        model.put( BASE_URL, strBaseUrl );
-        model.put( PARAMETER_INPUT, _input );
-    
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CHOOSE_DOCUMENT, locale, model );
-    
-        return template.getHtml(  );
-    }*/
     public String getSelectMedia( HttpServletRequest request )
     {
         init( request );
@@ -197,21 +201,22 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
                 getAttributesFromMapping( mapping ) );
         }
 
-        Paginator paginator = getPaginator( request, listDocuments );
+        Paginator<Pair<String, Document>> paginator = getPaginator( request, listDocuments );
         HashMap<String, Object> model = getDefaultModel(  );
         model.put( MARK_PREVIEW_TYPE, "<img src='%SRC' alt='%ALT' />" );
         model.put( MARK_MEDIA_TYPE, mediaType );
         model.put( MARK_MEDIA_TYPE_ATTRIBUTES, mediaType.getMediaAttributeList(  ) );
         model.put( MARK_ALL_MEDIA_ATTRIBUTES_ASSOCIATIONS, mapAssociationAttributes );
         model.put( MARK_ALL_DOCUMENTS, paginator.getPageItems(  ) );
-        //model.put( MARK_SPACES, spaces );
         model.put( MARK_SPACES_BROWSER,
             DocumentSpacesService.getInstance(  ).getSpacesBrowser( request, _user, _user.getLocale(  ), true, true ) );
         model.put( MARK_SELECTED_SPACE, nSpaceId );
         model.put( MARK_PAGINATOR, paginator );
-        model.put( PARAMETER_NB_ITEMS_PER_PAGE, _nNbItemsPerPage );
+        model.put( MARK_NB_ITEMS_PER_PAGE, Integer.toString( paginator.getItemsPerPage(  ) ) );
+        model.put( MARK_SELECTED_MEDIAS, _listSelectedMedia );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MEDIA_SELECTOR, _user.getLocale(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( mediaType.getIsMultipleMedia(  )
+                ? TEMPLATE_MEDIA_SELECTOR_MULTIPLE : TEMPLATE_MEDIA_SELECTOR, _user.getLocale(  ), model );
 
         return template.getHtml(  );
     }
@@ -221,25 +226,222 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         init( request );
 
         String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
-        String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
-        String strMappingId = request.getParameter( PARAMETER_MAPPING_ID );
 
         LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaTypeId ), _plugin );
         mediaType.setMediaAttributeList( MediaAttributeHome.findAllAttributesForMedia( mediaType.getMediaId(  ), _plugin ) );
 
-        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( Integer.parseInt( strMappingId ), _plugin );
-
-        Document doc = DocumentHome.findByPrimaryKey( Integer.parseInt( strDocumentId ) );
         Map<String, Object> model = getDefaultModel(  );
         model.put( MARK_MEDIA_TYPE, mediaType );
         model.put( MARK_MEDIA_TYPE_ATTRIBUTES, mediaType.getMediaAttributeList(  ) );
-        model.put( MARK_MEDIA_ATTRIBUTES_ASSOCIATIONS, getAttributesFromMapping( mapping ) );
-        model.put( MARK_MEDIA_DOC, doc );
+
+        if ( mediaType.getIsMultipleMedia(  ) )
+        {
+            for ( SelectedMedia media : _listSelectedMedia )
+            {
+                LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( media.getMappingId(  ), _plugin );
+                media.setAttributesFromMapping( getAttributesFromMapping( mapping ) );
+            }
+
+            model.put( MARK_MEDIA_DOC_LIST, _listSelectedMedia );
+        }
+        else
+        {
+            String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
+            Document doc = DocumentHome.findByPrimaryKey( Integer.parseInt( strDocumentId ) );
+            model.put( MARK_MEDIA_DOC, doc );
+
+            String strMappingId = request.getParameter( PARAMETER_MAPPING_ID );
+            LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( Integer.parseInt( strMappingId ), _plugin );
+            model.put( MARK_MEDIA_ATTRIBUTES_ASSOCIATIONS, getAttributesFromMapping( mapping ) );
+        }
+
         model.put( MARK_JSP_INSERT, JSP_INSERT_MEDIA );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_EDIT_MEDIA, _user.getLocale(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( mediaType.getIsMultipleMedia(  )
+                ? TEMPLATE_EDIT_MEDIA_MULTIPLE : TEMPLATE_EDIT_MEDIA, _user.getLocale(  ), model );
 
         return template.getHtml(  );
+    }
+
+    public String doSelectMedia( HttpServletRequest request )
+    {
+        init( request );
+
+        String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
+        String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
+        String strMappingId = request.getParameter( PARAMETER_MAPPING_ID );
+
+        UrlItem urlItem = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MEDIA_TYPE_SELECTION );
+        urlItem.addParameter( PARAMETER_MEDIA_TYPE, strMediaTypeId );
+
+        if ( Boolean.parseBoolean( request.getParameter( PARAMETER_REMOVE_SELECTED ) ) )
+        {
+            int nIdDocument = Integer.parseInt( strDocumentId );
+
+            if ( ( _listSelectedMedia != null ) && ( _listSelectedMedia.size(  ) > 0 ) )
+            {
+                for ( SelectedMedia media : _listSelectedMedia )
+                {
+                    if ( media.getDocumentId(  ) == nIdDocument )
+                    {
+                        _listSelectedMedia.remove( media );
+
+                        break;
+                    }
+                }
+
+                if ( _listSelectedMedia.size(  ) > 0 )
+                {
+                    Collections.sort( _listSelectedMedia );
+
+                    int nOrder = 1;
+
+                    for ( SelectedMedia media : _listSelectedMedia )
+                    {
+                        media.setOrder( nOrder++ );
+                    }
+                }
+                else
+                {
+                    _listSelectedMedia = null;
+                }
+            }
+
+            return urlItem.getUrl(  );
+        }
+
+        SelectedMedia media = new SelectedMedia( Integer.parseInt( strMediaTypeId ), Integer.parseInt( strDocumentId ),
+                Integer.parseInt( strMappingId ) );
+        media.setDocument( DocumentHome.findByPrimaryKeyWithoutBinaries( media.getDocumentId(  ) ) );
+
+        if ( ( _listSelectedMedia == null ) || ( _listSelectedMedia.size(  ) == 0 ) )
+        {
+            _listSelectedMedia = new ArrayList<SelectedMedia>(  );
+            media.setOrder( 1 );
+        }
+        else
+        {
+            media.setOrder( _listSelectedMedia.get( _listSelectedMedia.size(  ) - 1 ).getOrder(  ) + 1 );
+        }
+
+        _listSelectedMedia.add( media );
+
+        return urlItem.getUrl(  );
+    }
+
+    public String addAllSpace( HttpServletRequest request )
+    {
+        init( request );
+
+        String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
+
+        int nMediaTypeId = Integer.parseInt( strMediaTypeId );
+
+        int nIdSpace = (Integer) request.getSession(  ).getAttribute( SPACE_ID_SESSION );
+
+        List<Document> listDocuments = DocumentHome.findBySpaceKey( nIdSpace );
+        int nCurrentOrder;
+
+        if ( ( _listSelectedMedia == null ) || ( _listSelectedMedia.size(  ) == 0 ) )
+        {
+            _listSelectedMedia = new ArrayList<SelectedMedia>(  );
+            nCurrentOrder = 1;
+        }
+        else
+        {
+            nCurrentOrder = _listSelectedMedia.get( _listSelectedMedia.size(  ) - 1 ).getOrder(  ) + 1;
+        }
+
+        LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( nMediaTypeId, _plugin );
+        Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ),
+                _plugin );
+
+        for ( Document document : listDocuments )
+        {
+            document = DocumentHome.findByPrimaryKeyWithoutBinaries( document.getId(  ) );
+
+            LibraryMapping selectedMapping = null;
+
+            for ( LibraryMapping mapping : allMappings )
+            {
+                if ( StringUtils.equals( mapping.getCodeDocumentType(  ), document.getCodeDocumentType(  ) ) )
+                {
+                    selectedMapping = mapping;
+                }
+            }
+
+            if ( selectedMapping != null )
+            {
+                SelectedMedia media = new SelectedMedia( nMediaTypeId, document.getId(  ),
+                        selectedMapping.getIdMapping(  ) );
+                media.setOrder( nCurrentOrder );
+                media.setDocument( document );
+                _listSelectedMedia.add( media );
+            }
+        }
+
+        UrlItem urlItem = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MEDIA_EDIT_SELECTED );
+        urlItem.addParameter( PARAMETER_MEDIA_ID, strMediaTypeId );
+
+        return urlItem.getUrl(  );
+    }
+
+    public String doMoveMedia( HttpServletRequest request )
+    {
+        String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
+        String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
+        String strMappingId = request.getParameter( PARAMETER_MAPPING_ID );
+
+        UrlItem urlItem = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MEDIA_TYPE_SELECTION );
+        urlItem.addParameter( PARAMETER_MEDIA_TYPE, strMediaTypeId );
+
+        boolean bMoveUp = Boolean.parseBoolean( request.getParameter( PARAMETER_MOVE_UP ) );
+
+        int nIdDocument = Integer.parseInt( strDocumentId );
+
+        if ( bMoveUp )
+        {
+            SelectedMedia previousMedia = null;
+
+            for ( SelectedMedia media : _listSelectedMedia )
+            {
+                if ( media.getDocumentId(  ) == nIdDocument )
+                {
+                    if ( previousMedia != null )
+                    {
+                        int nMediaOrder = media.getOrder(  );
+                        media.setOrder( previousMedia.getOrder(  ) );
+                        previousMedia.setOrder( nMediaOrder );
+                    }
+
+                    break;
+                }
+
+                previousMedia = media;
+            }
+        }
+        else
+        {
+            SelectedMedia currentMedia = null;
+
+            for ( SelectedMedia nextMedia : _listSelectedMedia )
+            {
+                if ( ( currentMedia != null ) && ( currentMedia.getDocumentId(  ) == nIdDocument ) )
+                {
+                    int nMediaOrder = nextMedia.getOrder(  );
+                    nextMedia.setOrder( currentMedia.getOrder(  ) );
+                    currentMedia.setOrder( nMediaOrder );
+
+                    break;
+                }
+
+                currentMedia = nextMedia;
+            }
+        }
+
+        Collections.sort( _listSelectedMedia );
+
+        return urlItem.getUrl(  );
     }
 
     public String doInsertUrl( HttpServletRequest request )
@@ -250,25 +452,53 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaTypeId ), _plugin );
         mediaType.setMediaAttributeList( MediaAttributeHome.findAllAttributesForMedia( mediaType.getMediaId(  ), _plugin ) );
 
-        Collection allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ), _plugin );
-        LibraryMapping mapping = (LibraryMapping) allMappings.iterator(  ).next(  );
+        //        Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ), _plugin );
+        //        LibraryMapping mapping = allMappings.iterator(  ).next(  );
+        StringBuffer sbXml = new StringBuffer( XmlUtil.getXmlHeader(  ) );
 
-        StringBuffer sbXml = new StringBuffer(  );
-        XmlUtil.beginElement( sbXml, XML_TAG_MEDIA );
-
-        for ( MediaAttribute attribute : mediaType.getMediaAttributeList(  ) )
+        if ( mediaType.getIsMultipleMedia(  ) )
         {
-            String strValue = request.getParameter( attribute.getCode(  ) );
+            XmlUtil.beginElement( sbXml, XML_TAG_MEDIA_LIST );
 
-            if ( attribute.getTypeId(  ) == MediaAttribute.ATTRIBUTE_TYPE_BINARY )
+            for ( int i = 0; i < _listSelectedMedia.size(  ); i++ )
             {
-                strValue = StringEscapeUtils.escapeHtml( strValue );
+                XmlUtil.beginElement( sbXml, XML_TAG_MEDIA );
+
+                for ( MediaAttribute attribute : mediaType.getMediaAttributeList(  ) )
+                {
+                    String strValue = request.getParameter( attribute.getCode(  ) + i );
+
+                    if ( attribute.getTypeId(  ) == MediaAttribute.ATTRIBUTE_TYPE_BINARY )
+                    {
+                        strValue = StringEscapeUtils.escapeHtml( strValue );
+                    }
+
+                    XmlUtil.addElement( sbXml, attribute.getCode(  ), strValue );
+                }
+
+                XmlUtil.endElement( sbXml, XML_TAG_MEDIA );
             }
 
-            XmlUtil.addElement( sbXml, attribute.getCode(  ), strValue );
+            XmlUtil.endElement( sbXml, XML_TAG_MEDIA_LIST );
         }
+        else
+        {
+            XmlUtil.beginElement( sbXml, XML_TAG_MEDIA );
 
-        XmlUtil.endElement( sbXml, XML_TAG_MEDIA );
+            for ( MediaAttribute attribute : mediaType.getMediaAttributeList(  ) )
+            {
+                String strValue = request.getParameter( attribute.getCode(  ) );
+
+                if ( attribute.getTypeId(  ) == MediaAttribute.ATTRIBUTE_TYPE_BINARY )
+                {
+                    strValue = StringEscapeUtils.escapeHtml( strValue );
+                }
+
+                XmlUtil.addElement( sbXml, attribute.getCode(  ), strValue );
+            }
+
+            XmlUtil.endElement( sbXml, XML_TAG_MEDIA );
+        }
 
         String strHtml = "";
 
@@ -283,11 +513,15 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         }
         catch ( Exception e )
         {
-            // TODO Auto-generated catch block
             AppLogService.error( sbXml.toString(  ) );
             AppLogService.error( getClass(  ).getClassLoader(  ).getResource( "testlibrary.xsl" ) );
             AppLogService.error( e.getMessage(  ), e );
         }
+
+        // We reset session parameters
+        _nNbItemsPerPage = 0;
+        _strCurrentPageIndex = "";
+        _listSelectedMedia = null;
 
         return insertUrl( request, _input, strHtml );
     }
@@ -353,8 +587,18 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     {
         String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
         _user = AdminUserService.getAdminUser( request );
-        _plugin = PluginService.getPlugin( strPluginName );
-        _input = request.getParameter( PARAMETER_INPUT );
+
+        if ( StringUtils.isNotBlank( strPluginName ) )
+        {
+            _plugin = PluginService.getPlugin( strPluginName );
+        }
+
+        String strInput = request.getParameter( PARAMETER_INPUT );
+
+        if ( StringUtils.isNotBlank( strInput ) )
+        {
+            _input = strInput;
+        }
     }
 
     private HashMap<String, Object> getDefaultModel(  )
@@ -366,17 +610,34 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         return model;
     }
 
-    private Paginator getPaginator( HttpServletRequest request, List list )
+    private Paginator<Pair<String, Document>> getPaginator( HttpServletRequest request,
+        List<Pair<String, Document>> list )
     {
-        String strNbItemPerPage = request.getParameter( PARAMETER_NB_ITEMS_PER_PAGE );
-        String strDefaultNbItemPerPage = AppPropertiesService.getProperty( PROPERTY_RESULTS_PER_PAGE,
-                DEFAULT_RESULTS_PER_PAGE );
-        strNbItemPerPage = ( strNbItemPerPage != null ) ? strNbItemPerPage : strDefaultNbItemPerPage;
+        String strNbItemPerPage = request.getParameter( Paginator.PARAMETER_ITEMS_PER_PAGE );
 
-        _nNbItemsPerPage = Integer.parseInt( strNbItemPerPage );
+        if ( StringUtils.isNotEmpty( strNbItemPerPage ) && StringUtils.isNumeric( strNbItemPerPage ) )
+        {
+            _nNbItemsPerPage = Integer.parseInt( strNbItemPerPage );
+        }
 
-        String strCurrentPageIndex = request.getParameter( PARAMETER_PAGE_INDEX );
-        strCurrentPageIndex = ( strCurrentPageIndex != null ) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
+        if ( _nNbItemsPerPage <= 0 )
+        {
+            String strDefaultNbItemPerPage = AppPropertiesService.getProperty( PROPERTY_RESULTS_PER_PAGE,
+                    DEFAULT_RESULTS_PER_PAGE );
+            _nNbItemsPerPage = Integer.parseInt( strDefaultNbItemPerPage );
+        }
+
+        String strCurrentPageIndex = request.getParameter( Paginator.PARAMETER_PAGE_INDEX );
+
+        if ( StringUtils.isNotEmpty( strCurrentPageIndex ) && StringUtils.isNumeric( strCurrentPageIndex ) )
+        {
+            _strCurrentPageIndex = strCurrentPageIndex;
+        }
+
+        if ( StringUtils.isEmpty( _strCurrentPageIndex ) )
+        {
+            _strCurrentPageIndex = DEFAULT_PAGE_INDEX;
+        }
 
         UrlItem url = new UrlItem( JSP_MEDIA_TYPE_SELECTION );
         url.addParameter( PARAMETER_INPUT, _input );
@@ -392,7 +653,8 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         url.addParameter( PARAMETER_MEDIA_TYPE, request.getParameter( PARAMETER_MEDIA_TYPE ) );
         url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, _nNbItemsPerPage );
 
-        return new Paginator( list, _nNbItemsPerPage, url.getUrl(  ), PARAMETER_PAGE_INDEX, strCurrentPageIndex );
+        return new Paginator<Pair<String, Document>>( list, _nNbItemsPerPage, url.getUrl(  ), PARAMETER_PAGE_INDEX,
+            _strCurrentPageIndex );
     }
 
     public class Pair<X, Y>

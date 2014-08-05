@@ -1,7 +1,7 @@
 <div class="row-fluid" >
 	<div class="span12" >
-	<fieldset>        
-	<legend>#i18n{library.manage_media.form.modify.title} "${media.name}"</legend> 
+	<fieldset>
+	<legend>#i18n{library.manage_media.form.modify.title} "${media.name}"</legend>
 		<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoModifyMedia.jsp" name="modify_media" enctype="multipart/form-data">
 		<input type="hidden" name="media_id" value="${media.mediaId}" />                      
         <div class="control-group">
@@ -9,17 +9,23 @@
             <div class="controls">
 				<input type="text" id="media_name" name="media_name" value="${media.name}" class="input-xxlarge" maxlength="250"/>
 			</div>
-		</div>			
+		</div>
         <div class="control-group">
 		<label class="control-label" for="media_description" >#i18n{library.manage_media.form.modify.description}&nbsp;*&nbsp;:</label>
             <div class="controls">
 				<input type="text" id="media_description" name="media_description" value="${media.description}" size="100" maxlength="250"/>
 			</div>
-		</div>			
+		</div>
         <div class="control-group">
 		<label class="control-label" for="media_stylesheet">#i18n{library.media.creation.label.stylesheet}&nbsp;*&nbsp;:</label>
        		<div class="controls">
 				<input type="file" id="media_stylesheet" name="media_stylesheet" value="" />
+			</div>
+		</div>	
+		<div class="control-group">
+			<label class="control-label" for="media_stylesheet">#i18n{library.media.creation.label.multiple}&nbsp;*&nbsp;:</label>
+			<div class="controls">
+				<input type="checkbox" id="media-multiple" name="media-multiple" value="true" <#if media.isMultipleMedia>checked="checked"</#if> />
 			</div>
 		</div>
        	<div class="form-actions">
