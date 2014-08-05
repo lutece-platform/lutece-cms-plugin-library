@@ -77,6 +77,7 @@ public class LibraryJspBean extends PluginAdminPageJspBean
      * Right to manage libray plugin
      */
     public static final String LIBRARY_MANAGEMENT = "LIBRARY_MANAGEMENT";
+    private static final long serialVersionUID = -4537118194245494293L;
 
     // Jsp
     private static final String JSP_URL_MEDIA = "ManageMedia.jsp";

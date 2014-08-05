@@ -38,7 +38,6 @@ import fr.paris.lutece.plugins.document.business.DocumentFilter;
 import fr.paris.lutece.plugins.document.business.DocumentHome;
 import fr.paris.lutece.plugins.document.business.attributes.DocumentAttributeHome;
 import fr.paris.lutece.plugins.document.business.spaces.DocumentSpace;
-import fr.paris.lutece.plugins.document.business.spaces.DocumentSpaceHome;
 import fr.paris.lutece.plugins.document.service.spaces.DocumentSpacesService;
 import fr.paris.lutece.plugins.library.business.LibraryMapping;
 import fr.paris.lutece.plugins.library.business.LibraryMapping.AttributeAssociation;
@@ -188,8 +187,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
         Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ),
                 _plugin );
-        Collection<DocumentSpace> spaces = DocumentSpaceHome.findAll(  );
-        spaces = DocumentSpacesService.getInstance(  ).getUserAllowedSpaces( _user );
+        Collection<DocumentSpace> spaces = DocumentSpacesService.getInstance(  ).getUserAllowedSpaces( _user );
 
         List<Pair<String, Document>> listDocuments = new ArrayList<Pair<String, Document>>(  );
         HashMap<String, Map<String, String>> mapAssociationAttributes = new HashMap<String, Map<String, String>>(  );
