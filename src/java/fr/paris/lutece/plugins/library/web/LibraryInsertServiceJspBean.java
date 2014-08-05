@@ -390,7 +390,6 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     {
         String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
         String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
-        String strMappingId = request.getParameter( PARAMETER_MAPPING_ID );
 
         UrlItem urlItem = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MEDIA_TYPE_SELECTION );
         urlItem.addParameter( PARAMETER_MEDIA_TYPE, strMediaTypeId );

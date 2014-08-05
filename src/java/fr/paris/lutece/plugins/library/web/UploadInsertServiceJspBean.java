@@ -75,13 +75,16 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+
 
 /**
  * UploadInsertServiceJspBean
@@ -138,9 +141,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     //MESSAGE
     private static final String MESSAGE_DOCUMENT_ERROR = "library.uploadinsertservice.message.documentError";
     private static final String MESSAGE_NOT_AUTHORIZED = "library.uploadinsertservice.message.notAuthorized";
-
     private static final String SPACE_ID_SESSION = "spaceIdSession";
-
     private AdminUser _user;
     private Plugin _plugin;
     private String _input;
@@ -211,13 +212,14 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         }
 
         LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaType ), _plugin );
-        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( mediaType.getMediaId( ), _plugin );
+        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( mediaType.getMediaId(  ), _plugin );
 
         DocumentType documentType = DocumentTypeHome.findByPrimaryKey( mapping.getCodeDocumentType(  ) );
 
-        if ( ( nSpaceId == -1 )
-                || ( !DocumentService.getInstance( ).isAuthorizedAdminDocument( nSpaceId, documentType.getCode( ),
-                        DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) ) )
+        if ( ( nSpaceId == -1 ) ||
+                ( !DocumentService.getInstance(  )
+                                      .isAuthorizedAdminDocument( nSpaceId, documentType.getCode(  ),
+                    DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) ) )
         {
             return getSelectSpace( request );
         }
@@ -225,10 +227,11 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         HashMap<String, Object> model = getDefaultModel(  );
         model.put( MARK_DOCUMENT_TYPE, documentType.getCode(  ) );
         model.put( MARK_FIELDS,
-                DocumentService.getInstance( ).getCreateForm( documentType.getCode( ), _user.getLocale( ),
-                        AppPathService.getBaseUrl( request ) ) );
-        model.put( MARK_METADATA, new DublinCoreMetadata( ) );
-        model.put( MARK_MEDIA, mediaType.getMediaId( ) );
+            DocumentService.getInstance(  )
+                           .getCreateForm( documentType.getCode(  ), _user.getLocale(  ),
+                AppPathService.getBaseUrl( request ) ) );
+        model.put( MARK_METADATA, new DublinCoreMetadata(  ) );
+        model.put( MARK_MEDIA, mediaType.getMediaId(  ) );
         model.put( MARK_INPUT, _input );
         model.put( MARK_SPACE_ID, nSpaceId );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
@@ -251,7 +254,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         String strMediaType = request.getParameter( PARAMETER_MEDIA_TYPE );
 
         LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaType ), _plugin );
-        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( mediaType.getMediaId( ), _plugin );
+        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( mediaType.getMediaId(  ), _plugin );
 
         DocumentType documentType = DocumentTypeHome.findByPrimaryKey( mapping.getCodeDocumentType(  ) );
 
@@ -285,14 +288,16 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         XmlTransformerService xmlTransformerService = new XmlTransformerService(  );
         String strSpacesTree = xmlTransformerService.transformBySourceWithXslCache( strXmlSpaces, sourceXsl,
                 SPACE_TREE_XSL_UNIQUE_PREFIX, htXslParameters, null );
+
         try
         {
-            fis.close( );
+            fis.close(  );
         }
         catch ( IOException e )
         {
-            AppLogService.error( e.getMessage( ), e );
+            AppLogService.error( e.getMessage(  ), e );
         }
+
         DocumentSpace currentSpace = DocumentSpaceHome.findByPrimaryKey( nSpaceId );
 
         HashMap<String, Object> model = getDefaultModel(  );
@@ -319,6 +324,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         String strDocumentTypeCode = request.getParameter( PARAMETER_DOCUMENT_TYPE_CODE );
         String strSpaceIdRequest = request.getParameter( PARAMETER_SPACE_ID );
         int nSpaceId;
+
         try
         {
             nSpaceId = Integer.parseInt( strSpaceIdRequest );
@@ -329,8 +335,8 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         }
 
         if ( !DocumentService.getInstance(  )
-.isAuthorizedAdminDocument( nSpaceId, strDocumentTypeCode,
-                DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) )
+                                 .isAuthorizedAdminDocument( nSpaceId, strDocumentTypeCode,
+                    DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) )
         {
             return AdminMessageService.getMessageUrl( request, MESSAGE_NOT_AUTHORIZED, AdminMessage.TYPE_ERROR );
         }
@@ -338,8 +344,8 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         Document document = new Document(  );
         document.setCodeDocumentType( strDocumentTypeCode );
 
-        String strError = DocumentService.getInstance( )
-                .getDocumentData( multipartRequest, document, _user.getLocale( ) );
+        String strError = DocumentService.getInstance(  )
+                                         .getDocumentData( multipartRequest, document, _user.getLocale(  ) );
 
         if ( strError != null )
         {
@@ -352,16 +358,17 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         try
         {
-            DocumentService.getInstance( ).createDocument( document, _user );
+            DocumentService.getInstance(  ).createDocument( document, _user );
+
             DocumentAction action = DocumentActionHome.findByPrimaryKey( DocumentAction.ACTION_VALIDATE );
             DocumentService.getInstance(  )
-                    .validateDocument( document, _user, action.getFinishDocumentState( ).getId( ) );
+                           .validateDocument( document, _user, action.getFinishDocumentState(  ).getId(  ) );
         }
         catch ( DocumentException e )
         {
             return AdminMessageService.getMessageUrl( request, MESSAGE_DOCUMENT_ERROR,
-                    new String[] { I18nService.getLocalizedString( e.getI18nMessage( ), _user.getLocale( ) ) },
-                    AdminMessage.TYPE_ERROR );
+                new String[] { I18nService.getLocalizedString( e.getI18nMessage(  ), _user.getLocale(  ) ) },
+                AdminMessage.TYPE_ERROR );
         }
 
         return getEditSelectedMedia( request, document );
@@ -426,15 +433,14 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
      */
     public String getEditSelectedMedia( HttpServletRequest request, Document document )
     {
-
         String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
 
         LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaTypeId ), _plugin );
         mediaType.setMediaAttributeList( MediaAttributeHome.findAllAttributesForMedia( mediaType.getMediaId(  ), _plugin ) );
 
-        Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId( ),
+        Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ),
                 _plugin );
-        LibraryMapping mapping = allMappings.iterator( ).next( );
+        LibraryMapping mapping = allMappings.iterator(  ).next(  );
 
         Map<String, Object> model = getDefaultModel(  );
         model.put( MARK_MEDIA_TYPE, mediaType );
