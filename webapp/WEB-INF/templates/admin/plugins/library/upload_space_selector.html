@@ -1,21 +1,25 @@
 <div class="row">
-	<div class="col-md-12">
-		<form class="form" method="post"  action="jsp/admin/plugins/library/CreateMediaByInsert.jsp">
-		<input type="hidden" name="plugin_name" value="${plugin_name}">
-		<input type="hidden" name="input" value="${input}">
-		<input type="hidden" name="media_type" value="${mediatype}">
-		<fieldset>
-			<legend>#i18n{library.insertservice.selectSpace}</legend>
-			<div class="form-group">
-				${spaces_tree}
+	<div class="col-xs-12 col-sm-12 col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<h3 class="box-title">#i18n{library.insertservice.selectSpace}</h3>
 			</div>
-			<div class="form-group">
-				<button class="btn btn-primary btn-sm" type="submit" >
-					<i class="glyphicon glyphicon-ok"></i>&nbsp;#i18n{library.create_media.button.validate}
-				</button>
+			<div class="box-body">
+				<form class="form" method="post"  action="jsp/admin/plugins/library/CreateMediaByInsert.jsp">
+					<input type="hidden" name="plugin_name" value="${plugin_name}">
+					<input type="hidden" name="input" value="${input}">
+					<input type="hidden" name="media_type" value="${mediatype}">
+					<div class="form-group">
+						${spaces_tree}
+					</div>
+					<div class="form-group">
+						<button class="btn btn-primary btn-xs btn-flat" type="submit" >
+							<i class="glyphicon glyphicon-ok"></i>&nbsp;#i18n{library.create_media.button.validate}
+						</button>
+					</div>
+				</form>
 			</div>
-		</fieldset>
-		</form>
+		</div>
 	</div>
 </div>
 <script src="js/jquery/plugins/ui/jstree/jquery.jstree.js"></script>

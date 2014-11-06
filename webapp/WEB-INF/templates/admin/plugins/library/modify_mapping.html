@@ -1,52 +1,58 @@
-<div class="row-fluid" >
-	<div class="span12" >
-		<fieldset>                           
-		<legend>#i18n{library.modify_mapping.form.label} #i18n{library.modify_mapping.documentType.label} : <strong>${mapping.codeDocumentType} (${document_type.name})</strong></legend> 
-        #i18n{library.modify_mapping.documentType.text}
-			<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoModifyMappingAssociations.jsp" name="modify_mapping">
-			<input type="hidden" name="mapping_id" value="${mapping.idMapping}" />
-			<input type="hidden" name="media_id" value="${mapping.idMedia}" />
-			<input type="hidden" name="document_type" value="${mapping.codeDocumentType}" />
-			<#list media.mediaAttributeList as attribute >
-				<#if attribute.associableWithDocument >
-					<div class="control-group">
-						<label class="control-label" for="document_attribute_id_${attribute.attributeId}" >${attribute.code} : </label>
-						<div class="controls">
-							<select id="document_attribute_id_${attribute.attributeId}" name="document_attribute_id_${attribute.attributeId}" >			
-								<#list mapping.attributeAssociationList as association >	
-									<#if attribute.attributeId = association.idMediaAttribute >
-										<#assign associationDocumentAttributeId = association.idDocumentAttribute >
-										<#break />
-									</#if>
-								</#list>
-								<#list document_type.attributes as documentAttribute >
-									<#if documentAttribute.id = associationDocumentAttributeId >
-										<option value="${documentAttribute.id}" selected="selected" >${documentAttribute.name}</option>
-									<#else>
-										<option value="${documentAttribute.id}" >${documentAttribute.name}</option>
-									</#if>
-								</#list>		
-						</select>
-						</div>
-					</div>
-				<#else>
-					<div class="control-group">
-						<div class="controls">
-							<label class="control-label" for="" >${attribute.code} : </label>
-								<em>#i18n{library.modify_mapping.attribute.text.noChoiceAvailable}</em> 
+<div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<h3 class="box-title">#i18n{library.modify_mapping.form.label} #i18n{library.modify_mapping.documentType.label} : <strong>${mapping.codeDocumentType} (${document_type.name})</strong></h3>
+			</div>
+			<div class="box-body">
+				#i18n{library.modify_mapping.documentType.text}
+				<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoModifyMappingAssociations.jsp" name="modify_mapping">
+				<input type="hidden" name="mapping_id" value="${mapping.idMapping}">
+				<input type="hidden" name="media_id" value="${mapping.idMedia}">
+				<input type="hidden" name="document_type" value="${mapping.codeDocumentType}">
+				<#list media.mediaAttributeList as attribute >
+					<#if attribute.associableWithDocument >
+						<div class="form-group">
+							<label class="control-label col-xs-12 col-sm-2 col-md-2" for="document_attribute_id_${attribute.attributeId}" >${attribute.code}</label>
+							<div class="col-xs-12 col-sm-10 col-md-10">
+								<select id="document_attribute_id_${attribute.attributeId}" name="document_attribute_id_${attribute.attributeId}" class="form-control" >			
+									<#list mapping.attributeAssociationList as association >	
+										<#if attribute.attributeId = association.idMediaAttribute >
+											<#assign associationDocumentAttributeId = association.idDocumentAttribute >
+											<#break />
+										</#if>
+									</#list>
+									<#list document_type.attributes as documentAttribute >
+										<#if documentAttribute.id = associationDocumentAttributeId >
+											<option value="${documentAttribute.id}" selected="selected" >${documentAttribute.name}</option>
+										<#else>
+											<option value="${documentAttribute.id}" >${documentAttribute.name}</option>
+										</#if>
+									</#list>		
+								</select>
 							</div>
-					</div>
-				 </#if>	
-			</#list>
-				<div class="form-actions">
-					<button class="btn btn-primary btn-small" type="submit" >
-						<i class="icon-ok icon-white"></i>&nbsp;#i18n{library.modify_mapping.button.validate}
-					</button>
-					<button class="btn btn-small" onclick="javascript:history.go(-1)" >
-						<i class="icon-remove-circle"></i>&nbsp;#i18n{portal.util.labelCancel}
-					</button>
-				</div>     
-			</form>	
-    </fieldset>
+						</div>
+					<#else>
+						<div class="form-group">
+							<label class="control-label col-xs-12 col-sm-2 col-md-2" for="" >${attribute.code}</label>
+							<div class="col-xs-12 col-sm-10 col-md-10">
+								<p class="form-control-static"><em>#i18n{library.modify_mapping.attribute.text.noChoiceAvailable}</em> </p>
+							</div>
+						</div>
+					 </#if>	
+				</#list>
+					<div class="form-group">
+						<div class="col-xs-12 col-sm-offset-2 col-sm-10 col-md-offset-2 col-md-10">
+							<button class="btn btn-primary btn-flat" type="submit" >
+								<i class="fa fa-check"></i>&nbsp;#i18n{library.modify_mapping.button.validate}
+							</button>
+							<button class="btn btn-default btn-flat" onclick="javascript:history.go(-1)" >
+								<i class="fa fa-close "></i>&nbsp;#i18n{portal.util.labelCancel}
+							</button>
+						</div>     
+					</div>     
+				</form>	
+    		</div>
+		</div>
     </div>
 </div>

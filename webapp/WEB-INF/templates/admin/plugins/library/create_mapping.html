@@ -1,40 +1,46 @@
-<div class="row-fluid" >
-	<div class="span12" >
-	<fieldset>                           
-	<legend>#i18n{library.create_mapping.form.label} #i18n{library.create_mapping.documentType.label} : <strong>${document_type.code} (${document_type.name})</strong></legend> 
-		<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoCreateMapping.jsp" name="create_mapping">
-		<input type="hidden" name="media_id" value="${media.mediaId}" />
-		<input type="hidden" name="document_type" value="${document_type.code}" />
-		<#list media.mediaAttributeList as attribute >
-			<#if attribute.associableWithDocument >
-				<div class="control-group">
-				<label class="control-label" for="document_attribute_id_${attribute.attributeId}" >${attribute.code} : </label>
-					<div class="controls">
-					<select id="document_attribute_id_${attribute.attributeId}" name="document_attribute_id_${attribute.attributeId}" >			
-						<#list document_type.attributes as documentAttribute >	
-							<option value="${documentAttribute.id}" >${documentAttribute.name}</option>
-						</#list>		
-					</select>
-					</div>
-				</div>
-			<#else>
-				<div class="control-group">
-				<label class="control-label" for="" >${attribute.code} : </label>
-					<div class="controls">
-					<em>#i18n{library.create_mapping.attribute.text.noChoiceAvailable}</em> 
-					</div>
-				</div>
-			</#if>	
-		</#list>
-		<div class="form-actions">
-			<button class="btn btn-primary btn-small" type="submit" >
-				<i class="icon-ok icon-white"></i>&nbsp;#i18n{library.create_mapping.button.validate}
-			</button>
-			<a class="btn btn-small" href="jsp/admin/plugins/library/ManageLibrary.jsp" >
-				<i class="icon-remove-circle"></i>&nbsp;#i18n{library.create_mapping.button.cancel}
-			</a>
-		</div>   
-		</form>	
-    </fieldset>
-    </div>
+<div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<h3 class="box-title">#i18n{library.create_mapping.form.label} #i18n{library.create_mapping.documentType.label} : <strong>${document_type.code} (${document_type.name})</strong></h3>
+			</div>
+			<div class="box-body">
+				<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoCreateMapping.jsp" name="create_mapping">
+					<input type="hidden" name="media_id" value="${media.mediaId}">
+					<input type="hidden" name="document_type" value="${document_type.code}">
+					<#list media.mediaAttributeList as attribute >
+						<#if attribute.associableWithDocument >
+							<div class="form-group">
+								<label class="control-label col-xs-12 col-sm-2 col-md-2" for="document_attribute_id_${attribute.attributeId}" >${attribute.code}</label>
+								<div class="col-xs-12 col-sm-10 col-md-10">
+									<select id="document_attribute_id_${attribute.attributeId}" name="document_attribute_id_${attribute.attributeId}" class="form-control" >			
+										<#list document_type.attributes as documentAttribute >	
+											<option value="${documentAttribute.id}" >${documentAttribute.name}</option>
+										</#list>		
+									</select>
+								</div>
+							</div>
+						<#else>
+							<div class="form-group">
+								<label class="control-label col-xs-12 col-sm-2 col-md-2" for="" >${attribute.code}</label>
+								<div class="col-xs-12 col-sm-10 col-md-10">
+									<p class="form-control-static"><em>#i18n{library.create_mapping.attribute.text.noChoiceAvailable}</em></p>
+								</div>
+							</div>
+						</#if>	
+					</#list>
+					<div class="form-group">
+						<div class="col-xs-12 col-sm-offset-2 col-sm-10 col-md-offset-2 col-md-10">
+							<button class="btn btn-primary btn-flat" type="submit" >
+								<i class="fa fa-check"></i>&nbsp;#i18n{library.create_mapping.button.validate}
+							</button>
+							<a class="btn btn-default btn-flat" href="jsp/admin/plugins/library/ManageLibrary.jsp" >
+								<i class="fa fa-close"></i>&nbsp;#i18n{library.create_mapping.button.cancel}
+							</a>
+						</div>   
+					</div>   
+				</form>	
+    		</div>
+		</div>
+	</div>
 </div>
