@@ -43,8 +43,8 @@
         <jiraComponentId>10169</jiraComponentId>
     </properties>
     <scm>
-        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/cms/plugin-library</connection>
-        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/cms/plugin-library</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/trunk/plugins/cms/plugin-library</url>
+        <connection>scm:git:https://github.com/lutece-platform/lutece-cms-plugin-library.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-platform/lutece-cms-plugin-library.git</developerConnection>
+        <url>https://github.com/lutece-platform/lutece-cms-plugin-library.git</url>
     </scm>
 </project>
