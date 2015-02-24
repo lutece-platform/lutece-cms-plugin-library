@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <document>
-      <properties>
-          <title>
-              Introduction
-          </title>
-      </properties>
-      <body>
-	  
-	  </body>
-  </document>
+<document>
+    <properties>
+        <title>Plugin library</title>
+    </properties>
+    <body>
+        <section name="Plugin library">
+            <subsection name="Introduction">
+                <p>
+                    This plugin allows you to insert in a rich text box multimedia elements
+                    from the base of the <code>document</code> plugin.
+                 </p>
+                 <p>
+                     Once installed, an integration service appears in the list when the user
+                     click the <b>L</b> button in the rich text editor. 
+                </p> 
+            </subsection>
+            <subsection name="Configuration">
+                <p>
+                    The backoffice interface defines a mapping between the objects presented
+                    in service integration and document types in the database of the <code>document</code> plugin.
+                 </p>
+                 <p>
+                     This plugin is an extension of the <code>document</code> plugin.
+                </p> 
+            </subsection>
+        </section>	  
+    </body>
+</document>
