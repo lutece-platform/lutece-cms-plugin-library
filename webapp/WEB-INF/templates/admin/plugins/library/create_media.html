@@ -1,52 +1,41 @@
 <div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12">
-		<div class="box box-primary">
-			<div class="box-header">
-				<h3 class="box-title">#i18n{library.create_media.form.label}</h3>
-			</div>
-			<div class="box-body">
-				<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoCreateMedia.jsp" name="create_media" enctype="multipart/form-data">
-					<div class="form-group">
-						<label class="control-label col-xs-12 col-sm-2 col-md-2" for="media_name">#i18n{library.create_media.code}&nbsp;*</label>
-						<div class="col-xs-12 col-sm-5 col-md-5">
-							<input type="text" id="media_name" name="media_name" value="" class="form-control" maxlength="250">
-						</div>
-					</div>
-					<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-2 col-md-2" for="media_description" >#i18n{library.create_media.description}&nbsp;*</label>
-						 <div class="col-xs-12 col-sm-5 col-md-5">
-							<input type="text" id="media_description" name="media_description" value="" class="form-control" maxlength="250">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="control-label col-xs-12 col-sm-2 col-md-2" for="media_stylesheet">#i18n{library.media.creation.label.stylesheet}&nbsp;*</label>
-						<div class="col-xs-12 col-sm-5 col-md-5">
-							<input type="file" id="media_stylesheet" name="media_stylesheet" value="" class="form-control">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="control-label col-xs-12 col-sm-2 col-md-2 sr-only" for="media_stylesheet">#i18n{library.media.creation.label.multiple}&nbsp;*</label>
-						<div class="col-xs-12 col-sm-5 col-md-5">
-							<div class="checkbox">
-								<label>
-									<input type="checkbox" id="media-multiple" name="media-multiple" value="true">
-									#i18n{library.media.creation.label.multiple}&nbsp;*
-								</label>
-							</div>
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-xs-12 col-sm-offset-2 col-sm-10 col-md-offset-2 col-md-10">
-							<button class="btn btn-primary btn-flat" type="submit" >
-								<i class="fa fa-check"></i>&nbsp;#i18n{library.create_media.button.validate}
-							</button>
-							<a class="btn btn-default btn-flat" href="jsp/admin/plugins/library/ManageLibrary.jsp" >
-								<i class="fa fa-close"></i>&nbsp;#i18n{library.create_media.button.cancel}
-							</a>
-						</div>   	
-					</div>   	
-				</form>	
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<fieldset>                           
+	<legend>#i18n{library.create_media.form.label}</legend> 
+		<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoCreateMedia.jsp" name="create_media" enctype="multipart/form-data">
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="media_name">#i18n{library.create_media.code}&nbsp;*&nbsp;:</label>
+			<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+				<input type="text" id="media_name" name="media_name" value="" class="input-small" maxlength="250"/>
 			</div>
 		</div>
+		<div class="form-group">
+		<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="media_description">#i18n{library.create_media.description}&nbsp;*&nbsp;:</label>
+			 <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+				<input type="text" id="media_description" name="media_description" value="" class="input-xlarge" maxlength="250"/>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="media_stylesheet">#i18n{library.media.creation.label.stylesheet}&nbsp;*&nbsp;:</label>
+			<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+				<input type="file" id="media_stylesheet" name="media_stylesheet" value="" class="input-xxlarge" />
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="media_stylesheet">#i18n{library.media.creation.label.multiple}&nbsp;*&nbsp;:</label>
+			<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+				<input type="checkbox" id="media-multiple" name="media-multiple" value="true" />
+			</div>
+		</div>
+		<div class="form-actions">
+			<button class="btn btn-primary btn-sm" type="submit">
+				<i class="glyphicon glyphicon-ok"></i>&nbsp;#i18n{library.create_media.button.validate}
+			</button>
+			<a class="btn btn-sm" href="jsp/admin/plugins/library/ManageLibrary.jsp">
+				<i class="glyphicon glyphicon-remove-circle"></i>&nbsp;#i18n{library.create_media.button.cancel}
+			</a>
+		</div>   	
+		</form>	
+    </fieldset>
     </div>
 </div>

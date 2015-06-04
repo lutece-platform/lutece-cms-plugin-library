@@ -1,63 +1,78 @@
 <div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12">
-		<div class="box box-primary">
-			<div class="box-header">
-				<h3 class="box-title">#i18n{library.manage_media.form.modify.title} "${media.name}"</h3>
-				<div class="box-tools">
-					<form class="form-inline pull-right spaced" action="jsp/admin/plugins/library/CreateAttribute.jsp" method="post" >
-						<input type="hidden" name="media_id" value="${media.mediaId}" />
-						<button class="btn btn-primary btn-xs btn-flat" type="submit" ><i class="fa fa-plus"></i>&nbsp;#i18n{library.manage_media.add.attribute}</button>
-					</form>
-					<form class="form-inline pull-right" action="jsp/admin/plugins/library/ManageMappings.jsp" method="post" >
-						<input type="hidden" name="media_id" value="${media.mediaId}">
-						<button class="btn btn-primary btn-xs btn-flat" type="submit" ><i class="fa fa-cog"></i>&nbsp;#i18n{library.manage_media.mapping.management.link}</button>
-					</form>
-				</div>
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<fieldset>
+	<legend>#i18n{library.manage_media.form.modify.title} "${media.name}"</legend>
+		<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoModifyMedia.jsp" name="modify_media" enctype="multipart/form-data">
+		<input type="hidden" name="media_id" value="${media.mediaId}" />                      
+        <div class="form-group">
+		<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="media_name">#i18n{library.manage_media.form.modify.code}&nbsp;*&nbsp;:</label>
+            <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+				<input type="text" id="media_name" name="media_name" value="${media.name}" class="input-xxlarge" maxlength="250"/>
 			</div>
-			<div class="box-body table-responsive">	
-				<form class="form-inline" method="post" action="jsp/admin/plugins/library/DoModifyMedia.jsp" name="modify_media" enctype="multipart/form-data">
-				<input type="hidden" name="media_id" value="${media.mediaId}">                      
-				<label for="media_name" >#i18n{library.manage_media.form.modify.code}&nbsp;*</label>
-				<input type="text" id="media_name" name="media_name" value="${media.name}" class="form-control input-xs" size="40" maxlength="250">
-				<label for="media_description" >#i18n{library.manage_media.form.modify.description}&nbsp;*</label>
-				<input type="text" id="media_description" name="media_description" value="${media.description}" size="60" class="form-control input-xs" maxlength="250">
-				<label class="checkbox-inline" for="media-multiple">
-					<input type="checkbox" id="media-multiple" name="media-multiple" value="true" <#if media.isMultipleMedia>checked="checked"</#if>>
-					#i18n{library.media.creation.label.multiple}&nbsp;*
-				</label>
-				<label for="media_stylesheet">#i18n{library.media.creation.label.stylesheet}&nbsp;*</label>
-				<input type="file" id="media_stylesheet" name="media_stylesheet" value="" class="input-xs" >
-				<button class="btn btn-primary btn-xs btn-flat" type="submit" ><i class="fa fa-check"></i>&nbsp;#i18n{library.manage_media.form.modify.button.validate}</button>
-					<a class="btn btn-default btn-xs btn-flat" href="jsp/admin/plugins/library/ManageLibrary.jsp" >
-						<i class="fa fa-close"></i>&nbsp;#i18n{library.create_attribute.button.cancel}
-					</a>
-				</form>	
-				<#if media.mediaAttributeList?has_content>
-					<table class="table table-hover table-condensed">
-						<tr>
-							<th>#i18n{library.manage_media.table.attributes.column.code}</th>
-							<th>#i18n{library.manage_media.table.attributes.column.description}</th>
-							<th>#i18n{library.manage_media.table.attributes.column.type}</th>
-							<th>#i18n{library.manage_media.table.attributes.column.actions}</th>
-						</tr>
-						<#list media.mediaAttributeList as attribute >
-						<tr>
-							<td>${attribute.code}</td> 
-							<td>${attribute.description}</td>
-							<td>${attribute.typeLabel}</td>
-							<td>
-								<a class="btn btn-primary btn-xs btn-flat" href="jsp/admin/plugins/library/ModifyAttribute.jsp?attribute_id=${attribute.attributeId}"  title="null" >
-									<i class="fa fa-pencil"></i>
-								</a>
-								<a class="btn btn-danger btn-xs btn-flat" href="jsp/admin/plugins/library/RemoveAttribute.jsp?media_id=${media.mediaId}&attribute_id=${attribute.attributeId}"  title="null" >
-									<i class="fa fa-trash"></i>
-								</a>
-							</td>
-						</tr>
-						</#list>
-					</table>
-					</#if>
-    		</div>
 		</div>
+        <div class="form-group">
+		<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="media_description">#i18n{library.manage_media.form.modify.description}&nbsp;*&nbsp;:</label>
+            <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+				<input type="text" id="media_description" name="media_description" value="${media.description}" size="100" maxlength="250"/>
+			</div>
+		</div>
+        <div class="form-group">
+		<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="media_stylesheet">#i18n{library.media.creation.label.stylesheet}&nbsp;*&nbsp;:</label>
+       		<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+				<input type="file" id="media_stylesheet" name="media_stylesheet" value="" />
+			</div>
+		</div>	
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="media_stylesheet">#i18n{library.media.creation.label.multiple}&nbsp;*&nbsp;:</label>
+			<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+				<input type="checkbox" id="media-multiple" name="media-multiple" value="true" <#if media.isMultipleMedia>checked="checked"</#if> />
+			</div>
+		</div>
+       	<div class="form-actions">
+			<button class="btn btn-primary btn-sm" type="submit"><i class="glyphicon glyphicon-ok"></i>&nbsp;#i18n{library.manage_media.form.modify.button.validate}</button>
+			<a class="btn btn-sm" href="jsp/admin/plugins/library/ManageLibrary.jsp">
+					<i class="glyphicon glyphicon-remove-circle"></i>&nbsp;#i18n{library.create_attribute.button.cancel}
+			</a>
+		</div>
+		</form>	
+	</fieldset>
+    <fieldset>
+	<legend>#i18n{library.manage_media.table.attributes.title} "${media.name}"
+		<form class="form-inline pull-right" action="jsp/admin/plugins/library/ManageMappings.jsp" method="post">
+			<input type="hidden" name="media_id" value="${media.mediaId}" />
+			<button class="btn btn-primary btn-sm" type="submit"><i class="glyphicon glyphicon-cog"></i>&nbsp;#i18n{library.manage_media.mapping.management.link}</button>
+		</form>
+		<form class="form-inline pull-right spaced" action="jsp/admin/plugins/library/CreateAttribute.jsp" method="post">
+			<input type="hidden" name="media_id" value="${media.mediaId}" />
+			<button class="btn btn-primary btn-sm" type="submit"><i class="glyphicon glyphicon-plus"></i>&nbsp;#i18n{library.manage_media.add.attribute}</button>
+		</form>
+	</legend> 
+	<#if media.mediaAttributeList?has_content>
+	<table class="table table-striped table-condensed">
+		<tr>
+			<th>#i18n{library.manage_media.table.attributes.column.code}</th>
+			<th>#i18n{library.manage_media.table.attributes.column.description}</th>
+			<th>#i18n{library.manage_media.table.attributes.column.type}</th>
+			<th>#i18n{library.manage_media.table.attributes.column.actions}</th>
+		</tr>
+		<#list media.mediaAttributeList as attribute>
+		<tr>
+			<td>${attribute.code}</td> 
+		    <td>${attribute.description}</td>
+		    <td>${attribute.typeLabel}</td>
+		    <td>
+				<a class="btn btn-primary btn-sm" href="jsp/admin/plugins/library/ModifyAttribute.jsp?attribute_id=${attribute.attributeId}"  title="null">
+					<i class="glyphicon glyphicon-edit"></i>
+				</a>
+				<a class="btn btn-danger btn-sm" href="jsp/admin/plugins/library/RemoveAttribute.jsp?media_id=${media.mediaId}&attribute_id=${attribute.attributeId}"  title="null">
+					<i class="glyphicon glyphicon-trash"></i>
+				</a>
+			</td>
+		</tr>
+		</#list>
+    </table>
+	</#if>
+    
+	</fieldset>
 	</div>
 </div>

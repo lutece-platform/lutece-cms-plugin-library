@@ -31,7 +31,7 @@
 					</div>
 					<#if all_documents?? && all_documents?size &gt; 0>
 						<div class="pull-right">
-							<a class="btn btn-primary btn-small" href="jsp/admin/plugins/library/DoAddAllSpace.jsp?media=${mediatype.mediaId}" >
+							<a class="btn btn-primary btn-sm" href="jsp/admin/plugins/library/DoAddAllSpace.jsp?media=${mediatype.mediaId}">
 								<i class="glyphicon glyphicon-plus"></i>#i18n{library.insertservice.label.addAllSpace}
 							</a>
 						</div>
@@ -57,12 +57,12 @@
 										<img src="${document.thumbnail}&nocache" data-src="${document.thumbnail}&nocache" class="thumbnail" alt="${document.title}" title="${document.title} - ${document.type}">
 										<div class="caption">
 											<p>
-											<a href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.select}" >
+											<a href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.select}">
 												<span class="badge">${document.id}</span>
 												<small><#if document.title?length &gt; 50>${document.title?substring(0,50)}...<#else>${document.title}</#if></small></p>
 											</a>
 											<p>
-											<a class="btn btn-default center-block" id="btn-select" data-mapping="${mapping_id}" data-document="${document.id}" href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.select}" >
+											<a class="btn btn-default center-block" id="btn-select" data-mapping="${mapping_id}" data-document="${document.id}" href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.select}">
 												<i class="glyphicon glyphicon-ok"></i> #i18n{library.create_media.button.select}
 											</a>
 										</p>
@@ -105,16 +105,16 @@
 					<img src="${document.thumbnail}&nocache" data-src="${document.thumbnail}&nocache" class="thumbnail col-xs-12 col-sm-6 col-md-4" alt="${document.title}" title="${document.title} - ${document.type}">
 				</td>
 				<td>
-					<a class="btn btn-danger btn-small" href="jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=${document.id}&remove_selected=true&media=${media.mediaTypeId}&id_mapping=${media.mappingId}"  title="#i18n{portal.util.labelDelete}" >
+					<a class="btn btn-danger btn-sm" href="jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=${document.id}&remove_selected=true&media=${media.mediaTypeId}&id_mapping=${media.mappingId}"  title="#i18n{portal.util.labelDelete}">
 						<i class="glyphicon glyphicon-trash"></i>
 					</a>
 					<#if media_index &lt; (selected_medias?size - 1)>
-						<a class="btn btn-primary btn-small" href="jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id}&move_up=false&media=${media.mediaTypeId}&id_mapping=${media.mappingId}" >
+						<a class="btn btn-primary btn-sm" href="jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id}&move_up=false&media=${media.mediaTypeId}&id_mapping=${media.mappingId}">
 							<i class="glyphicon glyphicon-arrow-down"></i>
 						</a>
 					</#if>
 					<#if media_index &gt; 0>
-						<a class="btn btn-primary btn-small" href="jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id}&move_up=true&media=${media.mediaTypeId}&id_mapping=${media.mappingId}" >
+						<a class="btn btn-primary btn-sm" href="jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id}&move_up=true&media=${media.mediaTypeId}&id_mapping=${media.mappingId}">
 							<i class="glyphicon glyphicon-arrow-up"></i>
 						</a>
 					</#if>
@@ -123,7 +123,7 @@
 		</#list>
 		</table>
 		<div class="form-actions">
-			<a class="btn btn-primary btn-small" href="jsp/admin/plugins/library/EditSelectedMedia.jsp?media=${mediatype.mediaId}"  title="#i18n{library.create_media.button.validate}" >
+			<a class="btn btn-primary btn-sm" href="jsp/admin/plugins/library/EditSelectedMedia.jsp?media=${mediatype.mediaId}"  title="#i18n{library.create_media.button.validate}">
 				<i class="glyphicon glyphicon-ok"></i> #i18n{library.create_media.button.validate}
 			</a>
 		</div>

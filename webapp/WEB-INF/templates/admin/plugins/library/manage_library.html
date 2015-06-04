@@ -1,37 +1,32 @@
 <div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12">
-		<div class="box box-primary">
-			<div class="box-header">
-				<h3 class="box-title">#i18n{library.manage_library.table.title}</h3>
-				<div class="box-tools">
-					<form class="form-inline pull-right" action="jsp/admin/plugins/library/CreateMedia.jsp" method="post" >
-						<button class="btn btn-primary btn-xs btn-flat" type="submit" ><i class="fa fa-plus"></i>&nbsp;#i18n{library.manage_library.button.create}</button>
-					</form>
-				</div>
-			</div>
-			<div class="box-body">
-				<table class="table table-hover table-condensed">
-				<tr>
-				  <th>#i18n{library.manage_library.table.column.title.code}</th>
-				  <th>#i18n{library.manage_library.table.column.title.description}</th>
-				  <th>#i18n{library.manage_library.table.column.title.actions}</th>
-				</tr>
-				<#list media_list as media >
-					<tr>
-						<td>${media.name}</td>
-						<td>${media.description}</td>
-						<td>
-							<a class="btn btn-primary btn-xs btn-flat" href="jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}"  title="edit" >
-								<i class="fa fa-pencil"></i>
-							</a>
-							<a class="btn btn-danger btn-xs btn-flat" href="jsp/admin/plugins/library/RemoveMedia.jsp?media_id=${media.mediaId}"  title="delete" >
-								<i class="fa fa-trash"></i>
-							</a>
-						</td>
-					</tr>
-				</#list>
-				</table>
-			</div>
-		</div>
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+		<fieldset>
+		<legend>#i18n{library.manage_library.table.title}
+			<form class="form-inline pull-right" action="jsp/admin/plugins/library/CreateMedia.jsp" method="post">
+				<button class="btn btn-primary btn-sm" type="submit"><i class="glyphicon glyphicon-plus"></i>&nbsp;#i18n{library.manage_library.button.create}</button>
+			</form>
+		</legend>
+			<table class="table table-striped table-condensed">
+			<tr>
+			  <th>#i18n{library.manage_library.table.column.title.code}</th>
+			  <th>#i18n{library.manage_library.table.column.title.description}</th>
+			  <th>#i18n{library.manage_library.table.column.title.actions}</th>
+			</tr>
+			<#list media_list as media>
+			<tr>
+				<td>${media.name}</td>
+				<td>${media.description}</td>
+				<td>
+					<a class="btn btn-primary btn-sm" href="jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}"  title="edit">
+						<i class="glyphicon glyphicon-edit"></i>
+					</a>
+					<a class="btn btn-danger btn-sm" href="jsp/admin/plugins/library/RemoveMedia.jsp?media_id=${media.mediaId}"  title="delete">
+						<i class="glyphicon glyphicon-trash"></i>
+					</a>
+				</td>
+			</tr>
+			</#list>
+			</table>
+		</fieldset>
 	</div>
 </div>
