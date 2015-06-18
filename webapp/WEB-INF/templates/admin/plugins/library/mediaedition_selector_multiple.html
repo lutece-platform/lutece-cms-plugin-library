@@ -24,14 +24,14 @@
 									<!-- ATTRIBUTE_TYPE_TEXT_USER -->
 									<div class="form-group">	
 										<label for="${field_name}">${attribute.description} </label>
-										<input type="text" class="input-normal" name="${field_name}${document_index}" id="${field_name}${document_index}" value="${attribute.defaultValue}">
+										<input type="text" class="form-control input-sm" name="${field_name}${document_index}" id="${field_name}${document_index}" value="${attribute.defaultValue}">
 									</div>	
 								<#elseif attribute.typeId = 3>
 									<#if document.title?has_content>
 										<!-- ATTRIBUTE_TYPE_TITLE_DOCUMENT -->
 										<div class="form-group">
 											<label for="${field_name}">${attribute.description} </label>
-											<input type="text"  class="input-normal" name="${field_name}${document_index}" id="${field_name}${document_index}" value="${document.title}">
+											<input type="text" class="form-control input-sm" name="${field_name}${document_index}" id="${field_name}${document_index}" value="${document.title}">
 										</div>
 									</#if>
 								<#elseif attribute.typeId = 4>
@@ -39,7 +39,7 @@
 									<#if document.summary?has_content>
 										<div class="form-group">
 											<label for="${field_name}">${attribute.description} </label>
-											<textarea type="text" name="${field_name}${document_index}" id="${field_name}${document_index}" cols="60" rows="2">${document.summary}</textarea>
+											<textarea type="text" name="${field_name}${document_index}" id="${field_name}${document_index}" cols="60" rows="2" class="form-control input-sm">${document.summary}</textarea>
 										</div>
 									<#else>
 										- 
@@ -51,7 +51,7 @@
 										<#if document.getAttribute(doctype_code)?exists && document.getAttribute(doctype_code).textValue?has_content>
 											<div class="form-group">
 												<label for="${field_name}">${attribute.description} </label>
-												<textarea name="${field_name}${document_index}" id="${field_name}${document_index}">${document.getAttribute(doctype_code).textValue?xml}</textarea>
+												<textarea name="${field_name}${document_index}" id="${field_name}${document_index}" class="form-control input-sm">${document.getAttribute(doctype_code).textValue?xml}</textarea>
 											</div>	
 										</#if>
 									<#elseif attribute.typeId = 2>

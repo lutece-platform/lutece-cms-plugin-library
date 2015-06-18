@@ -21,14 +21,14 @@
 								<!-- ATTRIBUTE_TYPE_TEXT_USER -->
 								<div class="form-group">	
 									<label for="${field_name}">${attribute.description} </label>
-									<input type="text" class="input-normal" name="${field_name}" id="${field_name}" value="${attribute.defaultValue}">
+									<input type="text" class="form-control input-sm" name="${field_name}" id="${field_name}" value="${attribute.defaultValue}">
 								</div>	
 							<#elseif attribute.typeId = 3>
 								<#if document.title?has_content>
 									<!-- ATTRIBUTE_TYPE_TITLE_DOCUMENT -->
 									<div class="form-group">
 										<label for="${field_name}">${attribute.description} </label>
-										<input type="text"  class="input-normal" name="${field_name}" id="${field_name}" value="${document.title}">
+										<input type="text"  class="form-control input-sm" name="${field_name}" id="${field_name}" value="${document.title}">
 									</div>
 								</#if>
 							<#elseif attribute.typeId = 4>

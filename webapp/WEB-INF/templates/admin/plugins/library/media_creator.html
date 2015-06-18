@@ -9,88 +9,88 @@
 				<input type="hidden" name="document_type_code" value="${document_type}">    
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="document_title">#i18n{document.create_document.labelDocumentTitle}*</label>
-					<input type="text" name="document_title" id="document_title" size="72" maxlength="255">
+					<input type="text" name="document_title" id="document_title" size="72" maxlength="255" class="form-control input-sm">
 					<span class="help-block">#i18n{document.create_document.helpDocumentTitle}</span>
 				</div> 
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="document_summary">#i18n{document.create_document.labelDocumentSummary}*</label>
-					<textarea type="text" name="document_summary" id="document_summary" class="span5" rows="2"></textarea> 
+					<textarea type="text" name="document_summary" id="document_summary" class="form-control input-sm" rows="2"></textarea> 
 					<span class="help-block">#i18n{document.create_document.helpDocumentSummary}</span>
 				</div>
 				<p id="dbc">Afficher dublin-core</p>
 				<div id="dublin_core_meta">
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_title">#i18n{module.document.metadatadublincore.labelTitle}</label>
-						<input type="text" name="dc_title" id="dc_title" size="50" value="${metadata.title}">
+						<input type="text" name="dc_title" id="dc_title" size="50" value="${metadata.title}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpTitle}</span>
 					</div>
 					<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_creator">#i18n{module.document.metadatadublincore.labelCreator}</label>
-						<input type="text" name="dc_creator" id="dc_creator" size="50" value="${metadata.creator}">
+						<input type="text" name="dc_creator" id="dc_creator" size="50" value="${metadata.creator}" class="form-control input-sm">
 						 <span class="help-block">#i18n{module.document.metadatadublincore.labelHelpCreator}</span>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_subject">#i18n{module.document.metadatadublincore.labelSubject}</label>
-						<input type="text" name="dc_subject" id="dc_subject" size="50" value="${metadata.subject}">
+						<input type="text" name="dc_subject" id="dc_subject" size="50" value="${metadata.subject}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpSubject}</span>
 					</div>
 					 <div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_description">#i18n{module.document.metadatadublincore.labelDescription}</label>
-						<input type="text" name="dc_description" id="dc_description" size="50" value="${metadata.description}">
+						<input type="text" name="dc_description" id="dc_description" size="50" value="${metadata.description}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelDescription}</span>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_publisher">#i18n{module.document.metadatadublincore.labelPublisher}</label>
-						<input type="text" name="dc_publisher" id="dc_publisher" size="50" value="${metadata.publisher}">
+						<input type="text" name="dc_publisher" id="dc_publisher" size="50" value="${metadata.publisher}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpPublisher}</span>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_contributor">#i18n{module.document.metadatadublincore.labelContributor}</label>
-						<input type="text" name="dc_contributor" id="dc_contributor" size="50" value="${metadata.contributor}">
+						<input type="text" name="dc_contributor" id="dc_contributor" size="50" value="${metadata.contributor}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpContributor}
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_date">#i18n{module.document.metadatadublincore.labelDate}</label>
-						<input type="text" name="dc_date" id="dc_date" size="50" value="${metadata.date}">
+						<input type="text" name="dc_date" id="dc_date" size="50" value="${metadata.date}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpDate}</span>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_type">#i18n{module.document.metadatadublincore.labelType}</label>
-						<input type="text" name="dc_type" id="dc_type" size="50" value="${metadata.type}">
+						<input type="text" name="dc_type" id="dc_type" size="50" value="${metadata.type}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpType}</span>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_format">#i18n{module.document.metadatadublincore.labelFormat}</label>
-						<input type="text" name="dc_format" id="dc_format" size="50" value="${metadata.format}"/>
+						<input type="text" name="dc_format" id="dc_format" size="50" value="${metadata.format}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpFormat}</span>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_identifier">#i18n{module.document.metadatadublincore.labelIdentifier} :</label>
-						<input type="text" name="dc_identifier" id="dc_identifier" size="50" value="${metadata.identifier}">
+						<input type="text" name="dc_identifier" id="dc_identifier" size="50" value="${metadata.identifier}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpIdentifier}</span>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_source">#i18n{module.document.metadatadublincore.labelSource}</label>
-						<input type="text" name="dc_source" id="dc_source"  size="50" value="${metadata.source}">
+						<input type="text" name="dc_source" id="dc_source"  size="50" value="${metadata.source}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpSource}</span>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_language">#i18n{module.document.metadatadublincore.labelLanguage}</label>
-						<input type="text" name="dc_language" id="dc_language" size="50" value="${metadata.language}">
+						<input type="text" name="dc_language" id="dc_language" size="50" value="${metadata.language}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpLanguage}</span>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_relation">#i18n{module.document.metadatadublincore.labelRelation} :</label>
-						<input type="text" name="dc_relation" id="dc_relation" size="50" value="${metadata.relation}">
+						<input type="text" name="dc_relation" id="dc_relation" size="50" value="${metadata.relation}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpRelation}</span>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_coverage">#i18n{module.document.metadatadublincore.labelCoverage}</label>
-						<input type="text" name="dc_coverage" id="dc_coverage" size="50" value="${metadata.coverage}">
+						<input type="text" name="dc_coverage" id="dc_coverage" size="50" value="${metadata.coverage}" class="form-control input-sm">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpCoverage}</span>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_rights">#i18n{module.document.metadatadublincore.labelRights}</label>
+						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="dc_rights" class="form-control input-sm">#i18n{module.document.metadatadublincore.labelRights}</label>
 						<input type="text" name="dc_rights" id="dc_rights" size="50" value="${metadata.rights}">
 						<span class="help-block">#i18n{module.document.metadatadublincore.labelHelpRights}</span>
 					</div>
@@ -102,10 +102,10 @@
 					</div>	
 				</div>	
 				<div class="form-group">
-					<button class="btn btn-primary" type="submit">
+					<button class="btn btn-primary btn-sm" type="submit">
 						<i class="glyphicon glyphicon-plus"></i>&nbsp;#i18n{document.create_document.buttonCreate}
 					</button>
-					<button class="btn btn-default" type="button" onclick="javascript:history.go(-1);">
+					<button class="btn btn-default btn-sm" type="button" onclick="javascript:history.go(-1);">
 						<i class="glyphicon glyphicon-remove-circle"></i>#i18n{portal.admin.message.buttonCancel}
 					</button>
 				</div>

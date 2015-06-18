@@ -5,26 +5,26 @@
 			<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoCreateAttribute.jsp" name="create_attribute">			<input type="hidden" id="media_id" name="media_id" value="${mediaId}" />
 			<div class="form-group">
 			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="attribute_code">#i18n{library.create_attribute.code}&nbsp;*&nbsp;:</label>
-				<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
-					<input type="text" id="attribute_code" name="attribute_code" value="" size="100" maxlength="250"/>
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+					<input type="text" id="attribute_code" name="attribute_code" value="" size="100" maxlength="250" class="form-control input-sm">
 				</div>
 			</div>			
 			<div class="form-group">
 			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="attribute_description">#i18n{library.create_attribute.description}&nbsp;*&nbsp;:</label>
-				<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
-					<input type="text" id="attribute_description" name="attribute_description" value="" size="100" maxlength="250"/>
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+					<input type="text" id="attribute_description" name="attribute_description" value="" size="100" maxlength="250" class="form-control input-sm">
 				</div>
 			</div>			
 			<div class="form-group">
 			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="attribute_type">#i18n{library.create_attribute.type}&nbsp;*&nbsp;:</label>
-				<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
 					<@comboWithParams name="attribute_type" default_value="" additionalParameters="onChange=\"javascript:displayDefaultValue();\"" items=attribute_type_list />
 				</div>
 			</div>
 			<div class="form-group">
 			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="attribute_default_value">#i18n{library.create_attribute.defaultValue}&nbsp;*&nbsp;:</label>
-				<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
-					<input type="text" id="attribute_default_value" name="attribute_default_value" value="" size="100" maxlength="250" />
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+					<input type="text" id="attribute_default_value" name="attribute_default_value" value="" size="100" maxlength="250" class="form-control input-sm">
 				</div>
 			</div>
 			<div class="form-actions">

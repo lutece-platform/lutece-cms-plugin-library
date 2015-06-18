@@ -9,7 +9,7 @@
 			<#if attribute.associableWithDocument>
 				<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="document_attribute_id_${attribute.attributeId}">${attribute.code} : </label>
-					<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+					<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
 					<select id="document_attribute_id_${attribute.attributeId}" name="document_attribute_id_${attribute.attributeId}">			
 						<#list document_type.attributes as documentAttribute>	
 							<option value="${documentAttribute.id}">${documentAttribute.name}</option>
@@ -20,7 +20,7 @@
 			<#else>
 				<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="">${attribute.code} : </label>
-					<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+					<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
 					<em>#i18n{library.create_mapping.attribute.text.noChoiceAvailable}</em> 
 					</div>
 				</div>
