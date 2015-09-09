@@ -1,10 +1,10 @@
 <div class="row">
-	<div class="col-xs-12">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 		<h4>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h4>
 	</div>
 </div>
 <div class="row">
-	<div class="col-md-4 col-sm-4 col-xs-4">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-bottom:20px;">
 		<form class="form" method="post" name="filter" action="jsp/admin/plugins/library/SelectMedia.jsp">
 		<input type="hidden" name="plugin_name" value="${plugin_name}">
 		<input type="hidden" name="input" value="${input}">
@@ -17,15 +17,15 @@
 		<#-- input type="submit" value="#i18n{library.insertservice.filter.button}" class="btn btn-primary" /> -->
 		</form>
 	</div>
-	<div class="col-md-7 col-xs-7">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 		<div class="row">
-			<div class="col-xs-12">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 				<form class="form-inline" method="post" name="pagination" action="jsp/admin/plugins/library/SelectMedia.jsp">
-					<input type="hidden" name="plugin_name" value="${plugin_name}" />
-					<input type="hidden" name="input" value="${input}" />
-					<input type="hidden" name="media_type" value="${mediatype.mediaId}" />
-					<input type="hidden" name="space_id" value="${selected_space}" />
-					<input type="hidden" name="browser_id_space" value="${selected_space}" />
+					<input type="hidden" name="plugin_name" value="${plugin_name}">
+					<input type="hidden" name="input" value="${input}">
+					<input type="hidden" name="media_type" value="${mediatype.mediaId}">
+					<input type="hidden" name="space_id" value="${selected_space}">
+					<input type="hidden" name="browser_id_space" value="${selected_space}">
 					<div class="input-group">
 						<@paginationAdmin paginator=paginator form=0 combo=1 />
 					</div>
@@ -33,7 +33,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-xs-12">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 				<form class="form" method="post" name="fenvoi" id="fenvoi" action="jsp/admin/plugins/library/EditSelectedMedia.jsp">
 					<input type="hidden" name="plugin_name" value="${plugin_name}">
 					<input type="hidden" name="input" value="${input}">
@@ -45,17 +45,17 @@
 						<#list all_documents as mappingdocument>
 							<#assign mapping_id = mappingdocument.first />
 							<#assign document = mappingdocument.second />
-								<div class="col-sm-6 col-md-4">
+								<div class="col-xs-6 col-sm-4 col-md-3 col-lg-3">
 									<div class="thumbnail">
 										<img src="${document.thumbnail}&nocache" data-src="${document.thumbnail}&nocache" class="thumbnail" alt="${document.title}" title="${document.title} - ${document.type}">
 										<div class="caption">
 											<p>
-											<a href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.validate}" >
+											<a href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.validate}">
 												<span class="badge">${document.id}</span>
 												<small><#if document.title?length &gt; 50>${document.title?substring(0,50)}...<#else>${document.title}</#if></small></p>
 											</a>
 											<p>
-											<a class="btn btn-default center-block" id="btn-select" data-mapping="${mapping_id}" data-document="${document.id}" href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.validate}" >
+											<a class="btn btn-default center-block" id="btn-select" data-mapping="${mapping_id}" data-document="${document.id}" href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value='${document.id}'; document.fenvoi.submit();"  title="#i18n{library.create_media.button.validate}">
 												<i class="glyphicon glyphicon-ok"></i> #i18n{library.create_media.button.validate}
 											</a>
 										</p>
