@@ -7,7 +7,7 @@
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 		<form class="form" method="post" name="filter" action="jsp/admin/plugins/library/SelectMedia.jsp">
 			<input type="hidden" name="plugin_name" value="${plugin_name}">
-			<input type="hidden" name="input" value="${input}">
+			<input type="hidden" name="input" value="${.data_model.input}">
 			<input type="hidden" name="media_type" value="${mediatype.mediaId}">
 			<input type="hidden" name="space_id" value="${selected_space}">
 			<div class="form-group">
@@ -22,7 +22,7 @@
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 				<form class="form-inline" method="post" name="pagination" action="jsp/admin/plugins/library/SelectMedia.jsp">
 					<input type="hidden" name="plugin_name" value="${plugin_name}" />
-					<input type="hidden" name="input" value="${input}" />
+					<input type="hidden" name="input" value="${.data_model.input}" />
 					<input type="hidden" name="media_type" value="${mediatype.mediaId}" />
 					<input type="hidden" name="space_id" value="${selected_space}" />
 					<input type="hidden" name="browser_id_space" value="${selected_space}" />
@@ -43,7 +43,7 @@
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 				<form class="form" method="post" name="fenvoi" id="fenvoi" action="jsp/admin/plugins/library/DoSelectMedia.jsp">
 					<input type="hidden" name="plugin_name" value="${plugin_name}">
-					<input type="hidden" name="input" value="${input}">
+					<input type="hidden" name="input" value="${.data_model.input}">
 					<input type="hidden" name="media" value="${mediatype.mediaId}">
 					<input type="hidden" name="id_document" id="id_document" value="">
 					<input type="hidden" name="id_mapping" id="id_mapping" value="">
@@ -69,7 +69,9 @@
 										</div>
 									</div>
 								</div>
-						</#list>					</div>				</form>
+						</#list>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>
