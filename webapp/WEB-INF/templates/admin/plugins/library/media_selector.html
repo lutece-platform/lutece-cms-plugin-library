@@ -1,6 +1,13 @@
 <div class="row">
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-		<h4>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h4>
+		<h4>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h4> 
+
+                <#if is_document_creation_allowed?? && is_document_creation_allowed >
+                    <a href="jsp/admin/plugins/library/CreateMediaByInsert.jsp?plugin_name=${plugin_name}&media_type=${mediatype.mediaId}&space_id=${selected_space}&input=${.data_model.input}" 
+                    class='btn btn-primary pull-right' id='btnAdd'>
+                    #i18n{library.manage_media.add.attribute}
+                    </a>
+                </#if>
 	</div>
 </div>
 <div class="row">
