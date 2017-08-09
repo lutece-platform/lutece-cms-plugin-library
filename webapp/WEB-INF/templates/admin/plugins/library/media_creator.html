@@ -13,12 +13,14 @@
 				<input type="hidden" name="document_type_code" value="${document_type}">    
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="document_title">#i18n{document.create_document.labelDocumentTitle}*</label>
-					<input type="text" name="document_title" id="document_title" size="72" maxlength="255" class="form-control input-sm">
+					<input type="text" name="document_title" id="document_title" size="72" maxlength="255" class="form-control input-sm"
+                                        data-toggle="tooltip" title="#i18n{document.create_document.helpDocumentTitle}">
 					<span class="help-block">#i18n{document.create_document.helpDocumentTitle}</span>
 				</div> 
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="document_summary">#i18n{document.create_document.labelDocumentSummary}*</label>
-					<textarea type="text" name="document_summary" id="document_summary" class="form-control input-sm" rows="2"></textarea> 
+					<textarea type="text" name="document_summary" id="document_summary" class="form-control input-sm" rows="2"
+                                        data-toggle="tooltip" title="#i18n{document.create_document.helpDocumentSummary}"></textarea> 
 					<span class="help-block">#i18n{document.create_document.helpDocumentSummary}</span>
 				</div>
 				<p id="dbc">Afficher dublin-core</p>
@@ -127,7 +129,10 @@ $(document).ready( function(){
 <script>
 // add tooltip behaviour (help texts)
 $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();   
+    if (typeof(jQuery.ui.tooltip) != 'undefined'){
+        $('[data-toggle="tooltip"]').tooltip();   
+	$('.help-block').hide();
+    }   
 });
 </script>
 
@@ -149,3 +154,4 @@ $(document).ready(function(){
         } );
     } );
 </script>
+
