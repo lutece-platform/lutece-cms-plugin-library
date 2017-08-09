@@ -125,6 +125,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private static final String MARK_ALL_MEDIA_ATTRIBUTES_ASSOCIATIONS = "all_attributes_associations";
     private static final String MARK_ALL_DOCUMENTS = "all_documents";
     private static final String MARK_MEDIA_DOC_LIST = "document_list";
+    private static final String MARK_IS_DOCUMENT_CREATION_ALLOWED = "is_document_creation_allowed" ;
 
     // Constants
     private static final String XML_TAG_MEDIA_LIST = "mediaList";
@@ -199,6 +200,21 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
                 getAttributesFromMapping( mapping ) );
         }
 
+        // get the selected space 
+        DocumentSpace selectedSpace = null ;
+        if ( nSpaceId > 0 ) 
+        {
+            for ( DocumentSpace space : spaces ) 
+            {
+                if ( space.getId() == nSpaceId ) 
+                {
+                    selectedSpace = space ;
+                    break ;
+                }
+            }
+        }
+        
+        
         Paginator<Pair<String, Document>> paginator = getPaginator( request, listDocuments );
         HashMap<String, Object> model = getDefaultModel(  );
         model.put( MARK_PREVIEW_TYPE, "<img src='%SRC' alt='%ALT' />" );
@@ -207,12 +223,13 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         model.put( MARK_ALL_MEDIA_ATTRIBUTES_ASSOCIATIONS, mapAssociationAttributes );
         model.put( MARK_ALL_DOCUMENTS, paginator.getPageItems(  ) );
         model.put( MARK_SPACES_BROWSER,
-            DocumentSpacesService.getInstance(  ).getSpacesBrowser( request, _user, _user.getLocale(  ), true, true ) );
+            DocumentSpacesService.getInstance(  ).getSpacesBrowser( request, _user, _user.getLocale(  ), true, true, true ) );
         model.put( MARK_SELECTED_SPACE, nSpaceId );
         model.put( MARK_PAGINATOR, paginator );
         model.put( MARK_NB_ITEMS_PER_PAGE, Integer.toString( paginator.getItemsPerPage(  ) ) );
         model.put( MARK_SELECTED_MEDIAS, _listSelectedMedia );
-
+        model.put( MARK_IS_DOCUMENT_CREATION_ALLOWED , 
+                ( selectedSpace!=null?selectedSpace.isDocumentCreationAllowed():false ) ) ;
         HtmlTemplate template = AppTemplateService.getTemplate( mediaType.getIsMultipleMedia(  )
                 ? TEMPLATE_MEDIA_SELECTOR_MULTIPLE : TEMPLATE_MEDIA_SELECTOR, _user.getLocale(  ), model );
 
