@@ -124,6 +124,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     private static final String MARK_LOCALE = "locale";
     private static final String MARK_WEBAPP_URL = "webapp_url";
     private static final String MARK_IS_IMAGE = "is_image";
+    private static final String MARK_USER_LAST_NAME = "user_last_name";
 
     //PARAMETERS
     private static final String PARAMETER_DOCUMENT_TYPE_CODE = "document_type_code";
@@ -248,6 +249,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( MARK_LOCALE, _user.getLocale(  ).getLanguage(  ) );
         model.put( MARK_IS_IMAGE, Document.CODE_DOCUMENT_TYPE_IMAGE.equals( mediaType.getName() ) ) ;
+        model.put( MARK_USER_LAST_NAME, _user.getLastName( ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MEDIA_CREATOR, _user.getLocale(  ), model );
 
