@@ -123,3 +123,29 @@ $(document).ready( function(){
 	$("#dbc").click( function(){$("#dublin_core_meta").toggle();});
 });
 </script>
+
+<script>
+// add tooltip behaviour (help texts)
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();   
+});
+</script>
+
+<script type="text/javascript">
+    // set input fields default values where selecting a file (if not already set)
+    $( document ).ready( function( ) {
+        $( '#file' ).change( function ( ) {
+            var path = $( this ).val( );
+            if ( path ) {
+                    // get the filename without the path and extension
+                    fileName = path.match( /([\w\d_-]*)\.?[^\\\/]*$/i )[1];
+
+                    // init input fields default values
+                    if ( $( "#document_title" ).length   && $( "#document_title" ).val( ).length==0 ) $( "#document_title" ).val( fileName );
+                    if ( $( "#document_summary" ).length && $( "#document_summary" ).html( ).length==0 ) $( "#document_summary" ).html( fileName );
+                    if ( $( "#htmltitle" ).length && $( "#htmltitle" ).html( ).length==0 ) $( "#htmltitle" ).html( fileName );
+                    if ( $( "#credits" ).length && $( "#credits" ).val( ).length==0 ) $( "#credits" ).val( "${user_last_name}" );
+            }
+        } );
+    } );
+</script>
