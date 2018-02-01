@@ -212,7 +212,14 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         }
 
         LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaType ), _plugin );
-        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( mediaType.getMediaId(  ), _plugin );
+        Collection<LibraryMapping> libraryMappingList  = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ), _plugin);
+        
+        // there should be only one mapping per media
+        LibraryMapping mapping = null;
+        for (LibraryMapping libMap : libraryMappingList) 
+        {
+            mapping = LibraryMappingHome.findByPrimaryKey( libMap.getIdMapping( ), _plugin );
+        }
 
         DocumentType documentType = DocumentTypeHome.findByPrimaryKey( mapping.getCodeDocumentType(  ) );
 
@@ -254,8 +261,14 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         String strMediaType = request.getParameter( PARAMETER_MEDIA_TYPE );
 
         LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaType ), _plugin );
-        LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( mediaType.getMediaId(  ), _plugin );
-
+        Collection<LibraryMapping> libraryMappingList  = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ), _plugin);
+        
+        // there should be only one mapping per media
+        LibraryMapping mapping = null;
+        for (LibraryMapping libMap : libraryMappingList) 
+        {
+            mapping = LibraryMappingHome.findByPrimaryKey( libMap.getIdMapping( ), _plugin );
+        }
         DocumentType documentType = DocumentTypeHome.findByPrimaryKey( mapping.getCodeDocumentType(  ) );
 
         // Spaces       
