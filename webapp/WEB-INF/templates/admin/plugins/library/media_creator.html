@@ -1,6 +1,10 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoUploadDocument.jsp" enctype="multipart/form-data">
+			<form class="form-horizontal" method="post" enctype="multipart/form-data"
+                            <#if is_image >  action="jsp/admin/plugins/library/DoUploadImage.jsp" 
+                            <#else>             action="jsp/admin/plugins/library/DoUploadDocument.jsp" 
+                            </#if>
+                        >
 				<fieldset>
 				<legend>#i18n{document.create_document.title} &#34; ${document_type} &#34;</legend>
 				<input type="hidden" name="media" value="${media}">
