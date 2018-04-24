@@ -58,6 +58,7 @@ import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.insert.InsertServiceJspBean;
 import fr.paris.lutece.portal.web.insert.InsertServiceSelectionBean;
+import fr.paris.lutece.portal.web.util.LocalizedPaginator;
 import fr.paris.lutece.util.UniqueIDGenerator;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.html.Paginator;
@@ -192,12 +193,25 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
         List<Pair<String, Document>> listDocuments = new ArrayList<Pair<String, Document>>(  );
         HashMap<String, Map<String, String>> mapAssociationAttributes = new HashMap<String, Map<String, String>>(  );
+        List<Integer> listDocumentsId = new ArrayList<Integer>( );
+
+        
+        for ( LibraryMapping mapping : allMappings )
+        {
+            listDocumentsId.addAll( getIdDocumentsFromMapping( mapping, nSpaceId ) );
+            mapAssociationAttributes.put( String.valueOf( mapping.getIdMapping(  ) ),
+                getAttributesFromMapping( mapping ) );
+        }
+        
+        LocalizedPaginator<Integer> paginator = getPaginator( request, listDocumentsId );
+        
+        
+       
 
         for ( LibraryMapping mapping : allMappings )
         {
-            listDocuments.addAll( getDocumentsFromMapping( mapping, nSpaceId, spaces ) );
-            mapAssociationAttributes.put( String.valueOf( mapping.getIdMapping(  ) ),
-                getAttributesFromMapping( mapping ) );
+            listDocuments.addAll( getDocumentsFromMapping( mapping, nSpaceId, paginator ) );
+           
         }
 
         // get the selected space 
@@ -215,13 +229,13 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         }
         
         
-        Paginator<Pair<String, Document>> paginator = getPaginator( request, listDocuments );
+        
         HashMap<String, Object> model = getDefaultModel(  );
         model.put( MARK_PREVIEW_TYPE, "<img src='%SRC' alt='%ALT' />" );
         model.put( MARK_MEDIA_TYPE, mediaType );
         model.put( MARK_MEDIA_TYPE_ATTRIBUTES, mediaType.getMediaAttributeList(  ) );
         model.put( MARK_ALL_MEDIA_ATTRIBUTES_ASSOCIATIONS, mapAssociationAttributes );
-        model.put( MARK_ALL_DOCUMENTS, paginator.getPageItems(  ) );
+        model.put( MARK_ALL_DOCUMENTS, listDocuments );
         model.put( MARK_SPACES_BROWSER,
             DocumentSpacesService.getInstance(  ).getSpacesBrowser( request, _user, _user.getLocale(  ), true, true, true ) );
         model.put( MARK_SELECTED_SPACE, nSpaceId );
@@ -539,47 +553,45 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
         return insertUrl( request, _input, strHtml );
     }
+    
+    private List<Integer> getIdDocumentsFromMapping( LibraryMapping m, int nSpaceId )
+    {
+            DocumentFilter filter = new DocumentFilter(  );
+            filter.setCodeDocumentType( m.getCodeDocumentType(  ) );
+            filter.setIdState( APPROVED_DOCUMENT_STATE );
+
+            List<Integer> documents = null;
+
+            if ( nSpaceId >= 0 )
+            {
+                if ( !DocumentSpacesService.getInstance(  ).isAuthorizedViewByRole( nSpaceId, _user ) ||
+                        !DocumentSpacesService.getInstance(  ).isAuthorizedViewByWorkgroup( nSpaceId, _user ) )
+                {
+                    return null;
+                }
+
+                filter.setIdSpace( nSpaceId );
+                documents = (List<Integer>) DocumentHome.findPrimaryKeysByFilter(filter,  _user.getLocale(  ) );
+            }
+
+           return documents;
+    }
 
     private List<Pair<String, Document>> getDocumentsFromMapping( LibraryMapping m, int nSpaceId,
-        Collection<DocumentSpace> spaces )
+    		LocalizedPaginator<Integer> paginator)
     {
-        DocumentFilter filter = new DocumentFilter(  );
-        filter.setCodeDocumentType( m.getCodeDocumentType(  ) );
-        filter.setIdState( APPROVED_DOCUMENT_STATE );
-
-        List<Document> documents = null;
+    	
         List<Pair<String, Document>> result = new ArrayList<Pair<String, Document>>(  );
-
-        if ( nSpaceId >= 0 )
+        for ( Integer documentId : paginator.getPageItems( ) )
         {
-            if ( !DocumentSpacesService.getInstance(  ).isAuthorizedViewByRole( nSpaceId, _user ) ||
-                    !DocumentSpacesService.getInstance(  ).isAuthorizedViewByWorkgroup( nSpaceId, _user ) )
-            {
-                return null;
-            }
+            Document document = DocumentHome.findByPrimaryKey( documentId ) ;
 
-            filter.setIdSpace( nSpaceId );
-            documents = DocumentHome.findByFilter( filter, _user.getLocale(  ) );
-        }
-
-        /* else
-         {
-             documents = new ArrayList<Document>(  );
-        
-             for ( DocumentSpace space : spaces )
-             {
-                 filter.setIdSpace( space.getId(  ) );
-                 documents.addAll( DocumentHome.findByFilter( filter, _user.getLocale(  ) ) );
-             }
-         }*/
-        if ( documents != null )
-        {
-            for ( Document document : documents )
+            if ( document != null )
             {
-                DocumentHome.loadAttributes( document );
-                result.add( new Pair<String, Document>( String.valueOf( m.getIdMapping(  ) ), document ) );
+           	 result.add( new Pair<String, Document>( String.valueOf( m.getIdMapping(  ) ), document ) );
             }
         }
+       
 
         return result;
     }
@@ -624,8 +636,8 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         return model;
     }
 
-    private Paginator<Pair<String, Document>> getPaginator( HttpServletRequest request,
-        List<Pair<String, Document>> list )
+    private LocalizedPaginator<Integer> getPaginator( HttpServletRequest request,
+    		List<Integer> listDocumentsId )
     {
         String strNbItemPerPage = request.getParameter( Paginator.PARAMETER_ITEMS_PER_PAGE );
 
@@ -667,8 +679,12 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         url.addParameter( PARAMETER_MEDIA_TYPE, request.getParameter( PARAMETER_MEDIA_TYPE ) );
         url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, _nNbItemsPerPage );
 
-        return new Paginator<Pair<String, Document>>( list, _nNbItemsPerPage, url.getUrl(  ), PARAMETER_PAGE_INDEX,
-            _strCurrentPageIndex );
+        LocalizedPaginator<Integer> paginator = new LocalizedPaginator<Integer>( (List<Integer>) listDocumentsId, _nNbItemsPerPage, url.getUrl(  ),
+                Paginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex, _user.getLocale(  ) );
+        return paginator;
+        
+        //return new Paginator<Pair<String, Document>>( list, _nNbItemsPerPage, url.getUrl(  ), PARAMETER_PAGE_INDEX,
+          //  _strCurrentPageIndex );
     }
 
     public class Pair<X, Y>
