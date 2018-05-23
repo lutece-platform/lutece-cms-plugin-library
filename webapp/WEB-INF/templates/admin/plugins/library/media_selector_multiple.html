@@ -107,16 +107,16 @@
 					<img src="${document.thumbnail}&nocache" data-src="${document.thumbnail}&nocache" class="thumbnail col-xs-12 col-sm-6 col-md-4 col-lg-4" alt="${document.title}" title="${document.title} - ${document.type}">
 				</td>
 				<td>
-					<a class="btn btn-danger btn-sm" href="jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=${document.id}&remove_selected=true&media=${media.mediaTypeId}&id_mapping=${media.mappingId}"  title="#i18n{portal.util.labelDelete}">
+					<a class="btn btn-danger btn-sm" href="jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=${document.id}&remove_selected=true&media=${media.mediaTypeId}&id_mapping=${media.mappingId}&browser_id_space=${selected_space}&browser_selected_space_id=${selected_space}"  title="#i18n{portal.util.labelDelete}">
 						<i class="glyphicon glyphicon-trash"></i>
 					</a>
 					<#if media_index &lt; (selected_medias?size - 1)>
-						<a class="btn btn-primary btn-sm" href="jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id}&move_up=false&media=${media.mediaTypeId}&id_mapping=${media.mappingId}">
+						<a class="btn btn-primary btn-sm" href="jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id}&move_up=false&media=${media.mediaTypeId}&id_mapping=${media.mappingId}&browser_id_space=${selected_space}&browser_selected_space_id=${selected_space}">
 							<i class="glyphicon glyphicon-arrow-down"></i>
 						</a>
 					</#if>
 					<#if media_index &gt; 0>
-						<a class="btn btn-primary btn-sm" href="jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id}&move_up=true&media=${media.mediaTypeId}&id_mapping=${media.mappingId}">
+						<a class="btn btn-primary btn-sm" href="jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id}&move_up=true&media=${media.mediaTypeId}&id_mapping=${media.mappingId}&browser_id_space=${selected_space}&browser_selected_space_id=${selected_space}">
 							<i class="glyphicon glyphicon-arrow-up"></i>
 						</a>
 					</#if>
