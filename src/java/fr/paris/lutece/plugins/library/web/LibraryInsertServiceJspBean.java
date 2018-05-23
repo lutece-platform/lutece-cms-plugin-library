@@ -104,6 +104,8 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private static final String PARAMETER_PAGE_INDEX = "page_index";
     private static final String PARAMETER_REMOVE_SELECTED = "remove_selected";
     private static final String PARAMETER_MOVE_UP = "move_up";
+    private static final String PARAMETER_BROWSER_SPACE_ID = "browser_id_space";
+
 
     // JSP
     private static final String JSP_INSERT_MEDIA = "jsp/admin/plugins/library/DoInsertMedia.jsp";
@@ -299,10 +301,16 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
         String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
         String strMappingId = request.getParameter( PARAMETER_MAPPING_ID );
+        String strIdSpaceFilter = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID );
+        String strIdSpace = request.getParameter( PARAMETER_BROWSER_SPACE_ID );
+
 
         UrlItem urlItem = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MEDIA_TYPE_SELECTION );
         urlItem.addParameter( PARAMETER_MEDIA_TYPE, strMediaTypeId );
+        urlItem.addParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID, strIdSpaceFilter );
+        urlItem.addParameter( PARAMETER_BROWSER_SPACE_ID, strIdSpace );
 
+        
         if ( Boolean.parseBoolean( request.getParameter( PARAMETER_REMOVE_SELECTED ) ) )
         {
             int nIdDocument = Integer.parseInt( strDocumentId );
@@ -419,10 +427,16 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     {
         String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
         String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
+        String strIdSpaceFilter = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID );
+        String strIdSpace = request.getParameter( PARAMETER_BROWSER_SPACE_ID );
+
 
         UrlItem urlItem = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MEDIA_TYPE_SELECTION );
         urlItem.addParameter( PARAMETER_MEDIA_TYPE, strMediaTypeId );
+        urlItem.addParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID, strIdSpaceFilter );
+        urlItem.addParameter( PARAMETER_BROWSER_SPACE_ID, strIdSpace );
 
+        
         boolean bMoveUp = Boolean.parseBoolean( request.getParameter( PARAMETER_MOVE_UP ) );
 
         int nIdDocument = Integer.parseInt( strDocumentId );
