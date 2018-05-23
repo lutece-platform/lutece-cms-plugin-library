@@ -48,6 +48,8 @@
 					<input type="hidden" name="id_document" id="id_document" value="">
 					<input type="hidden" name="id_mapping" id="id_mapping" value="">
 					<input type="hidden" name="space_id" value="${selected_space}">
+					<input type="hidden" name="browser_id_space" value="${selected_space}">
+					<input type="hidden" name="browser_selected_space_id" value="${selected_space}">
 					<div class="row">
 						<#list all_documents as mappingdocument>
 							<#assign mapping_id = mappingdocument.first />
