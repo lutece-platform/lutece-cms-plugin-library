@@ -19,7 +19,7 @@
 						<@td>${media.description}</@td>
 						<@td>
 							<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}' title='edit' hideTitle=['all'] buttonIcon='edit' size='sm' />
-							<@aButton href='jsp/admin/plugins/library/RemoveMedia.jsp?media_id=${media.mediaId}' title='delete' hideTitle=['all'] size='sm' />
+							<@aButton href='jsp/admin/plugins/library/RemoveMedia.jsp?media_id=${media.mediaId}' title='delete' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
 						</@td>
 					</@tr>
 					</#list>

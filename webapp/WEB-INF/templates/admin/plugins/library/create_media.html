@@ -1,9 +1,9 @@
 <@row>
 	<@columns>
 		<@box>
-			<@boxHeader title='#i18n{library.create_media.form.label} />
+			<@boxHeader title='#i18n{library.create_media.form.label}' />
 			<@boxBody>
-				<@tform method='post' action='jsp/admin/plugins/library/DoCreateMedia.jsp" name="create_media" enctype="multipart/form-data'>
+				<@tform method='post' action='jsp/admin/plugins/library/DoCreateMedia.jsp' name='create_media' enctype='multipart/form-data'>
 					<@formGroup labelFor='media_name' labelKey='#i18n{library.create_media.code}' mandatory=true>
 						<@input type='text' name='media_name' id='media_name' value='' maxlength=250 />
 					</@formGroup>
@@ -17,7 +17,7 @@
 						<@checkBox labelFor='media_stylesheet' labelKey='#i18n{library.media.creation.label.multiple}' name='media-multiple' id='media-multiple' value='true' />
 					</@formGroup>
 					<@formGroup>
-						<@button type='submit' title='#i18n{library.create_media.button.validate} buttonIcon='save' />
+						<@button type='submit' title='#i18n{library.create_media.button.validate}' buttonIcon='save' />
 						<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp' title='#i18n{library.create_media.button.cancel}' buttonIcon='times' color='default' />
 					</@formGroup>
 				</@tform>	
