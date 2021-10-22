@@ -1,21 +1,21 @@
 <div class="insert-service">
-	<div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<form class="form-inline" method="post" name="fenvoi" action="jsp/admin/plugins/library/SelectMedia.jsp">
-			<input type="hidden" name="plugin_name" value="${plugin_name}">
-			<input type="hidden" name="input" value="${.data_model.input}">
-			<input type="hidden" name="media_type" value="">
+	<@row>
+		<@columns>
+			<@tform method='post' name='fenvoi' action='jsp/admin/plugins/library/SelectMedia.jsp'>
+				<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+				<@input type='hidden' name='input' value='${.data_model.input}' />
+				<@input type='hidden' name='media_type' value='' />
 				<ul class="nav nav-list">
 					<li class="nav-header">#i18n{library.insertservice.selectMediaType}</li>
 					<#list mediatypes as mediatype>
 					<li>
-						<a href="javascript:document.fenvoi.media_type.value='${mediatype.mediaId}'; document.fenvoi.submit();" title="${mediatype.name}">
-							<i class="glyphicon glyphicon-chevron-right"></i>&nbsp;&nbsp;${mediatype.description}
-						</a>
+						<@link href='javascript:document.fenvoi.media_type.value="${mediatype.mediaId}"; document.fenvoi.submit();' title='${mediatype.name}'>
+							<@icon style='chevron-right' />&nbsp;&nbsp;${mediatype.description}
+						</@link>
 					</li>
 				</#list>
 				</ul>
-			</form>
-		</div>
-	</div>
+			</@tform>
+		</@columns>
+	</@row>
 </div>

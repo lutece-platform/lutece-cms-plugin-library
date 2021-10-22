@@ -1,44 +1,35 @@
-<div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-		<fieldset>                           
-		<legend>#i18n{library.create_attribute.form.label}</legend> 
-			<form class="form-horizontal" method="post" action="jsp/admin/plugins/library/DoCreateAttribute.jsp" name="create_attribute">			<input type="hidden" id="media_id" name="media_id" value="${mediaId}" />
-			<div class="form-group">
-			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="attribute_code">#i18n{library.create_attribute.code}&nbsp;*&nbsp;:</label>
-				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-					<input type="text" id="attribute_code" name="attribute_code" value="" size="100" maxlength="250" class="form-control input-sm">
-				</div>
-			</div>			
-			<div class="form-group">
-			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="attribute_description">#i18n{library.create_attribute.description}&nbsp;*&nbsp;:</label>
-				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-					<input type="text" id="attribute_description" name="attribute_description" value="" size="100" maxlength="250" class="form-control input-sm">
-				</div>
-			</div>			
-			<div class="form-group">
-			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="attribute_type">#i18n{library.create_attribute.type}&nbsp;*&nbsp;:</label>
-				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-					<@comboWithParams name="attribute_type" default_value="" additionalParameters="onChange=\"javascript:displayDefaultValue();\"" items=attribute_type_list />
-				</div>
-			</div>
-			<div class="form-group">
-			<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="attribute_default_value">#i18n{library.create_attribute.defaultValue}&nbsp;*&nbsp;:</label>
-				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-					<input type="text" id="attribute_default_value" name="attribute_default_value" value="" size="100" maxlength="250" class="form-control input-sm">
-				</div>
-			</div>
-			<div class="form-actions">
-				<button class="btn btn-primary btn-sm" type="submit">
-					<i class="glyphicon glyphicon-ok"></i>&nbsp;#i18n{library.create_attribute.button.validate}
-				</button>
-				<a class="btn btn-sm" href="jsp/admin/plugins/library/ManageMedia.jsp?media_id=${mediaId}">
-					<i class="glyphicon glyphicon-remove-circle"></i>&nbsp;#i18n{library.create_attribute.button.cancel}
-				</a>
-			</div>
-			</fieldset>
-			</form>	
-    </div>
-</div>
+<@row>
+	<@columns>
+		<@box>
+			<@boxHeader title='#i18n{library.create_attribute.form.label}' />
+			<@boxBody>
+				<@tform method='post' action='jsp/admin/plugins/library/DoCreateAttribute.jsp' name='create_attribute'>					<@input type='hidden' id='media_id' name='media_id' value='${mediaId}' />
+					
+					<@formGroup labelFor='attribute_code' labelKey='#i18n{library.create_attribute.code}' mandatory=true>
+						<@input type='text' id='attribute_code' name='attribute_code' value='' inputSize=100 maxlength=250 />
+					</@formGroup>
+					
+					<@formGroup labelFor='attribute_description' labelKey='#i18n{library.create_attribute.description}' mandatory=true>
+						<@input type='text' id='attribute_description' name='attribute_description' value='' inputSize=100 maxlength=250 />
+					</@formGroup>
+					
+					<@formGroup labelFor='attribute_type' labelKey='#i18n{library.create_attribute.type}' mandatory=true>
+						<@select name='attribute_type' default_value='' params='onChange=\"javascript:displayDefaultValue();\"' items=attribute_type_list />
+					</@formGroup>
+					
+					<@formGroup labelFor='attribute_default_value' labelKey='#i18n{library.create_attribute.defaultValue}' mandatory=true>
+						<@input type='text' id='attribute_default_value' name='attribute_default_value' value='' inputSize=100 maxlength=250 />
+					</@formGroup>
+					
+					<@formGroup>
+						<@button type='submit' title='#i18n{library.create_attribute.button.validate}' buttonIcon='save' />
+						<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${mediaId}' title='#i18n{library.create_attribute.button.cancel}' buttonIcon='times' color='default' />
+					</@formGroup>
+				</@tform>	
+			</@boxBody>
+		</@box>
+    </@columns>
+</@row>
 <#assign typeIdWithDefaultValue = 0 />
 <script type="text/javascript">
 function displayDefaultValue(  ){

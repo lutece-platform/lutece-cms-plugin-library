@@ -1,43 +1,38 @@
-<div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-		<form class="form" method="post" name="fenvoi" action="${jsp_insert}">
-		<input type="hidden" name="plugin_name" value="${plugin_name}">
-		<input type="hidden" name="input" value="${.data_model.input}">
-		<input type="hidden" name="media" value="${mediatype.mediaId}">
-		<input type="hidden" name="id_document" value="">
-		<fieldset>
-			<legend>${document.title}</legend>
-			<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
-						<div class="form-group">
-							<label for="thumbnail">#i18n{library.insertservice.preview}</label>
-							<img id="thumbnail" class="thumblist-lg" src="${document.thumbnail}" alt="${document.title}">
-						</div>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-7 col-lg-5">
+<@row>
+	<@columns>
+		<@box>
+			<@boxHeader title='${document.title}' />
+			<@boxBody>
+				<@tform method='post' name='fenvoi' action='${jsp_insert}'>
+					<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+					<@input type='hidden' name='input' value='${.data_model.input}' />
+					<@input type='hidden' name='media' value='${mediatype.mediaId}' />
+					<@input type='hidden' name='id_document' value='' />
+					<@fieldSet>
+						<@formGroup labelFor='thumbnail' labelKey='#i18n{library.insertservice.preview}'>
+							<img id="thumbnail" class="thumblist-lg" src="${document.thumbnail}" alt="${document.title}" />
+						</@formGroup>
+
 						<#list media_attributes as attribute>
 							<#assign field_name = attribute.code>
 							<#if attribute.typeId = 0>
 								<!-- ATTRIBUTE_TYPE_TEXT_USER -->
-								<div class="form-group">	
-									<label for="${field_name}">${attribute.description} </label>
-									<input type="text" class="form-control input-sm" name="${field_name}" id="${field_name}" value="${attribute.defaultValue}">
-								</div>	
+								<@formGroup labelFor='${field_name}' labelKey='${attribute.description}'>
+									<@input type='text' name='${field_name}' id='${field_name}' value='${attribute.defaultValue}' />
+								</@formGroup>	
 							<#elseif attribute.typeId = 3>
 								<#if document.title?has_content>
 									<!-- ATTRIBUTE_TYPE_TITLE_DOCUMENT -->
-									<div class="form-group">
-										<label for="${field_name}">${attribute.description} </label>
-										<input type="text"  class="form-control input-sm" name="${field_name}" id="${field_name}" value="${document.title}">
-									</div>
+									<@formGroup labelFor='${field_name}' labelKey='${attribute.description}'>
+										<@input type='text' name='${field_name}' id='${field_name}' value='${document.title}' />
+									</@formGroup>
 								</#if>
 							<#elseif attribute.typeId = 4>
 								<!-- ATTRIBUTE_TYPE_SUMMARY_DOCUMENT -->
 								<#if document.summary?has_content>
-									<div class="form-group">
-										<label for="${field_name}">${attribute.description} </label>
-										<textarea type="text" name="${field_name}" id="${field_name}" cols="60" rows="2">${document.summary}</textarea>
-									</div>
+									<@formGroup labelFor='${field_name}' labelKey='${attribute.description}'>
+										<@input type='textarea' name='${field_name}' id='${field_name}' cols=60 rows=2>${document.summary}</@input>
+									</@formGroup>
 								<#else>
 									- 
 								</#if>
@@ -46,38 +41,32 @@
 								<#if attribute.typeId = 1>
 									<!-- ATTRIBUTE_TYPE_TEXT_DOCUMENT -->
 									<#if document.getAttribute(doctype_code)?exists && document.getAttribute(doctype_code).textValue?has_content>
-										<div class="form-group">
-											<label for="${field_name}">${attribute.description} </label>
-											<textarea name="${field_name}" id="${field_name}">${document.getAttribute(doctype_code).textValue?xml}</textarea>
-										</div>	
+										<@formGroup labelFor='${field_name}' labelKey='${attribute.description}'>
+											<@input type='textarea' name='${field_name}' id='${field_name}'>${document.getAttribute(doctype_code).textValue?xml}</@input>
+										</@formGroup>	
 									</#if>
 								<#elseif attribute.typeId = 2>
 									<!-- ATTRIBUTE_TYPE_BINARY -->
 									<#if document.getAttribute(doctype_code)?has_content>
 										<#assign attributeId = document.getAttribute(doctype_code).id>
 										<#assign url = "document?id=" + document.id + "&amp;id_attribute=" + attributeId>
-										<div class="form-group">
-											<label for="${field_name}">Voir le document [Nouvelle fenêtre] </label>
-											<input type="hidden" name="${field_name}" id="${field_name}" value="${url}">
-											<a href="${url}" target="_blank" class="btn btn-link" title="Voir">
+										<@formGroup labelFor='${field_name}' labelKey='Voir le document [Nouvelle fenêtre]'>
+											<@input type='hidden' name='${field_name}" id="${field_name}' value='${url}' />
+											<@link href='${url}' target='_blank' title='Voir'>
 												${url}
-											</a>
-										</div>
+											</@link>
+										</@formGroup>
 									</#if>
 								</#if>
 							</#if>
 						</#list>
-						<div class="form-group">
-							<button class="btn btn-primary" type="submit">
-								<i class="glyphicon glyphicon-ok"></i>&nbsp;#i18n{library.insertservice.insertlink.button}
-							</button>
-							<button class="btn btn-default" onclick="javascript:history.go(-1);">
-								<i class="glyphicon glyphicon-remove-circle"></i>&nbsp;#i18n{library.insertservice.cancel.button}
-							</button>
-						</div>
-					</div>
-				</div>
-			</fieldset>
-			</form>
-	</div>
-</div>
+						<@formGroup>
+							<@button type='submit' title='#i18n{library.insertservice.insertlink.button}' buttonIcon='save' />
+							<@button type='button' params='onclick="javascript:history.go(-1);"' title='#i18n{library.insertservice.cancel.button}' buttonIcon='times' color='default' />
+						</@formGroup>
+					</@fieldSet>
+				</@tform>
+			</@boxBody>
+		</@box>
+	</@columns>
+</@row>

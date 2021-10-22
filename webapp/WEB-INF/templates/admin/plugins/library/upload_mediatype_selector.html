@@ -1,21 +1,21 @@
-<div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-		<form class="form-inline" method="post" name="fenvoi" action="jsp/admin/plugins/library/SelectSpaceForUpload.jsp">
-			<fieldset> 
+<@row>
+	<@columns>
+		<@tform method='post' name='fenvoi' action='jsp/admin/plugins/library/SelectSpaceForUpload.jsp'>
+			<@fieldSet> 
 				<legend>#i18n{library.insertservice.selectMediaType}</legend>
-				<input type="hidden" name="plugin_name" value="${plugin_name}">
-				<input type="hidden" name="input" value="${.data_model.input}">
-				<input type="hidden" name="media_type" value="">
+				<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+				<@input type='hidden' name='input' value='${.data_model.input}' />
+				<@input type='hidden' name='media_type' value='' />
 				<ul class="list-unstyled">
 					<#list mediatypes as mediatype>
 					<li>
-						<a class="btn btn-link" href="javascript:document.fenvoi.media_type.value='${mediatype.mediaId}'; document.fenvoi.submit();"  title="${mediatype.description}">
-							<i class="glyphicon glyphicon-chevron-right"></i> ${mediatype.description}
-						</a>
+						<@link href='javascript:document.fenvoi.media_type.value="${mediatype.mediaId}"; document.fenvoi.submit();'  title='${mediatype.description}'>
+							<@icon style='chevron-right' /> ${mediatype.description}
+						</@link>
 					</li>	
 					</#list>
 				</ul>
-			</fieldset>
-		</form>
-	</div>
-</div>
+			</@fieldSet>
+		</@tform>
+	</@columns>
+</@row>
