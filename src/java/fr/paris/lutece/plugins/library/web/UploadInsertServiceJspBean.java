@@ -72,7 +72,7 @@ import fr.paris.lutece.util.UniqueIDGenerator;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.xml.XmlUtil;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -492,7 +492,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
             
             if ( attribute.getTypeId(  ) == MediaAttribute.ATTRIBUTE_TYPE_BINARY )
             {
-                strValue = StringEscapeUtils.escapeHtml( strValue );
+                strValue = StringEscapeUtils.escapeHtml4( strValue );
             }
 
             XmlUtil.addElement( sbXml, attribute.getCode(  ), strValue );
@@ -509,7 +509,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
             String strPreHtml = xmlTransformerService.transformBySourceWithXslCache( sbXml.toString(  ),
                     mediaType.getStyleSheet(  ).getSource(  ), strXslUniqueId, null, null );
 
-            strHtml = StringEscapeUtils.escapeJavaScript( strPreHtml );
+            strHtml = StringEscapeUtils.escapeEcmaScript( strPreHtml );
         }
         catch ( Exception e )
         {
