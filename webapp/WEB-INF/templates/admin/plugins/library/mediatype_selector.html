@@ -1,21 +1,14 @@
-<div class="insert-service">
-	<@row>
-		<@columns>
-			<@tform method='post' name='fenvoi' action='jsp/admin/plugins/library/SelectMedia.jsp'>
-				<@input type='hidden' name='plugin_name' value='${plugin_name}' />
-				<@input type='hidden' name='input' value='${.data_model.input}' />
-				<@input type='hidden' name='media_type' value='' />
-				<ul class="nav nav-list">
-					<li class="nav-header">#i18n{library.insertservice.selectMediaType}</li>
-					<#list mediatypes as mediatype>
-					<li>
-						<@link href='javascript:document.fenvoi.media_type.value="${mediatype.mediaId}"; document.fenvoi.submit();' title='${mediatype.name}'>
-							<@icon style='chevron-right' />&nbsp;&nbsp;${mediatype.description}
-						</@link>
-					</li>
-				</#list>
-				</ul>
+<@div class='row row-cols-4 mt-3 p-5' id='insert-service'>    
+<#list mediatypes as mediatype>
+    <@columns class='mb-3'>
+		<@div class='d-flex flex-column justify-content-center' params='style="min-height:10rem"' >
+			<@tform method='post' name='fenvoi' action='jsp/admin/plugins/library/SelectMedia.jsp' class=''>
+			<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+			<@input type='hidden' name='input' value='${.data_model.input}' />
+			<@input type='hidden' name='media_type' value='${mediatype.mediaId?trim}' />
+			<@button type='submit' color='default p-5 border-2 border-solid border-dark' title='${mediatype.name}' />
 			</@tform>
-		</@columns>
-	</@row>
-</div>
+		</@div>
+	</@columns>
+</#list>
+</@div>

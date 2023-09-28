@@ -9,7 +9,7 @@
 				<ul class="list-unstyled">
 					<#list mediatypes as mediatype>
 					<li>
-						<@link href='javascript:document.fenvoi.media_type.value="${mediatype.mediaId}"; document.fenvoi.submit();'  title='${mediatype.description}'>
+						<@link href='javascript:document.fenvoi.media_type.value=${mediatype.mediaId?trim};document.fenvoi.submit();'  title='${mediatype.description}'>
 							<@icon style='chevron-right' /> ${mediatype.description}
 						</@link>
 					</li>	

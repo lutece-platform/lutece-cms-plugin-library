@@ -2,11 +2,10 @@
 	<@columns>
 		<@box>
 			<#assign boxHeaderTitle>
-				#i18n{library.modify_mapping.form.label} #i18n{library.modify_mapping.documentType.label} : <strong>${mapping.codeDocumentType} (${document_type.name})</strong>   #i18n{library.modify_mapping.documentType.text}
+				#i18n{library.modify_mapping.form.label} #i18n{library.modify_mapping.documentType.label} : <strong>${mapping.codeDocumentType} (${document_type.name})</strong> #i18n{library.modify_mapping.documentType.text}
 			</#assign>
 			<@boxHeader title=boxHeaderTitle />
 			<@boxBody>
-			
 				<@tform method='post' action='jsp/admin/plugins/library/DoModifyMappingAssociations.jsp' name='modify_mapping'>
 					<@input type='hidden' name='mapping_id' value='${mapping.idMapping}' />
 					<@input type='hidden' name='media_id' value='${mapping.idMedia}' />
@@ -15,12 +14,12 @@
 						<#if attribute.associableWithDocument>
 							<@formGroup labelFor='document_attribute_id_${attribute.attributeId}' labelKey='${attribute.code}'>
 								<@select id='document_attribute_id_${attribute.attributeId}' name='document_attribute_id_${attribute.attributeId}'>			
-									<#list mapping.attributeAssociationList as association>	
-										<#if attribute.attributeId = association.idMediaAttribute>
-											<#assign associationDocumentAttributeId = association.idDocumentAttribute>
-											<#break />
-										</#if>
-									</#list>
+								<#list mapping.attributeAssociationList as association>	
+									<#if attribute.attributeId = association.idMediaAttribute>
+										<#assign associationDocumentAttributeId = association.idDocumentAttribute>
+										<#break />
+									</#if>
+								</#list>
 									<#list document_type.attributes as documentAttribute>
 										<#if documentAttribute.id = associationDocumentAttributeId>
 											<option value="${documentAttribute.id}" selected="selected">${documentAttribute.name}</option>

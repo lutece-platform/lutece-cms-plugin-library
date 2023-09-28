@@ -1,4 +1,4 @@
-<@row>
+<@row id='select'>
 	<@columns>
 		<@box>
 			<@boxHeader title='${document.title}' />
@@ -10,9 +10,8 @@
 					<@input type='hidden' name='id_document' value='' />
 					<@fieldSet>
 						<@formGroup labelFor='thumbnail' labelKey='#i18n{library.insertservice.preview}'>
-							<img id="thumbnail" class="thumblist-lg" src="${document.thumbnail}" alt="${document.title}" />
+							<@img class="img-fluid" url="${document.thumbnail}" alt="${document.title}" />
 						</@formGroup>
-
 						<#list media_attributes as attribute>
 							<#assign field_name = attribute.code>
 							<#if attribute.typeId = 0>
@@ -70,3 +69,7 @@
 		</@box>
 	</@columns>
 </@row>
+<script>
+document.querySelector('#select').classList.add('visually-hidden')
+document.forms[0].submit();
+</script>

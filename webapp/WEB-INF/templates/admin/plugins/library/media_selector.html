@@ -1,71 +1,61 @@
-<@row>
-	<@columns>
-		<@box>
-			<@boxHeader title='#i18n{library.insertservice.selectMedia} ${mediatype.name}'>
-				<#if is_document_creation_allowed?? && is_document_creation_allowed >
-					<@aButton id='btnAdd' href='jsp/admin/plugins/library/CreateMediaByInsert.jsp?plugin_name=${plugin_name}&media_type=${mediatype.mediaId}&space_id=${selected_space}&input=${.data_model.input}' title='                    #i18n{library.manage_media.add.attribute}' size='sm' />
-				</#if>
-			</@boxHeader>
-			<@boxBody>
-				<@row>
-					<@columns md=4 params='style="margin-bottom:20px;"'>
-						<@tform method='post' name='filter' action='jsp/admin/plugins/library/SelectMedia.jsp'>
-							<@input type='hidden' name='plugin_name' value='${plugin_name}' />
-							<@input type='hidden' name='input' value='${.data_model.input}' />
-							<@input type='hidden' name='media_type' value='${mediatype.mediaId}' />
-							<@input type='hidden' name='space_id' value='${selected_space}' />
-							<@formGroup>
-								${spaces_browser}
-							</@formGroup>
-						<#-- LUTECE-1108: Use Freemarker comments to disable #i18n lookup. -->
-						<#-- input type="submit" value="#i18n{library.insertservice.filter.button}" class="btn btn-primary" /> -->
-						</@tform>
-					</@columns>
-					<@columns md=8>
-						<@tform method='post' name='pagination' action='jsp/admin/plugins/library/SelectMedia.jsp'>
-							<@input type='hidden' name='plugin_name' value='${plugin_name}' />
-							<@input type='hidden' name='input' value='${.data_model.input}' />
-							<@input type='hidden' name='media_type' value='${mediatype.mediaId}' />
-							<@input type='hidden' name='space_id' value='${selected_space}' />
-							<@input type='hidden' name='browser_id_space' value='${selected_space}' />
-							<@formGroup>
-								<@paginationAdmin paginator=paginator form=0 combo=1 />
-							</@formGroup>
-						</@tform>
-						
-						<@tform method='post' name='fenvoi' id='fenvoi' action='jsp/admin/plugins/library/EditSelectedMedia.jsp'>
-							<@input type='hidden' name='plugin_name' value='${plugin_name}' />
-							<@input type='hidden' name='input' value='${.data_model.input}' />
-							<@input type='hidden' name='media' value='${mediatype.mediaId}' />
-							<@input type='hidden' name='id_document' id='id_document' value='' />
-							<@input type='hidden' name='id_mapping' id='id_mapping' value='' />
-							<@input type='hidden' name='space_id' value='${selected_space}' />
-
-							<#list all_documents as mappingdocument>
-								<#assign mapping_id = mappingdocument.first />
-								<#assign document = mappingdocument.second />
-								<@columns xs=6 sm=4 md=3 lg=3">
-									<div class="thumbnail">
-										<img src="${document.thumbnail}&nocache" data-src="${document.thumbnail}&nocache" class="thumbnail" alt="${document.title}" title="${document.title} - ${document.type}">
-										<div class="caption">
-											<p>
-											<@link href='javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value=\'${document.id}\'; document.fenvoi.submit();'  title="#i18n{library.create_media.button.validate}">
-												<@tag>${document.id}</@tag>
-												<small><#if document.title?length &gt; 50>${document.title?substring(0,50)}...<#else>${document.title}</#if></small>
-											</@link>
-											</p>
-											
-											<p>
-												<@aButton id='btn-select' params='data-mapping="${mapping_id}" data-document="${document.id}" href="javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value="${document.id}"; document.fenvoi.submit();'  title='#i18n{library.create_media.button.validate}' title='#i18n{library.create_media.button.validate}' buttonIcon='check' color='default' />
-											</p>
-										</div>
-									</div>
-								</@columns>
-							</#list>
-						</@tform>
-					</@columns>
-				</@row>
-			</@boxBody>
-		</@box>
-	</@columns>
-</@row>
+<#switch mediatype.mediaId>
+	<#case 1>
+		<#assign btnTitle='#i18n{library.insertservice.add} #i18n{library.insertservice.someY} ${mediatype.name?cap_first}' />
+		<#assign btnIcon='photo-plus' />
+		<#break>
+	<#case 3>
+		<#assign btnTitle='#i18n{library.insertservice.add} #i18n{library.insertservice.someX} ${mediatype.name?cap_first}' />
+		<#assign btnIcon='file-plus' />
+		<#break>
+	<#default>
+		<#assign btnTitle='#i18n{library.insertservice.add} #i18n{library.insertservice.someX} #i18n{library.insertservice.defaultTitle}' />
+		<#assign btnIcon='plus' />
+</#switch>
+<@box>
+	<@boxHeader title='#i18n{library.insertservice.selectMedia} ${mediatype.name}' class='d-flex' boxTools=true>
+	<#if is_document_creation_allowed?? && is_document_creation_allowed >
+		<@aButton href='jsp/admin/plugins/library/CreateMediaByInsert.jsp?plugin_name=${plugin_name}&media_type=${mediatype.mediaId}&browser_id_space=${selected_space}&space_id=${selected_space}&input=${.data_model.input}' buttonIcon=btnIcon title=btnTitle size='sm' />
+	</#if>
+	</@boxHeader>
+	<@boxBody>
+		<@div class='row row-cols-4 mt-3' id='insert-service'> 
+			<#list all_documents as mappingdocument>
+				<#assign mapping_id = mappingdocument.first />
+				<#assign document = mappingdocument.second />
+				<@columns>
+					<@tform name='fenvoi' action='jsp/admin/plugins/library/EditSelectedMedia.jsp'>
+						<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+						<@input type='hidden' name='input' value='${.data_model.input}' />
+						<@input type='hidden' name='media' value='${mediatype.mediaId}' />
+						<@input type='hidden' name='id_document' id='id_document' value='${document.id}' />
+						<@input type='hidden' name='id_mapping' id='id_mapping' value='${mapping_id}' />
+						<@input type='hidden' name='space_id' value='${selected_space}' />
+						<@input type='hidden' name='browser_id_space' value='${selected_space}' />
+						<div class="card align-items-center pt-2">
+						<#if mediatype.mediaId=1>
+							<img src="${document.thumbnail}&nocache" class="card-img-top rounded-circle" style="width:100px;height: 100px;object-fit: cover;" data-src="${document.thumbnail}&nocache" >
+						<#else>
+							<figure class="text-white bg-dark rounded-circle p-2">
+								<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+									<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+									<path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+									<path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
+									<path d="M12 17v-6"></path>
+									<path d="M9.5 14.5l2.5 2.5l2.5 -2.5"></path>
+								</svg>
+							</figure>
+						</#if>
+							<div class="card-body">
+								<h2 class="h5 card-title text-center"><#if document.title?length &gt; 20>${document.title?substring(0,20)}...<#else>${document.title}</#if></h2>
+								<p>${mediatype.name!}</p>
+							</div>
+							<div class="card-body text-center">
+								<@button type="submit" title="#i18n{library.manage_media.add.attribute}" />
+							</div>
+						</div>
+					</@tform>
+				</@columns>
+			</#list>
+		</@div>
+	</@boxBody>
+</@box>

@@ -15,25 +15,22 @@
 		</@tform>
 	</@columns>
 </@row>
-
-<script src="js/jquery/plugins/ui/jstree/jquery.jstree.js"></script>
-<script src="js/jquery/plugins/ui/jstree/jquery.cookie.js"></script>
-<script type="text/javascript"> 
-    jQuery(function($) {
-        // Set the cookie of jstree
-        $("#tree").jstree(
-        {
-            "ui" : {
-                "select_limit" : 1,
-            },
-            "themes" : {
-                "theme" : "apple",
-                "icons" : false
-            },
-            "cookies" : {
-                "save_opened" : true,
-            },
-            "plugins" : [ "themes", "html_data", "cookies", "ui" ]
-        });
+<script> 
+jQuery(function($) {
+    // Set the cookie of jstree
+    $("#tree").jstree(
+    {
+        "ui" : {
+            "select_limit" : 1,
+        },
+        "themes" : {
+            "theme" : "apple",
+            "icons" : false
+        },
+        "cookies" : {
+            "save_opened" : true,
+        },
+        "plugins" : [ "themes", "html_data", "cookies", "ui" ]
     });
+});
 </script> 

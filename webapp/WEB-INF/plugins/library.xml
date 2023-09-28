@@ -10,7 +10,7 @@
     <description>library.plugin.description</description>
     <provider>library.plugin.provider</provider>
     <provider-url>http://lutece.paris.fr</provider-url>
-    <icon-url>images/admin/skin/plugins/library/library.png</icon-url>
+    <icon-url>themes/admin/shared/images/plugins/library/images/library.svg</icon-url>
     <copyright>Copyright 2001-2008 Mairie de Paris</copyright>
     <core-version-dependency>
 		<min-core-version>2.3.0</min-core-version>
