@@ -653,11 +653,10 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private LocalizedPaginator<Integer> getPaginator( HttpServletRequest request,
     		List<Integer> listDocumentsId )
     {
-        String strNbItemPerPage = request.getParameter( Paginator.PARAMETER_ITEMS_PER_PAGE );
-
-        if ( StringUtils.isNotEmpty( strNbItemPerPage ) && StringUtils.isNumeric( strNbItemPerPage ) )
+        // Get the number of items to display per page
+        if ( !listDocumentsId.isEmpty( ) )
         {
-            _nNbItemsPerPage = Integer.parseInt( strNbItemPerPage );
+            _nNbItemsPerPage = listDocumentsId.size(  );
         }
 
         if ( _nNbItemsPerPage <= 0 )
@@ -691,7 +690,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         }
 
         url.addParameter( PARAMETER_MEDIA_TYPE, request.getParameter( PARAMETER_MEDIA_TYPE ) );
-        url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, _nNbItemsPerPage );
+        url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, listDocumentsId.size(  ) );
 
         LocalizedPaginator<Integer> paginator = new LocalizedPaginator<Integer>( (List<Integer>) listDocumentsId, _nNbItemsPerPage, url.getUrl(  ),
                 Paginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex, _user.getLocale(  ) );
