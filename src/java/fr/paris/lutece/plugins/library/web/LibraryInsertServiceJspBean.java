@@ -61,7 +61,7 @@ import fr.paris.lutece.portal.web.insert.InsertServiceSelectionBean;
 import fr.paris.lutece.portal.web.util.LocalizedPaginator;
 import fr.paris.lutece.util.UniqueIDGenerator;
 import fr.paris.lutece.util.html.HtmlTemplate;
-import fr.paris.lutece.util.html.Paginator;
+import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.url.UrlItem;
 import fr.paris.lutece.util.xml.XmlUtil;
 
@@ -144,9 +144,10 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private AdminUser _user;
     private Plugin _plugin;
     private String _input;
-    private int _nNbItemsPerPage;
     private String _strCurrentPageIndex;
     private List<SelectedMedia> _listSelectedMedia;
+    private int _nItemsPerPage;
+    private int _nDefaultItemsPerPage;
 
     public String getInsertServiceSelectorUI( HttpServletRequest request )
     {
@@ -197,41 +198,41 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         HashMap<String, Map<String, String>> mapAssociationAttributes = new HashMap<String, Map<String, String>>(  );
         List<Integer> listDocumentsId = new ArrayList<Integer>( );
 
-        
+
         for ( LibraryMapping mapping : allMappings )
         {
             listDocumentsId.addAll( getIdDocumentsFromMapping( mapping, nSpaceId ) );
             mapAssociationAttributes.put( String.valueOf( mapping.getIdMapping(  ) ),
                 getAttributesFromMapping( mapping ) );
         }
-        
+
         LocalizedPaginator<Integer> paginator = getPaginator( request, listDocumentsId );
-        
-        
-       
+
+
+
 
         for ( LibraryMapping mapping : allMappings )
         {
             listDocuments.addAll( getDocumentsFromMapping( mapping, nSpaceId, paginator ) );
-           
+
         }
 
-        // get the selected space 
+        // get the selected space
         DocumentSpace selectedSpace = null ;
-        if ( nSpaceId > 0 ) 
+        if ( nSpaceId > 0 )
         {
-            for ( DocumentSpace space : spaces ) 
+            for ( DocumentSpace space : spaces )
             {
-                if ( space.getId() == nSpaceId ) 
+                if ( space.getId() == nSpaceId )
                 {
                     selectedSpace = space ;
                     break ;
                 }
             }
         }
-        
-        
-        
+
+
+
         HashMap<String, Object> model = getDefaultModel(  );
         model.put( MARK_PREVIEW_TYPE, "<img src='%SRC' alt='%ALT' />" );
         model.put( MARK_MEDIA_TYPE, mediaType );
@@ -244,7 +245,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         model.put( MARK_PAGINATOR, paginator );
         model.put( MARK_NB_ITEMS_PER_PAGE, Integer.toString( paginator.getItemsPerPage(  ) ) );
         model.put( MARK_SELECTED_MEDIAS, _listSelectedMedia );
-        model.put( MARK_IS_DOCUMENT_CREATION_ALLOWED , 
+        model.put( MARK_IS_DOCUMENT_CREATION_ALLOWED ,
                 ( selectedSpace!=null?selectedSpace.isDocumentCreationAllowed():false ) ) ;
         HtmlTemplate template = AppTemplateService.getTemplate( mediaType.getIsMultipleMedia(  )
                 ? TEMPLATE_MEDIA_SELECTOR_MULTIPLE : TEMPLATE_MEDIA_SELECTOR, _user.getLocale(  ), model );
@@ -310,7 +311,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         urlItem.addParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID, strIdSpaceFilter );
         urlItem.addParameter( PARAMETER_BROWSER_SPACE_ID, strIdSpace );
 
-        
+
         if ( Boolean.parseBoolean( request.getParameter( PARAMETER_REMOVE_SELECTED ) ) )
         {
             int nIdDocument = Integer.parseInt( strDocumentId );
@@ -436,7 +437,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         urlItem.addParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID, strIdSpaceFilter );
         urlItem.addParameter( PARAMETER_BROWSER_SPACE_ID, strIdSpace );
 
-        
+
         boolean bMoveUp = Boolean.parseBoolean( request.getParameter( PARAMETER_MOVE_UP ) );
 
         int nIdDocument = Integer.parseInt( strDocumentId );
@@ -561,13 +562,13 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         }
 
         // We reset session parameters
-        _nNbItemsPerPage = 0;
+        _nItemsPerPage = 0;
         _strCurrentPageIndex = "";
         _listSelectedMedia = null;
 
         return insertUrl( request, _input, strHtml );
     }
-    
+
     private List<Integer> getIdDocumentsFromMapping( LibraryMapping m, int nSpaceId )
     {
             DocumentFilter filter = new DocumentFilter(  );
@@ -594,7 +595,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private List<Pair<String, Document>> getDocumentsFromMapping( LibraryMapping m, int nSpaceId,
     		LocalizedPaginator<Integer> paginator)
     {
-    	
+
         List<Pair<String, Document>> result = new ArrayList<Pair<String, Document>>(  );
         for ( Integer documentId : paginator.getPageItems( ) )
         {
@@ -605,7 +606,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
            	 result.add( new Pair<String, Document>( String.valueOf( m.getIdMapping(  ) ), document ) );
             }
         }
-       
+
 
         return result;
     }
@@ -653,25 +654,14 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private LocalizedPaginator<Integer> getPaginator( HttpServletRequest request,
     		List<Integer> listDocumentsId )
     {
-        String strNbItemPerPage = request.getParameter( Paginator.PARAMETER_ITEMS_PER_PAGE );
+        _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_RESULTS_PER_PAGE, 10 );
+        _nItemsPerPage = AbstractPaginator.getItemsPerPage( request, AbstractPaginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, _nDefaultItemsPerPage );
 
-        if ( StringUtils.isNotEmpty( strNbItemPerPage ) && StringUtils.isNumeric( strNbItemPerPage ) )
+        _strCurrentPageIndex = AbstractPaginator.getPageIndex( request, AbstractPaginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex );
+
+        if ( StringUtils.isNotEmpty( _strCurrentPageIndex ) && StringUtils.isNumeric( _strCurrentPageIndex ) )
         {
-            _nNbItemsPerPage = Integer.parseInt( strNbItemPerPage );
-        }
-
-        if ( _nNbItemsPerPage <= 0 )
-        {
-            String strDefaultNbItemPerPage = AppPropertiesService.getProperty( PROPERTY_RESULTS_PER_PAGE,
-                    DEFAULT_RESULTS_PER_PAGE );
-            _nNbItemsPerPage = Integer.parseInt( strDefaultNbItemPerPage );
-        }
-
-        String strCurrentPageIndex = request.getParameter( Paginator.PARAMETER_PAGE_INDEX );
-
-        if ( StringUtils.isNotEmpty( strCurrentPageIndex ) && StringUtils.isNumeric( strCurrentPageIndex ) )
-        {
-            _strCurrentPageIndex = strCurrentPageIndex;
+            _strCurrentPageIndex = _strCurrentPageIndex;
         }
 
         if ( StringUtils.isEmpty( _strCurrentPageIndex ) )
@@ -691,14 +681,11 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         }
 
         url.addParameter( PARAMETER_MEDIA_TYPE, request.getParameter( PARAMETER_MEDIA_TYPE ) );
-        url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, _nNbItemsPerPage );
+        url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, _nItemsPerPage );
 
-        LocalizedPaginator<Integer> paginator = new LocalizedPaginator<Integer>( (List<Integer>) listDocumentsId, _nNbItemsPerPage, url.getUrl(  ),
-                Paginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex, _user.getLocale(  ) );
+        LocalizedPaginator<Integer> paginator = new LocalizedPaginator<Integer>( (List<Integer>) listDocumentsId, _nItemsPerPage, url.getUrl(  ),
+                AbstractPaginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex, _user.getLocale(  ) );
         return paginator;
-        
-        //return new Paginator<Pair<String, Document>>( list, _nNbItemsPerPage, url.getUrl(  ), PARAMETER_PAGE_INDEX,
-          //  _strCurrentPageIndex );
     }
 
     public class Pair<X, Y>

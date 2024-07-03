@@ -18,7 +18,7 @@
 	</#if>
 	</@boxHeader>
 	<@boxBody>
-		<@div class='row row-cols-4 mt-3' id='insert-service'> 
+		<@div class='row row-cols-4 mt-3' id='insert-service'>
 			<#list all_documents as mappingdocument>
 				<#assign mapping_id = mappingdocument.first />
 				<#assign document = mappingdocument.second />
@@ -59,3 +59,4 @@
 		</@div>
 	</@boxBody>
 </@box>
+<@paginationAdmin paginator=paginator combo=1 />
