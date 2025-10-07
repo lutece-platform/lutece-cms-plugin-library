@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset library:init_db_library.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- Dumping data for table library_media
 --

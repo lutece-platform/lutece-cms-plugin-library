@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset library:init_core_library.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- Dumping data for table core_admin_right
 --
