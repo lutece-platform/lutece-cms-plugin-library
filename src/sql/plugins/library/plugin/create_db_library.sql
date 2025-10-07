@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset library:create_db_library.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- Structure for table library_mapping
 --
