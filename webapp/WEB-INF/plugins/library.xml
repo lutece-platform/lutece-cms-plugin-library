@@ -2,7 +2,7 @@
     <!-- Plugin Informations -->
     <name>library</name>
     <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
-    <version>5.0.3-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
     <documentation/>
     <installation/>
     <changes/>
@@ -13,7 +13,7 @@
     <icon-url>themes/admin/shared/images/plugins/library/images/library.svg</icon-url>
     <copyright>Copyright 2001-2008 Mairie de Paris</copyright>
     <core-version-dependency>
-		<min-core-version>2.3.0</min-core-version>
+		<min-core-version>8.0.0</min-core-version>
 		<max-core-version/>	
 	</core-version-dependency>
     <db-pool-required>1</db-pool-required>

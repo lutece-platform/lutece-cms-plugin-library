@@ -81,7 +81,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -92,6 +94,8 @@ import javax.xml.transform.stream.StreamSource;
  * Used for uploading document
  *
  */
+@RequestScoped
+@Named( "libraryUploadInsertServiceJspBean" )
 public class UploadInsertServiceJspBean extends InsertServiceJspBean implements InsertServiceSelectionBean
 {
     private static final long serialVersionUID = -7071548876864568789L;
@@ -339,6 +343,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
      */
     public String createDocument( HttpServletRequest request , Document document )
     {
+        init (request );
 
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 

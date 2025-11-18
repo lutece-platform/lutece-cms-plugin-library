@@ -75,12 +75,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 /**
  * Library insert service JSP Bean
  */
+@SessionScoped
+@Named
 public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements InsertServiceSelectionBean
 {
     private static final long serialVersionUID = -7071548876864568789L;
@@ -426,6 +430,8 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
     public String doMoveMedia( HttpServletRequest request )
     {
+        init( request );
+
         String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
         String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
         String strIdSpaceFilter = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID );

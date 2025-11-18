@@ -36,11 +36,12 @@ package fr.paris.lutece.plugins.library.business;
 import fr.paris.lutece.plugins.library.business.LibraryMapping.AttributeAssociation;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-
+@ApplicationScoped
 public class LibraryMappingDAO implements ILibraryMappingDAO
 {
     private static final String SQL_QUERY_NEW_PK = " SELECT max( id_mapping ) FROM library_mapping ";

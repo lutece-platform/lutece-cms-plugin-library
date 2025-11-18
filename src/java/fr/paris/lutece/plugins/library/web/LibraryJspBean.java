@@ -49,6 +49,7 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.upload.MultipartItem;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
@@ -57,20 +58,22 @@ import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.apache.commons.fileupload.FileItem;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 /**
  * Library management JSP Bean
  */
+@RequestScoped
+@Named
 public class LibraryJspBean extends PluginAdminPageJspBean
 {
     /**
@@ -176,7 +179,7 @@ public class LibraryJspBean extends PluginAdminPageJspBean
         String strDescription = request.getParameter( PARAMETER_MEDIA_DESCRIPTION );
 
         MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
-        FileItem item = mRequest.getFile( PARAMETER_MEDIA_STYLESHEET );
+        MultipartItem item = mRequest.getFile( PARAMETER_MEDIA_STYLESHEET );
 
         if ( ( strName.length(  ) == 0 ) || ( strDescription.length(  ) == 0 ) || ( item.getSize(  ) == 0 ) )
         {
@@ -275,7 +278,7 @@ public class LibraryJspBean extends PluginAdminPageJspBean
         String strDescription = request.getParameter( PARAMETER_MEDIA_DESCRIPTION );
 
         MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
-        FileItem item = mRequest.getFile( PARAMETER_MEDIA_STYLESHEET );
+        MultipartItem item = mRequest.getFile( PARAMETER_MEDIA_STYLESHEET );
 
         if ( ( strName.length(  ) == 0 ) || ( strDescription.length(  ) == 0 ) || ( strMediaId.length(  ) == 0 ) )
         {
