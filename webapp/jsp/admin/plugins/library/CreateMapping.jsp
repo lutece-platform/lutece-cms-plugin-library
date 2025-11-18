@@ -1,10 +1,9 @@
 <%@ page errorPage="../../ErrorPage.jsp" %>
-
 <jsp:include page="../../AdminHeader.jsp" />
 
-<jsp:useBean id="library" scope="session" class="fr.paris.lutece.plugins.library.web.LibraryJspBean" />
+<%@page import="fr.paris.lutece.plugins.library.web.LibraryJspBean"%>
 
-<% library.init( request, library.LIBRARY_MANAGEMENT ); %>
-<%= library.getCreateMapping( request ) %>
+${ libraryJspBean.init( pageContext.request, LibraryJspBean.LIBRARY_MANAGEMENT ) }
+${ libraryJspBean.getCreateMapping( pageContext.request ) }
 
 <%@ include file="../../AdminFooter.jsp" %>

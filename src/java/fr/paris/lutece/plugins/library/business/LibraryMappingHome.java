@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2025, Mairie de Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@
 package fr.paris.lutece.plugins.library.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
 
 import java.util.Collection;
 
@@ -42,8 +42,7 @@ import java.util.Collection;
 public class LibraryMappingHome
 {
     // Static variable pointed at the DAO instance
-    private static ILibraryMappingDAO _dao = (ILibraryMappingDAO) SpringContextService.getPluginBean( "library",
-            "libraryMappingDAO" );
+    private static ILibraryMappingDAO _dao = CDI.current().select( ILibraryMappingDAO.class).get( );
 
     private LibraryMappingHome(  )
     {

@@ -34,7 +34,7 @@
 package fr.paris.lutece.plugins.library.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
 
 import java.util.Collection;
 
@@ -42,8 +42,7 @@ import java.util.Collection;
 public class MediaAttributeHome
 {
     //  Static variable pointed at the DAO instance
-    private static IMediaAttributeDAO _dao = (IMediaAttributeDAO) SpringContextService.getPluginBean( "library",
-            "mediaAttributeDAO" );
+    private static IMediaAttributeDAO _dao = CDI.current( ).select( IMediaAttributeDAO.class ).get( );
 
     private MediaAttributeHome(  )
     {
