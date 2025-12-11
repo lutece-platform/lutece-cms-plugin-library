@@ -173,7 +173,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
         String strMediaType = request.getParameter( PARAMETER_MEDIA_TYPE );
 
-        String strSpaceIdRequest = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID );
+        String strSpaceIdRequest = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SPACE_ID );
         int nSpaceId = -1;
 
         if ( ( strSpaceIdRequest != null ) && ( strSpaceIdRequest.length(  ) > 0 ) )
@@ -210,7 +210,9 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
                 getAttributesFromMapping( mapping ) );
         }
 
-        LocalizedPaginator<Integer> paginator = getPaginator( request, listDocumentsId );
+        String idSpace = Integer.toString(nSpaceId);
+        String baseUrl = getBaseUrl(request, idSpace);
+        LocalizedPaginator<Integer> paginator = getPaginator( request, listDocumentsId, baseUrl );
 
 
 
@@ -244,7 +246,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         model.put( MARK_ALL_MEDIA_ATTRIBUTES_ASSOCIATIONS, mapAssociationAttributes );
         model.put( MARK_ALL_DOCUMENTS, listDocuments );
         model.put( MARK_SPACES_BROWSER,
-            DocumentSpacesService.getInstance(  ).getSpacesBrowser( request, _user, _user.getLocale(  ), true, true, true ) );
+            DocumentSpacesService.getInstance(  ).getSpacesBrowser( request, _user, _user.getLocale(  ), true, true, true, idSpace, baseUrl) );
         model.put( MARK_SELECTED_SPACE, nSpaceId );
         model.put( MARK_PAGINATOR, paginator );
         model.put( MARK_NB_ITEMS_PER_PAGE, Integer.toString( paginator.getItemsPerPage(  ) ) );
@@ -657,8 +659,27 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         return model;
     }
 
+    /**
+     * Build baseurl for action
+     *
+     * @param request The HTTP request
+     * @param selectedSpace The selected space
+     * @return baseURL
+     */
+    private String getBaseUrl( HttpServletRequest request, String selectedSpace )
+    {
+        UrlItem url = new UrlItem( JSP_MEDIA_TYPE_SELECTION );
+        url.addParameter( PARAMETER_INPUT, _input );
+        url.addParameter( PARAMETER_PLUGIN_NAME, _plugin.getName(  ) );
+        url.addParameter( PARAMETER_SPACE_ID, selectedSpace );
+        url.addParameter( PARAMETER_MEDIA_TYPE, request.getParameter( PARAMETER_MEDIA_TYPE ) );
+        url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, _nItemsPerPage );
+
+        return url.getUrl(  );
+    }
+
     private LocalizedPaginator<Integer> getPaginator( HttpServletRequest request,
-    		List<Integer> listDocumentsId )
+    		List<Integer> listDocumentsId, String baseUrl )
     {
         _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_RESULTS_PER_PAGE, 10 );
         _nItemsPerPage = AbstractPaginator.getItemsPerPage( request, AbstractPaginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, _nDefaultItemsPerPage );
@@ -675,21 +696,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
             _strCurrentPageIndex = DEFAULT_PAGE_INDEX;
         }
 
-        UrlItem url = new UrlItem( JSP_MEDIA_TYPE_SELECTION );
-        url.addParameter( PARAMETER_INPUT, _input );
-        url.addParameter( PARAMETER_PLUGIN_NAME, _plugin.getName(  ) );
-
-        String strSpaceId = request.getParameter( PARAMETER_SPACE_ID );
-
-        if ( strSpaceId != null )
-        {
-            url.addParameter( PARAMETER_SPACE_ID, strSpaceId );
-        }
-
-        url.addParameter( PARAMETER_MEDIA_TYPE, request.getParameter( PARAMETER_MEDIA_TYPE ) );
-        url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, _nItemsPerPage );
-
-        LocalizedPaginator<Integer> paginator = new LocalizedPaginator<Integer>( (List<Integer>) listDocumentsId, _nItemsPerPage, url.getUrl(  ),
+        LocalizedPaginator<Integer> paginator = new LocalizedPaginator<Integer>( (List<Integer>) listDocumentsId, _nItemsPerPage, baseUrl,
                 AbstractPaginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex, _user.getLocale(  ) );
         return paginator;
     }
