@@ -19,6 +19,17 @@
 	</@boxHeader>
 	<@boxBody>
 		<@div class='row row-cols-4 mt-3' id='insert-service'>
+			<@div class="col-12 col-md-4 col-lg-3">
+				<@tform name='filter' action='jsp/admin/plugins/library/SelectMedia.jsp' class="form">
+					<@input type="hidden" name="plugin_name" value="${plugin_name}" />
+					<@input type="hidden" name="input" value="${.data_model.input}" />
+					<@input type="hidden" name="media_type" value="${mediatype.mediaId}" />
+					<@input type="hidden" name="space_id" value="${selected_space}" />
+					<@div class="form-group">
+						${spaces_browser}
+					</@div>
+				</@tform>
+			</@div>
 			<#list all_documents as mappingdocument>
 				<#assign mapping_id = mappingdocument.first />
 				<#assign document = mappingdocument.second />
