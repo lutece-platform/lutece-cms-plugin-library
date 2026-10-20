@@ -48,6 +48,7 @@ import fr.paris.lutece.portal.service.html.XmlTransformerService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.upload.MultipartItem;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
@@ -58,6 +59,9 @@ import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -67,6 +71,7 @@ import java.util.Map;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 /**
@@ -80,6 +85,7 @@ public class LibraryJspBean extends PluginAdminPageJspBean
      * Right to manage libray plugin
      */
     public static final String LIBRARY_MANAGEMENT = "LIBRARY_MANAGEMENT";
+    private static final String PLUGIN_NAME = "library";
     private static final long serialVersionUID = -4537118194245494293L;
 
     // Jsp
@@ -114,6 +120,8 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     private static final String PROPERTY_MESSAGE_REMOVE_MAPPING = "library.message.mapping.remove";
     private static final String PROPERTY_PAGE_TITLE_MAPPING_MODIFICATION = "library.pageTitle.mapping.modification";
     private static final String PROPERTY_MESSAGE_REMOVE_ATTRIBUTE = "library.message.attribute.remove";
+    private static final String PROPERTY_MESSAGE_MEDIA_NOT_FOUND = "library.message.media.notFound";
+    private static final String PROPERTY_MESSAGE_ATTRIBUTE_NOT_FOUND = "library.message.attribute.notFound";
 
     // Marks
     private static final String MARK_MEDIA_LIST = "media_list";
@@ -306,13 +314,27 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     }
 
     /**
+     * Get the attribute creation page of a media
      *
-     * @param request
-     * @return
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @return the page, or null if the response has been redirected
+     * @throws IOException if the redirection fails
      */
-    public String getCreateAttribute( HttpServletRequest request )
+    public String getCreateAttribute( HttpServletRequest request, HttpServletResponse response )
+        throws IOException
     {
         String strMediaId = request.getParameter( PARAMETER_MEDIA_ID );
+
+        if ( !StringUtils.isNumeric( strMediaId ) ||
+                ( LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaId ), PluginService.getPlugin( PLUGIN_NAME ) ) == null ) )
+        {
+            response.sendRedirect( AdminMessageService.getMessageUrl( request, PROPERTY_MESSAGE_MEDIA_NOT_FOUND,
+                    AdminMessage.TYPE_STOP ) );
+
+            return null;
+        }
+
         setPageTitleProperty( PROPERTY_PAGE_TITLE_ATTRIBUTE_CREATION );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
@@ -360,18 +382,30 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     }
 
     /**
+     * Get the modification page of a media attribute
      *
-     * @param request
-     * @return
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @return the page, or null if the response has been redirected
+     * @throws IOException if the redirection fails
      */
-    public String getModifyAttribute( HttpServletRequest request )
+    public String getModifyAttribute( HttpServletRequest request, HttpServletResponse response )
+        throws IOException
     {
         setPageTitleProperty( PROPERTY_PAGE_TITLE_ATTRIBUTE_MODIFICATION );
 
         String strAttributeId = request.getParameter( PARAMETER_ATTRIBUTE_ID );
-        int nAttributeId = Integer.parseInt( strAttributeId );
+        MediaAttribute attribute = StringUtils.isNumeric( strAttributeId )
+            ? MediaAttributeHome.findByPrimaryKey( Integer.parseInt( strAttributeId ), PluginService.getPlugin( PLUGIN_NAME ) ) : null;
 
-        MediaAttribute attribute = MediaAttributeHome.findByPrimaryKey( nAttributeId, getPlugin(  ) );
+        if ( attribute == null )
+        {
+            response.sendRedirect( AdminMessageService.getMessageUrl( request, PROPERTY_MESSAGE_ATTRIBUTE_NOT_FOUND,
+                    AdminMessage.TYPE_STOP ) );
+
+            return null;
+        }
+
         HashMap<String, Object> model = new HashMap<String, Object>(  );
 
         model.put( MARK_ATTRIBUTE, attribute );
