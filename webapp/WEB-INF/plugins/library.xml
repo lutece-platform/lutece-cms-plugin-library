@@ -10,7 +10,7 @@
     <description>library.plugin.description</description>
     <provider>library.plugin.provider</provider>
     <provider-url>http://lutece.paris.fr</provider-url>
-    <icon-url>themes/admin/shared/images/plugins/library/images/library.svg</icon-url>
+    <icon-url>themes/shared/plugins/library/images/library.svg</icon-url>
     <copyright>Copyright 2001-2008 Mairie de Paris</copyright>
     <core-version-dependency>
 		<min-core-version>8.0.0</min-core-version>
@@ -26,7 +26,7 @@
             <feature-description>library.adminFeature.library_management.description</feature-description>
             <feature-level>0</feature-level>
             <feature-url>jsp/admin/plugins/library/ManageLibrary.jsp</feature-url>
-            <feature-icon-url>images/admin/skin/plugins/library/manage_library.png</feature-icon-url>
+            <feature-icon-url>ti ti-books</feature-icon-url>
         </admin-feature> 
     </admin-features>   
 

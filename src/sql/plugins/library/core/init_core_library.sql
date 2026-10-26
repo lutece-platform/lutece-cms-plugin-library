@@ -19,3 +19,6 @@ DELETE FROM core_datastore WHERE entity_key='library.insert_service_media_type_p
 INSERT INTO core_datastore VALUES ('library.insert_service_media_type_pdf', '3');
 DELETE FROM core_datastore WHERE entity_key='library.insert_service_media_type_pdf_space';
 INSERT INTO core_datastore VALUES ('library.insert_service_media_type_pdf_space', '8');
+-- changeset library:init_core_library.sql-rev1.sql
+-- preconditions onFail:MARK_RAN onError:WARN
+UPDATE core_admin_right SET icon_url = 'ti ti-books' WHERE id_right = 'LIBRARY_MANAGEMENT' AND icon_url = 'images/admin/skin/plugins/library/library.png';
