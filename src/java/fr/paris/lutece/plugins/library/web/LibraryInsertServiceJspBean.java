@@ -583,14 +583,15 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
             filter.setCodeDocumentType( m.getCodeDocumentType(  ) );
             filter.setIdState( APPROVED_DOCUMENT_STATE );
 
-            List<Integer> documents = null;
+            // no space chosen yet, or a space the user may not see: no document
+            List<Integer> documents = new ArrayList<Integer>(  );
 
             if ( nSpaceId >= 0 )
             {
                 if ( !DocumentSpacesService.getInstance(  ).isAuthorizedViewByRole( nSpaceId, _user ) ||
                         !DocumentSpacesService.getInstance(  ).isAuthorizedViewByWorkgroup( nSpaceId, _user ) )
                 {
-                    return null;
+                    return documents;
                 }
 
                 filter.setIdSpace( nSpaceId );
