@@ -561,7 +561,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
             String strPreHtml = xmlTransformerService.transformBySourceWithXslCache( sbXml.toString(  ),
                     mediaType.getStyleSheet(  ).getSource(  ), strXslUniqueId, null, null );
 
-            strHtml = StringEscapeUtils.escapeEcmaScript( strPreHtml );
+            strHtml = strPreHtml;
         }
         catch ( Exception e )
         {
