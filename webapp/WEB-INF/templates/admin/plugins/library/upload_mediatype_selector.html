@@ -5,13 +5,10 @@
 				<legend>#i18n{library.insertservice.selectMediaType}</legend>
 				<@input type='hidden' name='plugin_name' value='${plugin_name}' />
 				<@input type='hidden' name='input' value='${.data_model.input}' />
-				<@input type='hidden' name='media_type' value='' />
 				<ul class="list-unstyled">
 					<#list mediatypes as mediatype>
 					<li>
-						<@link href='javascript:document.fenvoi.media_type.value=${mediatype.mediaId?trim};document.fenvoi.submit();'  title='${mediatype.description}'>
-							<@icon style='chevron-right' /> ${mediatype.description}
-						</@link>
+						<@button type='submit' name='media_type' value='${mediatype.mediaId?c}' color='link' class='px-0' title=mediatype.description buttonIcon='chevron-right' />
 					</li>	
 					</#list>
 				</ul>

@@ -14,7 +14,7 @@
 					</@formGroup>
 					
 					<@formGroup labelFor='attribute_type' labelKey='#i18n{library.create_attribute.type}' mandatory=true>
-						<@select name='attribute_type' default_value='' params='onChange=\"javascript:displayDefaultValue();\"' items=attribute_type_list />
+						<@select name='attribute_type' default_value='' items=attribute_type_list />
 					</@formGroup>
 					
 					<@formGroup labelFor='attribute_default_value' labelKey='#i18n{library.create_attribute.defaultValue}' mandatory=true>
@@ -23,7 +23,7 @@
 					
 					<@formGroup>
 						<@button type='submit' title='#i18n{library.create_attribute.button.validate}' buttonIcon='save' />
-						<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${mediaId}' title='#i18n{library.create_attribute.button.cancel}' buttonIcon='times' color='default' />
+						<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${mediaId?url}' title='#i18n{library.create_attribute.button.cancel}' buttonIcon='times' color='default' />
 					</@formGroup>
 				</@tform>	
 			</@boxBody>
@@ -35,11 +35,12 @@
 function displayDefaultValue(  ){
 var attribute_type = document.getElementById("attribute_type");
 var attribute_default_value = document.getElementById("attribute_default_value");
-if( attribute_type.options[attribute_type.selectedIndex].value == "${typeIdWithDefaultValue}"){
+if( attribute_type.options[attribute_type.selectedIndex].value == "${typeIdWithDefaultValue?c}"){
 		attribute_default_value.disabled = false;
 	} else {
 		attribute_default_value.value = "";
 		attribute_default_value.disabled = true;
     }
 }
+document.getElementById( 'attribute_type' ).addEventListener( 'change', displayDefaultValue );
 </script>

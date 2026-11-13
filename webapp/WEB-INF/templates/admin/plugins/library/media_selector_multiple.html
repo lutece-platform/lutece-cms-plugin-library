@@ -29,7 +29,7 @@
 							</@formGroup>
 							<#if all_documents?? && all_documents?size &gt; 0>
 								<@div align='right'>
-									<@aButton href='jsp/admin/plugins/library/DoAddAllSpace.jsp?media=${mediatype.mediaId}' title='#i18n{library.insertservice.label.addAllSpace}' buttonIcon='plus-circle' />
+									<@aButton href='jsp/admin/plugins/library/DoAddAllSpace.jsp?media=${mediatype.mediaId?c}' title='#i18n{library.insertservice.label.addAllSpace}' buttonIcon='plus-circle' />
 								</@div>
 							</#if>
 						</@tform>
@@ -38,8 +38,8 @@
 							<@input type='hidden' name='plugin_name' value='${plugin_name}' />
 							<@input type='hidden' name='input' value='${.data_model.input}' />
 							<@input type='hidden' name='media' value='${mediatype.mediaId}' />
-							<@input type='hidden' name='id_document" id="id_document' value='' />
-							<@input type='hidden' name='id_mapping" id="id_mapping' value='' />
+							<@input type='hidden' name='id_document' id='id_document' value='' />
+							<@input type='hidden' name='id_mapping' id='id_mapping' value='' />
 							<@input type='hidden' name='space_id' value='${selected_space}' />
 							<@input type='hidden' name='browser_id_space' value='${selected_space}' />
 							<@input type='hidden' name='browser_selected_space_id' value='${selected_space}' />
@@ -52,12 +52,12 @@
 											<img src="${document.thumbnail}&nocache" data-src="${document.thumbnail}&nocache" class="thumbnail" alt="${document.title}" title="${document.title} - ${document.type}">
 											<div class="caption">
 												<p>
-												<@link href='javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value="${document.id}"; document.fenvoi.submit();'  title='#i18n{library.create_media.button.select}'>
+												<@link href='#' class='library-select-media' params={"data-mapping": mapping_id, "data-document": document.id?c} title='#i18n{library.create_media.button.select}'>
 													<@tag>${document.id}</@tag>
 													<small><#if document.title?length &gt; 50>${document.title?substring(0,50)}...<#else>${document.title}</#if></small></p>
 												</@link>
 												<p>
-													<@aButton id='btn-select' params='data-mapping="${mapping_id}" data-document="${document.id}"' href='javascript:document.fenvoi.id_mapping.value=${mapping_id}; document.fenvoi.id_document.value="${document.id}"; document.fenvoi.submit();'  title='#i18n{library.create_media.button.select}' buttonIcon='check' />
+													<@aButton href='#' class='library-select-media' params={"data-mapping": mapping_id, "data-document": document.id?c} title='#i18n{library.create_media.button.select}' buttonIcon='check' />
 												</p>
 											</div>
 										</div>
@@ -102,22 +102,33 @@
 							<img src="${document.thumbnail}&nocache" data-src="${document.thumbnail}&nocache" class="thumbnail" alt="${document.title}" title="${document.title} - ${document.type}">
 						</@td>
 						<@td>
-							<@aButton href='jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=${document.id}&remove_selected=true&media=${media.mediaTypeId}&id_mapping=${media.mappingId}&browser_id_space=${selected_space}&browser_selected_space_id=${selected_space}' title='#i18n{portal.util.labelDelete}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
+							<@aButton href='jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=${document.id?c}&remove_selected=true&media=${media.mediaTypeId?c}&id_mapping=${media.mappingId?c}&browser_id_space=${selected_space?c}&browser_selected_space_id=${selected_space?c}' title='#i18n{portal.util.labelDelete}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
 							<#if media_index &lt; (selected_medias?size - 1)>
-								<@aButton href='jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id}&move_up=false&media=${media.mediaTypeId}&id_mapping=${media.mappingId}&browser_id_space=${selected_space}&browser_selected_space_id=${selected_space}' buttonIcon='arrow-down' size='sm' />
+								<@aButton href='jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id?c}&move_up=false&media=${media.mediaTypeId?c}&id_mapping=${media.mappingId?c}&browser_id_space=${selected_space?c}&browser_selected_space_id=${selected_space?c}' buttonIcon='arrow-down' size='sm' />
 							</#if>
 							<#if media_index &gt; 0>
-								<@aButton href='jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id}&move_up=true&media=${media.mediaTypeId}&id_mapping=${media.mappingId}&browser_id_space=${selected_space}&browser_selected_space_id=${selected_space}' buttonIcon='arrow-up' size='sm' />
+								<@aButton href='jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id?c}&move_up=true&media=${media.mediaTypeId?c}&id_mapping=${media.mappingId?c}&browser_id_space=${selected_space?c}&browser_selected_space_id=${selected_space?c}' buttonIcon='arrow-up' size='sm' />
 							</#if>
 						</@td>
 					</@tr>
 				</#list>
 				</@table>
 				<@formGroup>
-					<@aButton href='jsp/admin/plugins/library/EditSelectedMedia.jsp?media=${mediatype.mediaId}' title='#i18n{library.create_media.button.validate}' title='#i18n{library.create_media.button.validate}' buttonIcon='save' />
+					<@aButton href='jsp/admin/plugins/library/EditSelectedMedia.jsp?media=${mediatype.mediaId?c}' title='#i18n{library.create_media.button.validate}' title='#i18n{library.create_media.button.validate}' buttonIcon='save' />
 				</@formGroup>
 			</@boxBody>
 		</@box>
 		</#if>
 	</@columns>
 </@row>
+<script>
+document.querySelectorAll( '.library-select-media' ).forEach( function( link ) {
+	link.addEventListener( 'click', function( e ) {
+		e.preventDefault( );
+		const form = document.getElementById( 'fenvoi' );
+		form.elements['id_mapping'].value = link.dataset.mapping;
+		form.elements['id_document'].value = link.dataset.document;
+		form.submit( );
+	} );
+} );
+</script>

@@ -63,6 +63,7 @@ import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.template.HtmlMarkup;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.web.insert.InsertServiceJspBean;
@@ -242,10 +243,10 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         HashMap<String, Object> model = getDefaultModel(  );
         model.put( MARK_DOCUMENT_TYPE, documentType.getCode(  ) );
-        model.put( MARK_FIELDS,
+        model.put( MARK_FIELDS, HtmlMarkup.of(
             DocumentService.getInstance(  )
                            .getCreateForm( documentType.getCode(  ), _user.getLocale(  ),
-                AppPathService.getBaseUrl( request ) ) );
+                AppPathService.getBaseUrl( request ) ) ) );
         model.put( MARK_METADATA, new DublinCoreMetadata(  ) );
         model.put( MARK_MEDIA, mediaType.getMediaId(  ) );
         model.put( MARK_INPUT, _input );
@@ -327,7 +328,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         HashMap<String, Object> model = getDefaultModel(  );
 
         model.put( MARK_INPUT, _input );
-        model.put( MARK_SPACES_TREE, strSpacesTree );
+        model.put( MARK_SPACES_TREE, HtmlMarkup.of( strSpacesTree ) );
         model.put( MARK_SPACE, currentSpace );
         model.put( MARK_MEDIA_TYPE, strMediaType );
 

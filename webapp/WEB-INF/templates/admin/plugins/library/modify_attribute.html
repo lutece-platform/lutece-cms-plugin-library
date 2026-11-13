@@ -14,7 +14,7 @@
 						<@input type='text' name='attribute_description' id='attribute_description' value='${attribute.description}' maxlength=250 />
 					</@formGroup>	
 					<@formGroup labelFor='attribute_type' labelKey='#i18n{library.modify_attribute.type}' mandatory=true>
-						<@select name='attribute_type' default_value='${attribute.typeId}' params='onChange=\"javascript:displayDefaultValue();\""' items=attribute_type_list />
+						<@select name='attribute_type' default_value='${attribute.typeId?c}' items=attribute_type_list />
 					</@formGroup>
 					<@formGroup labelFor='attribute_default_value' labelKey='#i18n{library.create_attribute.defaultValue}' mandatory=true>
 						<@input type='text' name='attribute_default_value' id='attribute_default_value' value='${attribute.defaultValue}' maxlength=100 disabled=(attribute.typeId != typeIdWithDefaultValue) />
@@ -33,11 +33,12 @@
 function displayDefaultValue(  ){
 var attribute_type = document.getElementById("attribute_type");
 var attribute_default_value = document.getElementById("attribute_default_value");
-if( attribute_type.options[attribute_type.selectedIndex].value == "${typeIdWithDefaultValue}"){
+if( attribute_type.options[attribute_type.selectedIndex].value == "${typeIdWithDefaultValue?c}"){
 	attribute_default_value.disabled = false;
 } else {
 	attribute_default_value.value = "";
 	attribute_default_value.disabled = true;
     }
 }
+document.getElementById( 'attribute_type' ).addEventListener( 'change', displayDefaultValue );
 </script>

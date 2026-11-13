@@ -50,6 +50,7 @@ import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.template.HtmlMarkup;
 import fr.paris.lutece.portal.service.upload.MultipartItem;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.portal.web.constants.Messages;
@@ -130,6 +131,7 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     private static final String MARK_ATTRIBUTE_TYPE_LIST = "attribute_type_list";
     private static final String MARK_ATTRIBUTE = "attribute";
     private static final String MARK_MAPPING_LIST = "mapping_list";
+    private static final String MARK_ASSOCIATION_LABELS = "association_labels";
     private static final String MARK_DOCUMENT_TYPE_LIST = "document_type_list";
     private static final String MARK_DOCUMENT_TYPE = "document_type";
     private static final String MARK_DOCUMENT_ATTRIBUTE = "document_attribute";
@@ -545,6 +547,9 @@ public class LibraryJspBean extends PluginAdminPageJspBean
 
         Collection<LibraryMapping> colMappings = LibraryMappingHome.findAllMappingsByMedia( nMediaId, getPlugin(  ) );
 
+        // the labels are HTML rendered by a template: marked here, keyed by "idMapping-idMediaAttribute"
+        Map<String, Object> mapAssociationLabels = new HashMap<String, Object>(  );
+
         for ( LibraryMapping mapping : colMappings )
         {
             if ( mapping.getAttributeAssociationList(  ) == null )
@@ -564,13 +569,15 @@ public class LibraryJspBean extends PluginAdminPageJspBean
 
                 HtmlTemplate templateLabel = AppTemplateService.getTemplate( TEMPLATE_GENERATE_ASSOCIATION_LABEL,
                         getLocale(  ), modelLabel );
-                association.setAssociationLabel( templateLabel.getHtml(  ) );
+                mapAssociationLabels.put( mapping.getIdMapping(  ) + "-" + association.getIdMediaAttribute(  ),
+                    HtmlMarkup.of( templateLabel.getHtml(  ) ) );
             }
         }
 
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_MEDIA, media );
         model.put( MARK_MAPPING_LIST, colMappings );
+        model.put( MARK_ASSOCIATION_LABELS, mapAssociationLabels );
         model.put( MARK_DOCUMENT_TYPE_LIST, DocumentTypeHome.getDocumentTypesList(  ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_MAPPINGS, getLocale(  ), model );

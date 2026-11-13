@@ -20,7 +20,7 @@
 							<#if mapping.attributeAssociationList?has_content>
 								 <#assign attributeAssociationLength = mapping.attributeAssociationList?size />
 								 <#list mapping.attributeAssociationList as mappingAttribute>
-									${mappingAttribute.associationLabel}<br/>
+									${association_labels[mapping.idMapping?c + '-' + mappingAttribute.idMediaAttribute?c]}<br/>
 								 </#list> 	
 								 <#else>
 								  <#assign attributeAssociationLength = 0 />

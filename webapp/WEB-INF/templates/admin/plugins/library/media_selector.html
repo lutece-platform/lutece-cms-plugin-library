@@ -14,7 +14,7 @@
 <@box>
 	<@boxHeader title='#i18n{library.insertservice.selectMedia} ${mediatype.name}' class='d-flex' boxTools=true>
 	<#if is_document_creation_allowed?? && is_document_creation_allowed >
-		<@aButton href='jsp/admin/plugins/library/CreateMediaByInsert.jsp?plugin_name=${plugin_name}&media_type=${mediatype.mediaId}&browser_id_space=${selected_space}&space_id=${selected_space}&input=${.data_model.input}' buttonIcon=btnIcon title=btnTitle size='sm' />
+		<@aButton href='jsp/admin/plugins/library/CreateMediaByInsert.jsp?plugin_name=${plugin_name?url}&media_type=${mediatype.mediaId?c}&browser_id_space=${selected_space?c}&space_id=${selected_space?c}&input=${.data_model.input?url}' buttonIcon=btnIcon title=btnTitle size='sm' />
 	</#if>
 	</@boxHeader>
 	<@boxBody>
