@@ -6,7 +6,7 @@
 				<@tform method='post' name='fenvoi' action='${jsp_insert}'>
 				<@input type='hidden' name='plugin_name' value='${plugin_name}' />
 				<@input type='hidden' name='input' value='${.data_model.input}' />
-				<@input type='hidden' name='media' value='${mediatype.mediaId}' />
+				<@input type='hidden' name='media' value='${mediatype.mediaId?c}' />
 				<@input type='hidden' name='id_document' value='' />
 				<#list document_list as selectedDocument>
 					<#assign document = selectedDocument.document>
@@ -43,14 +43,14 @@
 								<!-- ATTRIBUTE_TYPE_TEXT_DOCUMENT -->
 								<#if document.getAttribute(doctype_code)?exists && document.getAttribute(doctype_code).textValue?has_content>
 									<@formGroup labelFor='${field_name}' labelKey='${attribute.description}'>
-										<@input type='textarea' name='${field_name}${document_index}' id='${field_name}${document_index}'>${document.getAttribute(doctype_code).textValue?xml}</@input>
+										<@input type='textarea' name='${field_name}${document_index}' id='${field_name}${document_index}'>${document.getAttribute(doctype_code).textValue}</@input>
 									</@formGroup>	
 								</#if>
 							<#elseif attribute.typeId = 2>
 								<!-- ATTRIBUTE_TYPE_BINARY -->
 								<#if document.getAttribute(doctype_code)?has_content>
 									<#assign attributeId = document.getAttribute(doctype_code).id>
-									<#assign url = "document?id=" + document.id + "&amp;id_attribute=" + attributeId>
+									<#assign url = "document?id=" + document.id?c + "&id_attribute=" + attributeId?c>
 									<@formGroup labelFor='${field_name}' labelKey='Voir le document [Nouvelle fenêtre]'>
 										<@input type='hidden' name='${field_name}${document_index}' id='${field_name}${document_index}' value='${url}' />
 										<@link href='${url}' target='_blank' title='Voir'>
@@ -64,13 +64,15 @@
 				</#list>
 				<@formGroup>
 					<@button type='submit' title='#i18n{library.insertservice.insertlink.button}' buttonIcon='save' />
-					<@button type='button' params='onclick="javascript:history.go(-1);"' title='#i18n{library.insertservice.cancel.button}' size='sm' color='default' />
+					<@aButton href='jsp/admin/plugins/library/SelectMedia.jsp?plugin_name=${plugin_name?url}&media_type=${mediatype.mediaId?c}&input=${.data_model.input?url}' params={"data-lutece-action": "back"} title='#i18n{library.insertservice.cancel.button}' size='sm' color='default' />
 				</@formGroup>
 				</@tform>
 			</@boxBody>
 		</@box>
 	</@columns>
 </@row>
+<#-- the insert service pages do not load the admin scripts: data-lutece-action="back" needs lutece-actions.js -->
+<script src="themes/admin/shared/js/util/lutece-actions.js"></script>
 <script>
 document.querySelector('#select').classList.add('visually-hidden')
 document.forms[0].submit();

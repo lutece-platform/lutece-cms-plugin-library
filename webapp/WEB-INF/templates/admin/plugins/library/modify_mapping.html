@@ -37,7 +37,7 @@
 					</#list>
 					<@formGroup>
 						<@button type='submit' title='#i18n{library.modify_mapping.button.validate}' buttonIcon='save' />
-						<@button type='button' params='onclick="javascript:history.go(-1)"' title='#i18n{portal.util.labelCancel}' buttonIcon='times' color='default' />
+						<@aButton href='jsp/admin/plugins/library/ManageMappings.jsp?media_id=${mapping.idMedia?c}' params={"data-lutece-action": "back"} title='#i18n{portal.util.labelCancel}' buttonIcon='times' color='default' />
 					</@formGroup>
 				</@tform>	
 			</@boxBody>

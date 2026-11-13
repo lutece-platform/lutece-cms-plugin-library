@@ -24,9 +24,9 @@
 					<#assign formAction = 'jsp/admin/plugins/library/DoUploadDocument.jsp' />
 				</#if>
 				<@tform method='post' enctype='multipart/form-data' action=formAction>
-					<@input type='hidden' name='media' value='${media}' />
+					<@input type='hidden' name='media' value='${media?c}' />
 					<@input type='hidden' name='input' value='${.data_model.input}' />
-					<@input type='hidden' name='space_id' value='${space_id}' />
+					<@input type='hidden' name='space_id' value='${space_id?c}' />
 					<@input type='hidden' name='document_type_code' value='${document_type}' />    
 					<@input type='hidden' name='document_summary' id='document_summary' value='${document_type}'/>
 					<@formGroup labelFor='document_title' labelKey='#i18n{document.create_document.labelDocumentTitle}' helpKey='#i18n{document.create_document.helpDocumentTitle}' mandatory=true>
@@ -82,13 +82,15 @@
 					</@div>
 					<@formGroup class='mt-3'>
 						<@button type='submit' title='#i18n{document.create_document.buttonCreate}' buttonIcon='plus' />
-						<@button type='button' params='onclick="javascript:history.go(-1);"' title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' />
+						<@aButton href='jsp/admin/plugins/library/SelectSpaceForUpload.jsp?plugin_name=${plugin_name?url}&media_type=${media?c}&input=${.data_model.input?url}' params={"data-lutece-action": "back"} title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' />
 					</@formGroup>
 				</@tform>
 			</@boxBody>
 		</@box>
 	</@columns>
 </@row>
+<#-- the insert service pages do not load the admin scripts: data-lutece-action="back" needs lutece-actions.js -->
+<script src="themes/admin/shared/js/util/lutece-actions.js"></script>
 <script>
 document.addEventListener( "DOMContentLoaded", function(){
 	const dcm = document.querySelector('#dublin_core_meta')

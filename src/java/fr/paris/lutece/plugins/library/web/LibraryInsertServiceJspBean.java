@@ -53,6 +53,7 @@ import fr.paris.lutece.portal.service.html.XmlTransformerService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.template.HtmlMarkup;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -245,8 +246,8 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         model.put( MARK_MEDIA_TYPE_ATTRIBUTES, mediaType.getMediaAttributeList(  ) );
         model.put( MARK_ALL_MEDIA_ATTRIBUTES_ASSOCIATIONS, mapAssociationAttributes );
         model.put( MARK_ALL_DOCUMENTS, listDocuments );
-        model.put( MARK_SPACES_BROWSER,
-            DocumentSpacesService.getInstance(  ).getSpacesBrowser( request, _user, _user.getLocale(  ), true, true, true, idSpace, baseUrl) );
+        model.put( MARK_SPACES_BROWSER, HtmlMarkup.of(
+            DocumentSpacesService.getInstance(  ).getSpacesBrowser( request, _user, _user.getLocale(  ), true, true, true, idSpace, baseUrl) ) );
         model.put( MARK_SELECTED_SPACE, nSpaceId );
         model.put( MARK_PAGINATOR, paginator );
         model.put( MARK_NB_ITEMS_PER_PAGE, Integer.toString( paginator.getItemsPerPage(  ) ) );
