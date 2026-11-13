@@ -1,8 +1,7 @@
 <@row>
 	<@columns>
 		<@tform method='post' name='fenvoi' action='jsp/admin/plugins/library/SelectSpaceForUpload.jsp'>
-			<@fieldSet> 
-				<legend>#i18n{library.insertservice.selectMediaType}</legend>
+			<@fieldSet legend='#i18n{library.insertservice.selectMediaType}'>
 				<@input type='hidden' name='plugin_name' value='${plugin_name}' />
 				<@input type='hidden' name='input' value='${.data_model.input}' />
 				<ul class="list-unstyled">

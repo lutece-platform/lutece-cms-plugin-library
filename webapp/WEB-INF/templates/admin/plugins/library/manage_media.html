@@ -56,8 +56,8 @@
 						<@td>${attribute.description}</@td>
 						<@td>${attribute.typeLabel}</@td>
 						<@td>
-							<@aButton href='jsp/admin/plugins/library/ModifyAttribute.jsp?attribute_id=${attribute.attributeId}' title='null' hideTitle=['all'] buttonIcon='edit' size='sm' />
-							<@aButton href='jsp/admin/plugins/library/RemoveAttribute.jsp?media_id=${media.mediaId}&attribute_id=${attribute.attributeId}' title='null' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
+							<@aButton href='jsp/admin/plugins/library/ModifyAttribute.jsp?attribute_id=${attribute.attributeId}' title='#i18n{portal.util.labelModify} ${attribute.code}' hideTitle=['all'] buttonIcon='edit' size='sm' />
+							<@aButton href='jsp/admin/plugins/library/RemoveAttribute.jsp?media_id=${media.mediaId}&attribute_id=${attribute.attributeId}' title='#i18n{portal.util.labelDelete} ${attribute.code}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
 						</@td>
 					</@tr>
 					</#list>

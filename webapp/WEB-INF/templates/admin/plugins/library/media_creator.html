@@ -15,7 +15,7 @@
 	<@columns>
 		<@box>
 			<@boxHeader title=boxTitle class='d-flex' boxTools=true>
-			<@button type='button' id='dbc' title='Dublin-core' buttonIcon='pencil-cog' />
+			<@button type='button' id='dbc' title='Dublin-core' buttonIcon='pencil-cog' params={"aria-controls": "dublin_core_meta", "aria-expanded": "false"} />
 			</@boxHeader>
 			<@boxBody>
 				<#if is_image>
@@ -94,9 +94,11 @@
 <script>
 document.addEventListener( "DOMContentLoaded", function(){
 	const dcm = document.querySelector('#dublin_core_meta')
-	dcm.classList.toggle('visually-hidden')
-	document.querySelector( "#dbc" ).addEventListener( "click", (e) => {
-		dcm.classList.toggle('visually-hidden')
+	const dbc = document.querySelector( "#dbc" )
+	dcm.classList.add('d-none')
+	dbc.addEventListener( "click", (e) => {
+		const hidden = dcm.classList.toggle('d-none')
+		dbc.setAttribute( 'aria-expanded', hidden ? 'false' : 'true' )
 	});
 
 } );

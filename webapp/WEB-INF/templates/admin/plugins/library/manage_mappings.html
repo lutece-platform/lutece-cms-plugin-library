@@ -38,8 +38,8 @@
 							</#if>
 						</@td>
 						<@td>
-							<@aButton href='jsp/admin/plugins/library/ModifyMapping.jsp?mapping_id=${mapping.idMapping}' title='null' hideTitle=['all'] buttonIcon='edit' size='sm' />
-							<@aButton href='jsp/admin/plugins/library/RemoveMapping.jsp?mapping_id=${mapping.idMapping}' title='null' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
+							<@aButton href='jsp/admin/plugins/library/ModifyMapping.jsp?mapping_id=${mapping.idMapping}' title='#i18n{portal.util.labelModify} ${mapping.codeDocumentType}' hideTitle=['all'] buttonIcon='edit' size='sm' />
+							<@aButton href='jsp/admin/plugins/library/RemoveMapping.jsp?mapping_id=${mapping.idMapping}' title='#i18n{portal.util.labelDelete} ${mapping.codeDocumentType}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
 						</@td>
 					</@tr>
 					</#list>

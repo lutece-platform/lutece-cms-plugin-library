@@ -9,7 +9,7 @@
 					<@input type='hidden' name='media' value='${mediatype.mediaId?c}' />
 					<@input type='hidden' name='id_document' value='' />
 					<@fieldSet>
-						<@formGroup labelFor='thumbnail' labelKey='#i18n{library.insertservice.preview}'>
+						<@formGroup labelKey='#i18n{library.insertservice.preview}'>
 							<@img class="img-fluid" url="${document.thumbnail}" alt="${document.title}" />
 						</@formGroup>
 						<#list media_attributes as attribute>
@@ -49,9 +49,9 @@
 									<#if document.getAttribute(doctype_code)?has_content>
 										<#assign attributeId = document.getAttribute(doctype_code).id>
 										<#assign url = "document?id=" + document.id?c + "&id_attribute=" + attributeId?c>
-										<@formGroup labelFor='${field_name}' labelKey='Voir le document [Nouvelle fenêtre]'>
+										<@formGroup labelKey='#i18n{library.insertservice.label.viewDocument}'>
 											<@input type='hidden' name='${field_name}' id='${field_name}' value='${url}' />
-											<@link href='${url}' target='_blank' title='Voir'>
+											<@link href='${url}' target='_blank' title='#i18n{library.insertservice.label.viewDocument}'>
 												${url}
 											</@link>
 										</@formGroup>

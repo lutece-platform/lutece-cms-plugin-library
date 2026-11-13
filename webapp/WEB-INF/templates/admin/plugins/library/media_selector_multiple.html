@@ -54,8 +54,9 @@
 												<p>
 												<@link href='#' class='library-select-media' params={"data-mapping": mapping_id, "data-document": document.id?c} title='#i18n{library.create_media.button.select}'>
 													<@tag>${document.id}</@tag>
-													<small><#if document.title?length &gt; 50>${document.title?substring(0,50)}...<#else>${document.title}</#if></small></p>
+													<small><#if document.title?length &gt; 50>${document.title?substring(0,50)}...<#else>${document.title}</#if></small>
 												</@link>
+												</p>
 												<p>
 													<@aButton href='#' class='library-select-media' params={"data-mapping": mapping_id, "data-document": document.id?c} title='#i18n{library.create_media.button.select}' buttonIcon='check' />
 												</p>
@@ -102,12 +103,12 @@
 							<img src="${document.thumbnail}&nocache" data-src="${document.thumbnail}&nocache" class="thumbnail" alt="${document.title}" title="${document.title} - ${document.type}">
 						</@td>
 						<@td>
-							<@aButton href='jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=${document.id?c}&remove_selected=true&media=${media.mediaTypeId?c}&id_mapping=${media.mappingId?c}&browser_id_space=${selected_space?c}&browser_selected_space_id=${selected_space?c}' title='#i18n{portal.util.labelDelete}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
+							<@aButton href='jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=${document.id?c}&remove_selected=true&media=${media.mediaTypeId?c}&id_mapping=${media.mappingId?c}&browser_id_space=${selected_space?c}&browser_selected_space_id=${selected_space?c}' title='#i18n{portal.util.labelDelete} ${document.title}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
 							<#if media_index &lt; (selected_medias?size - 1)>
-								<@aButton href='jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id?c}&move_up=false&media=${media.mediaTypeId?c}&id_mapping=${media.mappingId?c}&browser_id_space=${selected_space?c}&browser_selected_space_id=${selected_space?c}' buttonIcon='arrow-down' size='sm' />
+								<@aButton href='jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id?c}&move_up=false&media=${media.mediaTypeId?c}&id_mapping=${media.mappingId?c}&browser_id_space=${selected_space?c}&browser_selected_space_id=${selected_space?c}' title='#i18n{library.insertservice.label.moveDown} ${document.title}' hideTitle=['all'] buttonIcon='arrow-down' size='sm' />
 							</#if>
 							<#if media_index &gt; 0>
-								<@aButton href='jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id?c}&move_up=true&media=${media.mediaTypeId?c}&id_mapping=${media.mappingId?c}&browser_id_space=${selected_space?c}&browser_selected_space_id=${selected_space?c}' buttonIcon='arrow-up' size='sm' />
+								<@aButton href='jsp/admin/plugins/library/DoMoveMedia.jsp?id_document=${document.id?c}&move_up=true&media=${media.mediaTypeId?c}&id_mapping=${media.mappingId?c}&browser_id_space=${selected_space?c}&browser_selected_space_id=${selected_space?c}' title='#i18n{library.insertservice.label.moveUp} ${document.title}' hideTitle=['all'] buttonIcon='arrow-up' size='sm' />
 							</#if>
 						</@td>
 					</@tr>
