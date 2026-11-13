@@ -13,10 +13,12 @@
     <xsl:template match="space">
         <li>
             <img src="{space-icon-url}" alt="" hspace="5" />
+            <label>
              <xsl:if test="space-is-valid='true'">
-             	 <input type="radio" name="space_id" value="{space-id}" />         
-             </xsl:if> 
+             	 <input type="radio" name="space_id" value="{space-id}" />
+             </xsl:if>
             &#160;<xsl:value-of select="name" />
+            </label>
             <xsl:apply-templates select="child-spaces" />
         </li>  
     </xsl:template>

@@ -220,6 +220,7 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
         assertTrue( strHtml, strHtml.contains( "data-lutece-action=\"back\"" ) );
         assertTrue( strHtml, strHtml.contains( "lutece-actions.js" ) );
         assertTrue( strHtml, strHtml.contains( "value=\"1234\"" ) );
+        assertTrue( strHtml, strHtml.contains( "aria-controls=\"dublin_core_meta\"" ) );
         assertFalse( strHtml, strHtml.contains( "javascript:" ) );
     }
 

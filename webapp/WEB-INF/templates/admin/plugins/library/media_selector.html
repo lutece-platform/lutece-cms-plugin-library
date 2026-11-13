@@ -44,10 +44,10 @@
 						<@input type='hidden' name='browser_id_space' value='${selected_space}' />
 						<div class="card align-items-center pt-2">
 						<#if mediatype.mediaId=1>
-							<img src="${document.thumbnail}&nocache" class="card-img-top rounded-circle" style="width:100px;height: 100px;object-fit: cover;" data-src="${document.thumbnail}&nocache" >
+							<img src="${document.thumbnail}&nocache" class="card-img-top rounded-circle" style="width:100px;height: 100px;object-fit: cover;" data-src="${document.thumbnail}&nocache" alt="">
 						<#else>
 							<figure class="text-white bg-dark rounded-circle p-2">
-								<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+								<svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
 									<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
 									<path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
 									<path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
@@ -57,7 +57,7 @@
 							</figure>
 						</#if>
 							<div class="card-body">
-								<h2 class="h5 card-title text-center"><#if document.title?length &gt; 20>${document.title?substring(0,20)}...<#else>${document.title}</#if></h2>
+								<h3 class="h5 card-title text-center"><#if document.title?length &gt; 20>${document.title?substring(0,20)}...<#else>${document.title}</#if></h3>
 								<p>${mediatype.name!}</p>
 							</div>
 							<div class="card-body text-center">
