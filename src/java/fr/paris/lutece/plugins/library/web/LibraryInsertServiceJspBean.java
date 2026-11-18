@@ -204,9 +204,19 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         List<Integer> listDocumentsId = new ArrayList<Integer>( );
 
 
+        // Each document is listed once, with the mapping of its document type
+        Map<Integer, LibraryMapping> mapDocumentMapping = new HashMap<Integer, LibraryMapping>(  );
+
         for ( LibraryMapping mapping : allMappings )
         {
-            listDocumentsId.addAll( getIdDocumentsFromMapping( mapping, nSpaceId ) );
+            for ( Integer nDocumentId : getIdDocumentsFromMapping( mapping, nSpaceId ) )
+            {
+                if ( mapDocumentMapping.putIfAbsent( nDocumentId, mapping ) == null )
+                {
+                    listDocumentsId.add( nDocumentId );
+                }
+            }
+
             mapAssociationAttributes.put( String.valueOf( mapping.getIdMapping(  ) ),
                 getAttributesFromMapping( mapping ) );
         }
@@ -218,11 +228,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
 
 
-        for ( LibraryMapping mapping : allMappings )
-        {
-            listDocuments.addAll( getDocumentsFromMapping( mapping, nSpaceId, paginator ) );
-
-        }
+        listDocuments.addAll( getDocumentsFromMapping( mapDocumentMapping, paginator ) );
 
         // get the selected space
         DocumentSpace selectedSpace = null ;
@@ -602,7 +608,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
            return documents;
     }
 
-    private List<Pair<String, Document>> getDocumentsFromMapping( LibraryMapping m, int nSpaceId,
+    private List<Pair<String, Document>> getDocumentsFromMapping( Map<Integer, LibraryMapping> mapDocumentMapping,
     		LocalizedPaginator<Integer> paginator)
     {
 
@@ -613,7 +619,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
             if ( document != null )
             {
-           	 result.add( new Pair<String, Document>( String.valueOf( m.getIdMapping(  ) ), document ) );
+           	 result.add( new Pair<String, Document>( String.valueOf( mapDocumentMapping.get( documentId ).getIdMapping(  ) ), document ) );
             }
         }
 
