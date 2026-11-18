@@ -14,6 +14,8 @@
 						<#if attribute.associableWithDocument>
 							<@formGroup labelFor='document_attribute_id_${attribute.attributeId}' labelKey='${attribute.code}'>
 								<@select id='document_attribute_id_${attribute.attributeId}' name='document_attribute_id_${attribute.attributeId}'>			
+								<#-- An attribute of the media may have no association in the mapping (attribute added after the mapping) -->
+								<#assign associationDocumentAttributeId = -1>
 								<#list mapping.attributeAssociationList as association>	
 									<#if attribute.attributeId = association.idMediaAttribute>
 										<#assign associationDocumentAttributeId = association.idDocumentAttribute>

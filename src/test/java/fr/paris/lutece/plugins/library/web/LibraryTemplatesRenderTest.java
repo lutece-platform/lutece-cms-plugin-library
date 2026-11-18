@@ -42,6 +42,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import fr.paris.lutece.plugins.document.business.Document;
+import fr.paris.lutece.plugins.document.business.DocumentType;
 import fr.paris.lutece.plugins.document.business.attributes.DocumentAttribute;
 import fr.paris.lutece.plugins.document.modules.metadatadublincore.business.DublinCoreMetadata;
 import fr.paris.lutece.plugins.library.business.LibraryMapping;
@@ -315,5 +316,35 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
         strHtml = render( "admin/plugins/library/mediaedition_selector.html", model );
         assertTrue( strHtml, strHtml.contains( TEXT_ESCAPED ) );
         assertFalse( strHtml, strHtml.contains( TEXT_UNESCAPED ) );
+    }
+
+    /**
+     * A media attribute added after the mapping has no association: the modify mapping screen must render
+     */
+    @Test
+    public void testModifyMappingWithAnAttributeWithoutAssociation( )
+    {
+        LibraryMapping mapping = new LibraryMapping( );
+        mapping.setIdMapping( 3 );
+        mapping.setIdMedia( ID_MEDIA );
+        mapping.setCodeDocumentType( "article" );
+        // The association the DAO loads for a mapping without association (LEFT JOIN)
+        mapping.addAttributeAssociation( 0, 0 );
+
+        DocumentAttribute documentAttribute = new DocumentAttribute( );
+        documentAttribute.setId( 7 );
+        documentAttribute.setName( "Body" );
+        DocumentType documentType = new DocumentType( );
+        documentType.setName( "Article" );
+        documentType.addAttribute( documentAttribute );
+
+        Map<String, Object> model = new HashMap<>( );
+        model.put( "mapping", mapping );
+        model.put( "media", mediaType( MediaAttribute.ATTRIBUTE_TYPE_TEXT_DOCUMENT ) );
+        model.put( "document_type", documentType );
+        String strHtml = render( "admin/plugins/library/modify_mapping.html", model );
+
+        assertTrue( strHtml, strHtml.contains( "name=\"document_attribute_id_5\"" ) );
+        assertTrue( strHtml, strHtml.contains( "<option value=\"7\">Body</option>" ) );
     }
 }
