@@ -18,10 +18,10 @@
 	</core-version-dependency>
     <db-pool-required>1</db-pool-required>
 
-    <!-- Front office scripts: fslightbox opens the images of the lightbox media types (MIT licence, themes/skin/plugins/library/js/fslightbox/LICENSE) -->
+    <!-- Front office scripts: fslightbox opens the images of the lightbox media types (MIT licence, themes/skin/plugins/library/js/vendor/fslightbox/LICENSE) -->
     <javascript-files>
         <javascript-files-scope>portal</javascript-files-scope>
-        <javascript-file>../../themes/skin/plugins/library/js/fslightbox/fslightbox.js</javascript-file>
+        <javascript-file>../../themes/skin/plugins/library/js/vendor/fslightbox/fslightbox.min.js</javascript-file>
     </javascript-files>
         
     <!-- Administration interface parameters -->
@@ -32,7 +32,8 @@
             <feature-description>library.adminFeature.library_management.description</feature-description>
             <feature-level>0</feature-level>
             <feature-url>jsp/admin/plugins/library/ManageLibrary.jsp</feature-url>
-            <feature-icon-url>ti ti-books</feature-icon-url>
+            <feature-group>CONTENT</feature-group>
+            <icon-url>ti ti-books</icon-url>
         </admin-feature> 
     </admin-features>   
 

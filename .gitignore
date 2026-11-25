@@ -3,3 +3,9 @@
 /.project
 /.settings
 /bin/
+e2e/
+java.io.tmpdir/
+target/
+logs/
+.migration/
+*.log

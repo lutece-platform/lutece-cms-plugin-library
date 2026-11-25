@@ -50,6 +50,7 @@ import fr.paris.lutece.plugins.library.business.LibraryMappingHome;
 import fr.paris.lutece.plugins.library.business.LibraryMediaHome;
 import fr.paris.lutece.plugins.library.business.MediaAttribute;
 import fr.paris.lutece.plugins.library.business.MediaAttributeHome;
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.datastore.DatastoreService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
@@ -319,7 +320,7 @@ public class EditorUploadService
 
         InsertService insertService = InsertServiceManager.getInsertService( UPLOAD_INSERT_SERVICE_ID );
 
-        if ( ( insertService == null ) || !RBACService.isAuthorized( insertService, InsertResourceIdService.PERMISSION_USE, user ) )
+        if ( ( insertService == null ) || !RBACService.isAuthorized( insertService, InsertResourceIdService.PERMISSION_USE, (User) user ) )
         {
             return null;
         }

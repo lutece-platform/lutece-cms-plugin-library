@@ -178,3 +178,8 @@ INSERT INTO library_mapping_attribute (id_mapping,id_media_attribute,id_document
 	FROM library_media m, library_mapping p, library_media_attribute a, document_type_attr d
 	WHERE m.name = 'Image lightbox' AND p.id_media = m.id_media AND a.id_media = m.id_media AND a.code = 'src'
 	AND d.code_document_type = 'image' AND d.code = 'file';
+
+-- changeset library:update_db_library_6.0.1-7.0.0.sql-rev9.sql
+-- preconditions onFail:MARK_RAN onError:WARN
+-- comment The icon of the admin feature is the Tabler books icon of the descriptor and of the install script (LUT-34354)
+UPDATE core_admin_right SET icon_url = 'ti ti-books' WHERE id_right = 'LIBRARY_MANAGEMENT';

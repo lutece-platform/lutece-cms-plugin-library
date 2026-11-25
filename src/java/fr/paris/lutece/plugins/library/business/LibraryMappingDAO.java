@@ -58,28 +58,32 @@ public class LibraryMappingDAO implements ILibraryMappingDAO
     public void delete( int nMappingId, Plugin plugin )
     {
         // delete all attribute associations for this mapping
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_MAPPING_ATTRIBUTES, plugin );
-        daoUtil.setInt( 1, nMappingId );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_MAPPING_ATTRIBUTES, plugin ) )
+        {
+            daoUtil.setInt( 1, nMappingId );
+            daoUtil.executeUpdate(  );
+        }
 
         // delete the mapping definition
-        daoUtil = new DAOUtil( SQL_QUERY_REMOVE_MAPPING, plugin );
-        daoUtil.setInt( 1, nMappingId );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_MAPPING, plugin ) )
+        {
+            daoUtil.setInt( 1, nMappingId );
+            daoUtil.executeUpdate(  );
+        }
     }
 
     public void insert( LibraryMapping mapping, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_MAPPING, plugin );
         int nMappingId = newPrimaryKey( plugin );
-        // create the new mapping definition
-        daoUtil.setInt( 1, nMappingId );
-        daoUtil.setInt( 2, mapping.getIdMedia(  ) );
-        daoUtil.setString( 3, mapping.getCodeDocumentType(  ) );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_MAPPING, plugin ) )
+        {
+            // create the new mapping definition
+            daoUtil.setInt( 1, nMappingId );
+            daoUtil.setInt( 2, mapping.getIdMedia(  ) );
+            daoUtil.setString( 3, mapping.getCodeDocumentType(  ) );
+            daoUtil.executeUpdate(  );
+        }
 
         if ( mapping.getAttributeAssociationList(  ) == null )
         {
@@ -89,40 +93,42 @@ public class LibraryMappingDAO implements ILibraryMappingDAO
         // create the associations
         for ( AttributeAssociation association : mapping.getAttributeAssociationList(  ) )
         {
-            daoUtil = new DAOUtil( SQL_QUERY_INSERT_MAPPING_ATTRIBUTE, plugin );
-            daoUtil.setInt( 1, nMappingId );
-            daoUtil.setInt( 2, association.getIdMediaAttribute(  ) );
-            daoUtil.setInt( 3, association.getIdDocumentAttribute(  ) );
-            daoUtil.executeUpdate(  );
-            daoUtil.free(  );
+            try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_MAPPING_ATTRIBUTE, plugin ) )
+            {
+                daoUtil.setInt( 1, nMappingId );
+                daoUtil.setInt( 2, association.getIdMediaAttribute(  ) );
+                daoUtil.setInt( 3, association.getIdDocumentAttribute(  ) );
+                daoUtil.executeUpdate(  );
+            }
         }
     }
 
     public LibraryMapping load( int nMappingId, Plugin plugin )
     {
         LibraryMapping mapping = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_MAPPING, plugin );
-        daoUtil.setInt( 1, nMappingId );
-        daoUtil.executeQuery(  );
-
-        if ( daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_MAPPING, plugin ) )
         {
-            mapping = new LibraryMapping(  );
-            mapping.setIdMapping( daoUtil.getInt( 1 ) );
-            mapping.setIdMedia( daoUtil.getInt( 2 ) );
-            mapping.setCodeDocumentType( daoUtil.getString( 3 ) );
+            daoUtil.setInt( 1, nMappingId );
+            daoUtil.executeQuery(  );
 
-            // load first attribute definition
-            mapping.addAttributeAssociation( daoUtil.getInt( 4 ), daoUtil.getInt( 5 ) );
+            if ( daoUtil.next(  ) )
+            {
+                mapping = new LibraryMapping(  );
+                mapping.setIdMapping( daoUtil.getInt( 1 ) );
+                mapping.setIdMedia( daoUtil.getInt( 2 ) );
+                mapping.setCodeDocumentType( daoUtil.getString( 3 ) );
+
+                // load first attribute definition
+                mapping.addAttributeAssociation( daoUtil.getInt( 4 ), daoUtil.getInt( 5 ) );
+            }
+
+            // load other associations
+            while ( daoUtil.next(  ) )
+            {
+                mapping.addAttributeAssociation( daoUtil.getInt( 4 ), daoUtil.getInt( 5 ) );
+            }
+
         }
-
-        // load other associations
-        while ( daoUtil.next(  ) )
-        {
-            mapping.addAttributeAssociation( daoUtil.getInt( 4 ), daoUtil.getInt( 5 ) );
-        }
-
-        daoUtil.free(  );
 
         return mapping;
     }
@@ -131,33 +137,33 @@ public class LibraryMappingDAO implements ILibraryMappingDAO
     {
         Collection<LibraryMapping> colMapping = new ArrayList<LibraryMapping>(  );
 
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_MAPPING_BY_MEDIA, plugin );
-        daoUtil.setInt( 1, nMediaId );
-        daoUtil.executeQuery(  );
-
-        while ( daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_MAPPING_BY_MEDIA, plugin ) )
         {
-            LibraryMapping mapping = new LibraryMapping(  );
-            mapping.setIdMapping( daoUtil.getInt( 1 ) );
-            mapping.setIdMedia( daoUtil.getInt( 2 ) );
-            mapping.setCodeDocumentType( daoUtil.getString( 3 ) );
+            daoUtil.setInt( 1, nMediaId );
+            daoUtil.executeQuery(  );
 
-            // load attributes for this mapping	
-            DAOUtil daoUtilAssociation = new DAOUtil( SQL_QUERY_SELECT_MAPPING_ATTRIBUTES_BY_MAPPING_ID, plugin );
-            daoUtilAssociation.setInt( 1, mapping.getIdMapping(  ) );
-            daoUtilAssociation.executeQuery(  );
-
-            while ( daoUtilAssociation.next(  ) )
+            while ( daoUtil.next(  ) )
             {
-                mapping.addAttributeAssociation( daoUtilAssociation.getInt( 2 ), daoUtilAssociation.getInt( 3 ) );
+                LibraryMapping mapping = new LibraryMapping(  );
+                mapping.setIdMapping( daoUtil.getInt( 1 ) );
+                mapping.setIdMedia( daoUtil.getInt( 2 ) );
+                mapping.setCodeDocumentType( daoUtil.getString( 3 ) );
+
+                try ( DAOUtil daoUtilAssociation = new DAOUtil( SQL_QUERY_SELECT_MAPPING_ATTRIBUTES_BY_MAPPING_ID, plugin ) )
+                {
+                    daoUtilAssociation.setInt( 1, mapping.getIdMapping(  ) );
+                    daoUtilAssociation.executeQuery(  );
+
+                    while ( daoUtilAssociation.next(  ) )
+                    {
+                        mapping.addAttributeAssociation( daoUtilAssociation.getInt( 2 ), daoUtilAssociation.getInt( 3 ) );
+                    }
+                }
+
+                colMapping.add( mapping );
             }
 
-            daoUtilAssociation.free(  );
-
-            colMapping.add( mapping );
         }
-
-        daoUtil.free(  );
 
         return colMapping;
     }
@@ -165,18 +171,20 @@ public class LibraryMappingDAO implements ILibraryMappingDAO
     public void store( LibraryMapping mapping, Plugin plugin )
     {
         // delete all attribute associations for this mapping
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_MAPPING_ATTRIBUTES, plugin );
-        daoUtil.setInt( 1, mapping.getIdMapping(  ) );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_MAPPING_ATTRIBUTES, plugin ) )
+        {
+            daoUtil.setInt( 1, mapping.getIdMapping(  ) );
+            daoUtil.executeUpdate(  );
+        }
 
         // update mapping information
-        daoUtil = new DAOUtil( SQL_QUERY_UPDATE_MAPPING, plugin );
-        daoUtil.setInt( 1, mapping.getIdMedia(  ) );
-        daoUtil.setString( 2, mapping.getCodeDocumentType(  ) );
-        daoUtil.setInt( 3, mapping.getIdMapping(  ) );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_MAPPING, plugin ) )
+        {
+            daoUtil.setInt( 1, mapping.getIdMedia(  ) );
+            daoUtil.setString( 2, mapping.getCodeDocumentType(  ) );
+            daoUtil.setInt( 3, mapping.getIdMapping(  ) );
+            daoUtil.executeUpdate(  );
+        }
 
         if ( mapping.getAttributeAssociationList(  ) == null )
         {
@@ -187,12 +195,13 @@ public class LibraryMappingDAO implements ILibraryMappingDAO
         // create the associations
         for ( AttributeAssociation association : mapping.getAttributeAssociationList(  ) )
         {
-            daoUtil = new DAOUtil( SQL_QUERY_INSERT_MAPPING_ATTRIBUTE, plugin );
-            daoUtil.setInt( 1, mapping.getIdMapping(  ) );
-            daoUtil.setInt( 2, association.getIdMediaAttribute(  ) );
-            daoUtil.setInt( 3, association.getIdDocumentAttribute(  ) );
-            daoUtil.executeUpdate(  );
-            daoUtil.free(  );
+            try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_MAPPING_ATTRIBUTE, plugin ) )
+            {
+                daoUtil.setInt( 1, mapping.getIdMapping(  ) );
+                daoUtil.setInt( 2, association.getIdMediaAttribute(  ) );
+                daoUtil.setInt( 3, association.getIdDocumentAttribute(  ) );
+                daoUtil.executeUpdate(  );
+            }
         }
     }
 
@@ -202,19 +211,20 @@ public class LibraryMappingDAO implements ILibraryMappingDAO
     */
     public int newPrimaryKey( Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin );
-        daoUtil.executeQuery(  );
-
         int nKey;
 
-        if ( !daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin ) )
         {
-            // if the table is empty
-            nKey = 1;
-        }
+            daoUtil.executeQuery(  );
 
-        nKey = daoUtil.getInt( 1 ) + 1;
-        daoUtil.free(  );
+            if ( !daoUtil.next(  ) )
+            {
+                // if the table is empty
+                nKey = 1;
+            }
+
+            nKey = daoUtil.getInt( 1 ) + 1;
+        }
 
         return nKey;
     }
@@ -222,9 +232,10 @@ public class LibraryMappingDAO implements ILibraryMappingDAO
     public void deleteAttributeAssociation( int nAttributeId, Plugin plugin )
     {
         // delete all attribute associations for this media attribute
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_MAPPING_ATTRIBUTE_FROM_ID, plugin );
-        daoUtil.setInt( 1, nAttributeId );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_MAPPING_ATTRIBUTE_FROM_ID, plugin ) )
+        {
+            daoUtil.setInt( 1, nAttributeId );
+            daoUtil.executeUpdate(  );
+        }
     }
 }
