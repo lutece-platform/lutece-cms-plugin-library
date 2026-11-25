@@ -53,45 +53,48 @@ public class MediaAttributeDAO implements IMediaAttributeDAO
 
     public void delete( int nAttributeId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_ATTRIBUTE, plugin );
-        daoUtil.setInt( 1, nAttributeId );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_ATTRIBUTE, plugin ) )
+        {
+            daoUtil.setInt( 1, nAttributeId );
+            daoUtil.executeUpdate(  );
+        }
     }
 
     public void insert( MediaAttribute attribute, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_ATTRIBUTE, plugin );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_ATTRIBUTE, plugin ) )
+        {
 
-        daoUtil.setInt( 1, newPrimaryKey( plugin ) );
-        daoUtil.setInt( 2, attribute.getMediaId(  ) );
-        daoUtil.setString( 3, attribute.getCode(  ) );
-        daoUtil.setString( 4, attribute.getDescription(  ) );
-        daoUtil.setInt( 5, attribute.getTypeId(  ) );
-        daoUtil.setString( 6, attribute.getDefaultValue(  ) );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+            daoUtil.setInt( 1, newPrimaryKey( plugin ) );
+            daoUtil.setInt( 2, attribute.getMediaId(  ) );
+            daoUtil.setString( 3, attribute.getCode(  ) );
+            daoUtil.setString( 4, attribute.getDescription(  ) );
+            daoUtil.setInt( 5, attribute.getTypeId(  ) );
+            daoUtil.setString( 6, attribute.getDefaultValue(  ) );
+            daoUtil.executeUpdate(  );
+        }
     }
 
     public MediaAttribute load( int nAttributeId, Plugin plugin )
     {
         MediaAttribute attribute = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ATTRIBUTE, plugin );
-        daoUtil.setInt( 1, nAttributeId );
-        daoUtil.executeQuery(  );
-
-        if ( daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ATTRIBUTE, plugin ) )
         {
-            attribute = new MediaAttribute(  );
-            attribute.setAttributeId( daoUtil.getInt( 1 ) );
-            attribute.setMediaId( daoUtil.getInt( 2 ) );
-            attribute.setCode( daoUtil.getString( 3 ) );
-            attribute.setDescription( daoUtil.getString( 4 ) );
-            attribute.setTypeId( daoUtil.getInt( 5 ) );
-            attribute.setDefaultValue( daoUtil.getString( 6 ) );
-        }
+            daoUtil.setInt( 1, nAttributeId );
+            daoUtil.executeQuery(  );
 
-        daoUtil.free(  );
+            if ( daoUtil.next(  ) )
+            {
+                attribute = new MediaAttribute(  );
+                attribute.setAttributeId( daoUtil.getInt( 1 ) );
+                attribute.setMediaId( daoUtil.getInt( 2 ) );
+                attribute.setCode( daoUtil.getString( 3 ) );
+                attribute.setDescription( daoUtil.getString( 4 ) );
+                attribute.setTypeId( daoUtil.getInt( 5 ) );
+                attribute.setDefaultValue( daoUtil.getString( 6 ) );
+            }
+
+        }
 
         return attribute;
     }
@@ -99,40 +102,42 @@ public class MediaAttributeDAO implements IMediaAttributeDAO
     public Collection<MediaAttribute> selectAllAttributesForMedia( int nIdMedia, Plugin plugin )
     {
         Collection<MediaAttribute> colAttributes = new ArrayList<MediaAttribute>(  );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL_FOR_MEDIA, plugin );
-        daoUtil.setInt( 1, nIdMedia );
-        daoUtil.executeQuery(  );
-
-        while ( daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL_FOR_MEDIA, plugin ) )
         {
-            MediaAttribute attribute = new MediaAttribute(  );
-            attribute.setAttributeId( daoUtil.getInt( 1 ) );
-            attribute.setMediaId( daoUtil.getInt( 2 ) );
-            attribute.setCode( daoUtil.getString( 3 ) );
-            attribute.setDescription( daoUtil.getString( 4 ) );
-            attribute.setTypeId( daoUtil.getInt( 5 ) );
-            attribute.setDefaultValue( daoUtil.getString( 6 ) );
-            colAttributes.add( attribute );
-        }
+            daoUtil.setInt( 1, nIdMedia );
+            daoUtil.executeQuery(  );
 
-        daoUtil.free(  );
+            while ( daoUtil.next(  ) )
+            {
+                MediaAttribute attribute = new MediaAttribute(  );
+                attribute.setAttributeId( daoUtil.getInt( 1 ) );
+                attribute.setMediaId( daoUtil.getInt( 2 ) );
+                attribute.setCode( daoUtil.getString( 3 ) );
+                attribute.setDescription( daoUtil.getString( 4 ) );
+                attribute.setTypeId( daoUtil.getInt( 5 ) );
+                attribute.setDefaultValue( daoUtil.getString( 6 ) );
+                colAttributes.add( attribute );
+            }
+
+        }
 
         return colAttributes;
     }
 
     public void store( MediaAttribute attribute, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_ATTRIBUTE, plugin );
-        daoUtil.setInt( 1, attribute.getMediaId(  ) );
-        daoUtil.setString( 2, attribute.getCode(  ) );
-        daoUtil.setString( 3, attribute.getDescription(  ) );
-        daoUtil.setInt( 4, attribute.getTypeId(  ) );
-        daoUtil.setString( 5, attribute.getDefaultValue(  ) );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_ATTRIBUTE, plugin ) )
+        {
+            daoUtil.setInt( 1, attribute.getMediaId(  ) );
+            daoUtil.setString( 2, attribute.getCode(  ) );
+            daoUtil.setString( 3, attribute.getDescription(  ) );
+            daoUtil.setInt( 4, attribute.getTypeId(  ) );
+            daoUtil.setString( 5, attribute.getDefaultValue(  ) );
 
-        daoUtil.setInt( 6, attribute.getAttributeId(  ) );
+            daoUtil.setInt( 6, attribute.getAttributeId(  ) );
 
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+            daoUtil.executeUpdate(  );
+        }
     }
 
     /**
@@ -141,28 +146,30 @@ public class MediaAttributeDAO implements IMediaAttributeDAO
      */
     public int newPrimaryKey( Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin );
-        daoUtil.executeQuery(  );
-
         int nKey;
 
-        if ( !daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin ) )
         {
-            // if the table is empty
-            nKey = 1;
-        }
+            daoUtil.executeQuery(  );
 
-        nKey = daoUtil.getInt( 1 ) + 1;
-        daoUtil.free(  );
+            if ( !daoUtil.next(  ) )
+            {
+                // if the table is empty
+                nKey = 1;
+            }
+
+            nKey = daoUtil.getInt( 1 ) + 1;
+        }
 
         return nKey;
     }
 
     public void deleteAllForMedia( int nMediaId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_ALL_ATTRIBUTE_FOR_MEDIA, plugin );
-        daoUtil.setInt( 1, nMediaId );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REMOVE_ALL_ATTRIBUTE_FOR_MEDIA, plugin ) )
+        {
+            daoUtil.setInt( 1, nMediaId );
+            daoUtil.executeUpdate(  );
+        }
     }
 }
