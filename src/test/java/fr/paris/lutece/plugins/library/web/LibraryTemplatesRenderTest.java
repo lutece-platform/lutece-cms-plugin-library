@@ -43,6 +43,7 @@ import org.junit.jupiter.api.Test;
 
 import fr.paris.lutece.plugins.document.business.Document;
 import fr.paris.lutece.plugins.document.business.DocumentType;
+import fr.paris.lutece.plugins.document.service.spaces.SpaceNode;
 import fr.paris.lutece.plugins.document.business.attributes.DocumentAttribute;
 import fr.paris.lutece.plugins.document.modules.metadatadublincore.business.DublinCoreMetadata;
 import fr.paris.lutece.plugins.library.business.LibraryMapping;
@@ -69,6 +70,7 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
     private static final String TEXT_UNESCAPED = "Dupont <b>";
     private static final int ID_DOCUMENT = 43;
     private static final int ID_MEDIA = 2;
+    private static final int ID_SPACE = 5;
 
     /**
      * A document whose thumbnail is known without reading its type in the database
@@ -94,6 +96,18 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
     private static String render( String strTemplate, Map<String, Object> model )
     {
         return AppTemplateService.getTemplate( strTemplate, Locale.FRENCH, model ).getHtml( );
+    }
+
+    /**
+     * A spaces tree of one space, named with characters to escape, allowing images
+     *
+     * @return the root nodes
+     */
+    private static List<SpaceNode> spacesTree( )
+    {
+        SpaceNode node = new SpaceNode( ID_SPACE, TEXT, "", "" );
+        node.getAllowedDocumentTypes( ).add( "image" );
+        return List.of( node );
     }
 
     /**
@@ -226,16 +240,21 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
     }
 
     /**
-     * The spaces tree, output of a stylesheet, is written as markup
+     * The spaces tree is rendered from its nodes, the name of a space escaped once
      */
     @Test
     public void testUploadSpaceSelectorKeepsTheSpacesTree( )
     {
         Map<String, Object> model = insertModel( );
         model.put( "mediatype", "2" );
-        model.put( "spaces_tree", HtmlMarkup.of( FRAGMENT ) );
+        model.put( "document_type", "image" );
+        model.put( "spaces_tree", spacesTree( ) );
+        model.put( "selected_space_id", String.valueOf( ID_SPACE ) );
         String strHtml = render( "admin/plugins/library/upload_space_selector.html", model );
-        assertTrue( strHtml, strHtml.contains( FRAGMENT ) );
+        assertTrue( strHtml, strHtml.contains( "name=\"browser_selected_space_id\"" ) );
+        assertTrue( strHtml, strHtml.contains( "value=\"" + ID_SPACE + "\" data-document-types=\"image\"" ) );
+        assertTrue( strHtml, strHtml.contains( TEXT_ESCAPED ) );
+        assertFalse( strHtml, strHtml.contains( TEXT_UNESCAPED ) );
     }
 
     /**
@@ -257,7 +276,8 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
     }
 
     /**
-     * The spaces browser is written as markup; a document is selected by a listener reading data attributes
+     * The spaces tree is rendered from its nodes; a document is selected with no javascript: URL, by a listener (single
+     * media) or by the formaction of its own submit button (multiple media)
      */
     @Test
     public void testMediaSelectorsKeepTheSpacesBrowser( )
@@ -267,22 +287,23 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
         Map<String, Object> model = insertModel( );
         model.put( "mediatype", mediaType( MediaAttribute.ATTRIBUTE_TYPE_TEXT_USER ) );
         model.put( "all_documents", listDocuments );
-        model.put( "spaces_browser", HtmlMarkup.of( FRAGMENT ) );
-        model.put( "selected_space", 1 );
+        model.put( "spaces_tree", spacesTree( ) );
+        model.put( "document_types", List.of( "image" ) );
+        model.put( "selected_space", ID_SPACE );
         model.put( "paginator", new Paginator<>( new ArrayList<Integer>( ), 10, "jsp/admin/plugins/library/SelectMedia.jsp",
                 Paginator.PARAMETER_PAGE_INDEX, "1" ) );
         model.put( "nb_items_per_page", "10" );
 
         String strHtml = render( "admin/plugins/library/media_selector.html", model );
-        assertTrue( strHtml, strHtml.contains( FRAGMENT ) );
+        assertTrue( strHtml, strHtml.contains( "name=\"browser_selected_space_id\"" ) );
+        assertTrue( strHtml, strHtml.contains( "data-fields='{\"id_document\":\"" + ID_DOCUMENT + "\",\"id_mapping\":\"3\"}'" ) );
         assertTrue( strHtml, strHtml.contains( TEXT_ESCAPED ) );
         assertFalse( strHtml, strHtml.contains( TEXT_UNESCAPED ) );
+        assertFalse( strHtml, strHtml.contains( "javascript:" ) );
 
         strHtml = render( "admin/plugins/library/media_selector_multiple.html", model );
-        assertTrue( strHtml, strHtml.contains( FRAGMENT ) );
-        assertTrue( strHtml, strHtml.contains( "data-mapping=\"3\"" ) );
-        assertTrue( strHtml, strHtml.contains( "data-document=\"" + ID_DOCUMENT + "\"" ) );
-        assertTrue( strHtml, strHtml.contains( "name=\"id_document\"" ) );
+        assertTrue( strHtml, strHtml.contains( "name=\"browser_selected_space_id\"" ) );
+        assertTrue( strHtml, strHtml.contains( "formaction=\"jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=" + ID_DOCUMENT + "&amp;id_mapping=3\"" ) );
         assertFalse( strHtml, strHtml.contains( TEXT_UNESCAPED ) );
         assertFalse( strHtml, strHtml.contains( "javascript:" ) );
     }
@@ -306,7 +327,7 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
         model.put( "media_attributes", media.getMediaAttributeList( ) );
         String strHtml = render( "admin/plugins/library/mediaedition_selector.html", model );
         assertTrue( strHtml, strHtml.contains( "name=\"file\"" ) );
-        assertTrue( strHtml, strHtml.contains( "value=\"document?id=" + ID_DOCUMENT + "&amp;id_attribute=7\"" ) );
+        assertTrue( strHtml, strHtml.contains( "value=\"servlet/plugins/document/resource?id=" + ID_DOCUMENT + "&amp;id_attribute=7\"" ) );
         assertTrue( strHtml, strHtml.contains( "data-lutece-action=\"back\"" ) );
         assertFalse( strHtml, strHtml.contains( "&amp;amp;" ) );
 
@@ -345,6 +366,6 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
         String strHtml = render( "admin/plugins/library/modify_mapping.html", model );
 
         assertTrue( strHtml, strHtml.contains( "name=\"document_attribute_id_5\"" ) );
-        assertTrue( strHtml, strHtml.contains( "<option value=\"7\">Body</option>" ) );
+        assertTrue( strHtml, strHtml.contains( "<option value=\"7\">Body" ) );
     }
 }

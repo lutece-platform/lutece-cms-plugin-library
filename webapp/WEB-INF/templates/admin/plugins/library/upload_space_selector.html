@@ -1,17 +1,36 @@
-<@row>
-	<@columns>
-		<@tform method='post' action='jsp/admin/plugins/library/CreateMediaByInsert.jsp'>
-			<@input type='hidden' name='plugin_name' value='${plugin_name}' />
-			<@input type='hidden' name='input' value='${.data_model.input}' />
-			<@input type='hidden' name='media_type' value='${mediatype}' />
-			<@fieldSet legend='#i18n{library.insertservice.selectSpace}'>
-				<@formGroup>
-					${spaces_tree}
-				</@formGroup>
-				<@formGroup>
-					<@button type='submit' title='#i18n{library.create_media.button.validate}' buttonIcon='check' />
-				</@formGroup>
-			</@fieldSet>
-		</@tform>
-	</@columns>
-</@row>
+<#include "/admin/plugins/document/spaces/spaces_tree_select.html" />
+<#--
+ # Choice of the space where the uploaded media is created: the spaces allowing the document type of the media, then Valider (CreateMediaByInsert.jsp).
+ # Styles: insert_service.css (InsertServiceHeader.jsp).
+-->
+<#assign documentTypeIcons = { 'image': 'photo', 'pdf': 'file-type-pdf' } />
+<#assign documentTypeTints = { 'image': '1', 'pdf': '4' } />
+<div class="lutece-insert">
+	<div class="lutece-insert-head">
+		<span class="lutece-insert-badge lutece-insert-tint-${documentTypeTints[ document_type ]!'5'}" aria-hidden="true"><i class="ti ti-${documentTypeIcons[ document_type ]!'file-upload'}"></i></span>
+		<h2>#i18n{library.insertservice.selectSpace}</h2>
+	</div>
+	<@tform method='post' action='jsp/admin/plugins/library/CreateMediaByInsert.jsp' class='lutece-insert-main'>
+		<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+		<@input type='hidden' name='input' value='${.data_model.input}' />
+		<@input type='hidden' name='media_type' value='${mediatype}' />
+		<div class="lutece-insert-frame">
+			<@spacesTreeSelect id='library_spaces_tree' nodes=spaces_tree selectedId=selected_space_id label='#i18n{library.insertservice.selectSpace}' />
+		</div>
+		<div class="lutece-insert-footer">
+			<div class="lutece-insert-actions">
+				<@button type='submit' title='#i18n{library.create_media.button.validate}' buttonIcon='check' color='primary' />
+			</div>
+		</div>
+	</@tform>
+</div>
+
+<script>
+document.querySelectorAll( '#library_spaces_tree input[data-document-types]' ).forEach( ( radio ) => {
+	if ( !radio.dataset.documentTypes.split( ',' ).includes( '${document_type}' ) ) {
+		radio.disabled = true;
+		radio.checked = false;
+		radio.nextElementSibling?.classList.add( 'text-muted' );
+	}
+} );
+</script>

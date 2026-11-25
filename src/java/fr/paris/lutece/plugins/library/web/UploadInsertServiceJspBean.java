@@ -54,9 +54,9 @@ import fr.paris.lutece.plugins.library.business.LibraryMedia;
 import fr.paris.lutece.plugins.library.business.LibraryMediaHome;
 import fr.paris.lutece.plugins.library.business.MediaAttribute;
 import fr.paris.lutece.plugins.library.business.MediaAttributeHome;
+import fr.paris.lutece.plugins.library.service.LibraryMediaTemplateService;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AdminUserService;
-import fr.paris.lutece.portal.service.html.XmlTransformerService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -64,30 +64,26 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.template.HtmlMarkup;
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.web.insert.InsertServiceJspBean;
 import fr.paris.lutece.portal.web.insert.InsertServiceSelectionBean;
 import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
-import fr.paris.lutece.util.UniqueIDGenerator;
 import fr.paris.lutece.util.html.HtmlTemplate;
-import fr.paris.lutece.util.xml.XmlUtil;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 /**
@@ -101,6 +97,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 {
     private static final long serialVersionUID = -7071548876864568789L;
     private static final String PARAMETER_PLUGIN_NAME = "plugin_name";
+    private static final String PLUGIN_NAME = "library";
 
     //TEMPLATES
     private static final String TEMPLATE_MEDIATYPE_SELECTOR = "admin/plugins/library/upload_mediatype_selector.html";
@@ -130,6 +127,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     private static final String MARK_WEBAPP_URL = "webapp_url";
     private static final String MARK_IS_IMAGE = "is_image";
     private static final String MARK_USER_LAST_NAME = "user_last_name";
+    private static final String MARK_SELECTED_SPACE_ID = "selected_space_id";
 
     //PARAMETERS
     private static final String PARAMETER_DOCUMENT_TYPE_CODE = "document_type_code";
@@ -138,23 +136,22 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     private static final String PARAMETER_MEDIA_ID = "media";
     private static final String PARAMETER_SPACE_ID = "space_id";
 
-    //TAGS
-    private static final String XML_TAG_MEDIA = "media";
-    private static final String XSL_UNIQUE_PREFIX_ID = UniqueIDGenerator.getNewId(  ) + "library-";
-    private static final String XSL_PARAMETER_CURRENT_SPACE = "current-space-id";
-    private static final String SPACE_TREE_XSL_UNIQUE_PREFIX = UniqueIDGenerator.getNewId(  ) + "SpacesTree";
-    private static final String PATH_XSL = "/WEB-INF/plugins/library/xsl/";
-    private static final String FILE_TREE_XSL = "document_spaces_tree.xsl";
-
     //MESSAGE
     private static final String MESSAGE_DOCUMENT_ERROR = "library.uploadinsertservice.message.documentError";
     private static final String MESSAGE_NOT_AUTHORIZED = "library.uploadinsertservice.message.notAuthorized";
     private static final String SPACE_ID_SESSION = "spaceIdSession";
+    private static final String URL_DOCUMENT_RESOURCE = "servlet/plugins/document/resource?id=";
+    private static final String URL_PARAMETER_ATTRIBUTE = "&id_attribute=";
     
+    @Inject
+    private DocumentService _documentService;
+    @Inject
+    private DocumentSpacesService _documentSpacesService;
+    @Inject
+    private LibraryMediaTemplateService _mediaTemplateService;
     private AdminUser _user;
     private Plugin _plugin;
     private String _input;
-    private static final int IMAGE_MEDIA_TYPE_ID = 2 ;  
 
     /**
      * Get the select type of document page
@@ -179,7 +176,8 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     {
         String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
         _user = AdminUserService.getAdminUser( request );
-        _plugin = PluginService.getPlugin( strPluginName );
+        // The multipart forms of the upload (media_creator.html) do not carry plugin_name, and the multipart servlet keeps only their fields
+        _plugin = PluginService.getPlugin( StringUtils.defaultIfEmpty( strPluginName, PLUGIN_NAME ) );
         _input = request.getParameter( PARAMETER_INPUT );
     }
 
@@ -203,7 +201,8 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         String strMediaType = request.getParameter( PARAMETER_MEDIA_TYPE );
 
-        String strSpaceId = request.getParameter( PARAMETER_SPACE_ID );
+        String strSpaceId = StringUtils.defaultIfEmpty( request.getParameter( PARAMETER_SPACE_ID ),
+                request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID ) );
         int nSpaceId = -1;
 
         if ( ( strSpaceId != null ) && ( strSpaceId.length(  ) > 0 ) )
@@ -234,8 +233,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         DocumentType documentType = DocumentTypeHome.findByPrimaryKey( mapping.getCodeDocumentType(  ) );
 
         if ( ( nSpaceId == -1 ) ||
-                ( !DocumentService.getInstance(  )
-                                      .isAuthorizedAdminDocument( nSpaceId, documentType.getCode(  ),
+                ( !_documentService.isAuthorizedAdminDocument( nSpaceId, documentType.getCode(  ),
                     DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) ) )
         {
             return getSelectSpace( request );
@@ -244,8 +242,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         HashMap<String, Object> model = getDefaultModel(  );
         model.put( MARK_DOCUMENT_TYPE, documentType.getCode(  ) );
         model.put( MARK_FIELDS, HtmlMarkup.of(
-            DocumentService.getInstance(  )
-                           .getCreateForm( documentType.getCode(  ), _user.getLocale(  ),
+            _documentService.getCreateForm( documentType.getCode(  ), _user.getLocale(  ),
                 AppPathService.getBaseUrl( request ) ) ) );
         model.put( MARK_METADATA, new DublinCoreMetadata(  ) );
         model.put( MARK_MEDIA, mediaType.getMediaId(  ) );
@@ -283,12 +280,6 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         }
         DocumentType documentType = DocumentTypeHome.findByPrimaryKey( mapping.getCodeDocumentType(  ) );
 
-        // Spaces       
-        String strXmlSpaces = DocumentSpacesService.getInstance(  ).getXmlSpacesList( _user, documentType.getCode(  ) );
-
-        FileInputStream fis = AppPathService.getResourceAsStream( PATH_XSL, FILE_TREE_XSL );
-        Source sourceXsl = new StreamSource( fis );
-
         String strSpaceIdRequest = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID );
         int nSpaceId = -1;
 
@@ -307,28 +298,14 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
             }
         }
 
-        HashMap<String, String> htXslParameters = new HashMap<String, String>(  );
-        htXslParameters.put( XSL_PARAMETER_CURRENT_SPACE, nSpaceId + "" );
-
-        XmlTransformerService xmlTransformerService = new XmlTransformerService(  );
-        String strSpacesTree = xmlTransformerService.transformBySourceWithXslCache( strXmlSpaces, sourceXsl,
-                SPACE_TREE_XSL_UNIQUE_PREFIX, htXslParameters, null );
-
-        try
-        {
-            fis.close(  );
-        }
-        catch ( IOException e )
-        {
-            AppLogService.error( e.getMessage(  ), e );
-        }
-
         DocumentSpace currentSpace = DocumentSpaceHome.findByPrimaryKey( nSpaceId );
 
         HashMap<String, Object> model = getDefaultModel(  );
 
         model.put( MARK_INPUT, _input );
-        model.put( MARK_SPACES_TREE, HtmlMarkup.of( strSpacesTree ) );
+        model.put( MARK_SPACES_TREE, _documentSpacesService.getSpacesTreeRoots( _user ) );
+        model.put( MARK_SELECTED_SPACE_ID, String.valueOf( nSpaceId ) );
+        model.put( MARK_DOCUMENT_TYPE, documentType.getCode(  ) );
         model.put( MARK_SPACE, currentSpace );
         model.put( MARK_MEDIA_TYPE, strMediaType );
 
@@ -361,8 +338,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
             nSpaceId = -1;
         }
 
-        if ( !DocumentService.getInstance(  )
-                                 .isAuthorizedAdminDocument( nSpaceId, strDocumentTypeCode,
+        if ( !_documentService.isAuthorizedAdminDocument( nSpaceId, strDocumentTypeCode,
                     DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) )
         {
             return AdminMessageService.getMessageUrl( request, MESSAGE_NOT_AUTHORIZED, AdminMessage.TYPE_ERROR );
@@ -370,8 +346,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         document.setCodeDocumentType( strDocumentTypeCode );
 
-        String strError = DocumentService.getInstance(  )
-                                         .getDocumentData( multipartRequest, document, _user.getLocale(  ) );
+        String strError = _documentService.getDocumentData( multipartRequest, document, _user.getLocale(  ) );
 
         if ( strError != null )
         {
@@ -384,11 +359,10 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
         try
         {
-            DocumentService.getInstance(  ).createDocument( document, _user );
+            _documentService.createDocument( document, _user );
 
             DocumentAction action = DocumentActionHome.findByPrimaryKey( DocumentAction.ACTION_VALIDATE );
-            DocumentService.getInstance(  )
-                           .validateDocument( document, _user, action.getFinishDocumentState(  ).getId(  ) );
+            _documentService.validateDocument( document, _user, action.getFinishDocumentState(  ).getId(  ) );
         }
         catch ( DocumentException e )
         {
@@ -402,63 +376,66 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     }
     
     /**
-     * creation of a document
+     * Creates a document, then shows the form of its media values
      * @param request The HTTP request
-     * @return The URL to go after performing the action
+     * @param response The HTTP response, redirected to the error message when the document can not be created
+     * @return the page of the media values, empty when the response is redirected
+     * @throws IOException if the redirection fails
      */
-    public String doCreateDocument( HttpServletRequest request )
+    public String doCreateDocument( HttpServletRequest request, HttpServletResponse response ) throws IOException
     {
         Document document = new Document( ) ;
         String url = createDocument(request, document) ;
 
         if ( url != null ) 
         {
-            return url;
+            response.sendRedirect( url );
+
+            return StringUtils.EMPTY;
         } 
-        else 
-        {
-            return getEditSelectedMedia( request, document );
-        }
+
+        return getEditSelectedMedia( request, document );
     }
 
-        /**
-     * Perform the creation of a document
-     * @param request The HTTP request
-     * @return The URL to go after performing the action
-     */
-    public String doCreateImage ( HttpServletRequest request )
-    {
-        Document document = new Document( ) ;
-        String url = createDocument(request, document) ;
-
-        if ( url != null ) 
-        {
-            return url;
-        } 
-        else 
-        {
-            return doInsertUrl( request , document);
-        }
-        
-    }
-    
     /**
-     * Insert the link to the document into the current editor
+     * Creates an image, then inserts it into the current editor without the page of the media values
+     * @param request The HTTP request
+     * @param response The HTTP response, redirected to the error message when the image can not be created
+     * @return the page inserting the image, empty when the response is redirected
+     * @throws IOException if the redirection fails
+     */
+    public String doCreateImage( HttpServletRequest request, HttpServletResponse response ) throws IOException
+    {
+        Document document = new Document( ) ;
+        String url = createDocument(request, document) ;
+
+        if ( url != null ) 
+        {
+            response.sendRedirect( url );
+
+            return StringUtils.EMPTY;
+        } 
+
+        return getInsertMedia( request, document );
+    }
+
+    /**
+     * Inserts the document into the current editor
      * @param request the request
-     * @return the url
+     * @return the page inserting the document, rendered in the response to the form rather than reached through a redirect
      */
-    public String doInsertUrl( HttpServletRequest request )
+    public String doInsertMedia( HttpServletRequest request )
     {
-        return doInsertUrl ( request, null ) ;
-        
+        return getInsertMedia( request, null );
     }
+
     /**
-     * Insert the link to the document into the current editor
+     * Returns the page inserting the document into the current editor
      * @param request the request
      * @param document the document in case of "quick image insertion" without the "media_edition" page
-     * @return the url
+     * @return the page inserting the document
      */
-    public String doInsertUrl( HttpServletRequest request , Document document )
+    private String getInsertMedia( HttpServletRequest request, Document document )
     {
         init( request );
 
@@ -469,62 +446,54 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
         Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ), _plugin );
         LibraryMapping mapping = allMappings.iterator(  ).next(  );
         
-        Map<String,String> _listAttributesAssociation = getAttributesFromMapping(mapping) ;
-        
-        StringBuffer sbXml = new StringBuffer(  );
-        XmlUtil.beginElement( sbXml, XML_TAG_MEDIA );
+        Map<String, String> mapAttributesAssociation = getAttributesFromMapping( mapping );
+        Map<String, String> mapValues = new HashMap<>(  );
 
         for ( MediaAttribute attribute : mediaType.getMediaAttributeList(  ) )
         {
-            String strValue = request.getParameter( attribute.getCode(  ) );
+            String strValue = LibraryInsertPage.getMediaValue( request, attribute.getCode(  ) );
 
-            // pick the attribute value in the document in case of "quick image insertion" without the "media edition selector" confirmation page
-            if ( strValue == null ) {
-                if (document.getAttribute( attribute.getCode(  ) ) != null ) 
-                {
-                    strValue = (document.getAttribute( attribute.getCode(  ) ) ).getTextValue() ;
-                } 
-                else 
-                {
-                    // build the link without the "media edition selector" page
-                    if ( attribute.getTypeId( ) == IMAGE_MEDIA_TYPE_ID && _listAttributesAssociation != null ) {
-                        String docType_code = _listAttributesAssociation.get( attribute.getCode(  ) ) ;
-                        DocumentAttribute _docAttr = document.getAttribute( docType_code );
-                        if ( _docAttr != null ) strValue = "document?id=" + document.getId() + "&amp;id_attribute=" + _docAttr.getId() ;
-                    }
-										
-                }
-            }
-            
-            if ( attribute.getTypeId(  ) == MediaAttribute.ATTRIBUTE_TYPE_BINARY )
+            if ( ( strValue == null ) && ( document != null ) )
             {
-                strValue = StringEscapeUtils.escapeHtml4( strValue );
+                strValue = getDocumentValue( document, attribute, mapAttributesAssociation );
             }
 
-            XmlUtil.addElement( sbXml, attribute.getCode(  ), strValue );
+            mapValues.put( attribute.getCode(  ), strValue );
         }
 
-        XmlUtil.endElement( sbXml, XML_TAG_MEDIA );
+        String strHtml = _mediaTemplateService.render( mediaType, List.of( mapValues ), _user.getLocale(  ) );
 
-        String strHtml = "";
+        return LibraryInsertPage.getHtml( _input, strHtml, _user.getLocale(  ) );
+    }
 
-        try
+    /**
+     * Returns the value of a media attribute taken from the document itself, for a quick image insertion that skips the media edition page:
+     * the document attribute of the same code, or, for a binary attribute, the URL of the document attribute it is mapped to
+     * @param document the document just created
+     * @param attribute the media attribute
+     * @param mapAttributesAssociation the codes of the document attributes, keyed by the codes of the media attributes
+     * @return the value, null if the document has none
+     */
+    private String getDocumentValue( Document document, MediaAttribute attribute, Map<String, String> mapAttributesAssociation )
+    {
+        DocumentAttribute documentAttribute = document.getAttribute( attribute.getCode(  ) );
+
+        if ( documentAttribute != null )
         {
-            XmlTransformerService xmlTransformerService = new XmlTransformerService(  );
-            String strXslUniqueId = XSL_UNIQUE_PREFIX_ID + strMediaTypeId;
-            String strPreHtml = xmlTransformerService.transformBySourceWithXslCache( sbXml.toString(  ),
-                    mediaType.getStyleSheet(  ).getSource(  ), strXslUniqueId, null, null );
-
-            strHtml = strPreHtml;
+            return documentAttribute.getTextValue(  );
         }
-        catch ( Exception e )
+
+        if ( ( attribute.getTypeId(  ) == MediaAttribute.ATTRIBUTE_TYPE_BINARY ) && ( mapAttributesAssociation != null ) )
         {
-            AppLogService.error( sbXml.toString(  ) );
-            AppLogService.error( getClass(  ).getClassLoader(  ).getResource( "testlibrary.xsl" ) );
-            AppLogService.error( e.getMessage(  ), e );
+            DocumentAttribute mappedAttribute = document.getAttribute( mapAttributesAssociation.get( attribute.getCode(  ) ) );
+
+            if ( mappedAttribute != null )
+            {
+                return URL_DOCUMENT_RESOURCE + document.getId(  ) + URL_PARAMETER_ATTRIBUTE + mappedAttribute.getId(  );
+            }
         }
 
-        return insertUrl( request, _input, strHtml );
+        return null;
     }
 
     /**

@@ -44,17 +44,15 @@ import fr.paris.lutece.plugins.library.business.LibraryMedia;
 import fr.paris.lutece.plugins.library.business.LibraryMediaHome;
 import fr.paris.lutece.plugins.library.business.MediaAttribute;
 import fr.paris.lutece.plugins.library.business.MediaAttributeHome;
-import fr.paris.lutece.portal.service.html.XmlTransformerService;
+import fr.paris.lutece.plugins.library.service.LibraryMediaTemplateService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.template.HtmlMarkup;
-import fr.paris.lutece.portal.service.upload.MultipartItem;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.portal.web.constants.Messages;
-import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
 import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -70,6 +68,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -108,7 +107,7 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_MEDIA_DESCRIPTION = "media_description";
     private static final String PARAMETER_PREFIX_DOCUMENT_ATTRIBUTE_ID = "document_attribute_id_";
     private static final String PARAMETER_MAPPING_ID = "mapping_id";
-    private static final String PARAMETER_MEDIA_STYLESHEET = "media_stylesheet";
+    private static final String PARAMETER_MEDIA_TEMPLATE = "media_template";
 
     // Properties
     private static final String PROPERTY_PAGE_TITLE_MAPPING_CREATION = "library.pageTitle.mapping.creation";
@@ -123,6 +122,7 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     private static final String PROPERTY_MESSAGE_REMOVE_ATTRIBUTE = "library.message.attribute.remove";
     private static final String PROPERTY_MESSAGE_MEDIA_NOT_FOUND = "library.message.media.notFound";
     private static final String PROPERTY_MESSAGE_ATTRIBUTE_NOT_FOUND = "library.message.attribute.notFound";
+    private static final String PROPERTY_MESSAGE_TEMPLATE_ERROR = "library.message.media.templateError";
 
     // Marks
     private static final String MARK_MEDIA_LIST = "media_list";
@@ -137,6 +137,9 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     private static final String MARK_DOCUMENT_ATTRIBUTE = "document_attribute";
     private static final String MARK_MAPPING = "mapping";
     private static final String MARK_MEDIA_MULTIPLE = "media-multiple";
+    private static final String MARK_MEDIA_TEMPLATE = "media_template";
+    private static final String MARK_LEGACY_STYLESHEET = "legacy_stylesheet";
+    private static final String MARK_LEGACY_MEDIA_IDS = "legacy_media_ids";
 
     // Templates
     private static final String TEMPLATE_MANAGE_MEDIA = "admin/plugins/library/manage_media.html";
@@ -149,6 +152,9 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     private static final String TEMPLATE_GENERATE_ASSOCIATION_LABEL = "admin/plugins/library/generate_mapping_association_label.html";
     private static final String TEMPLATE_MODIFY_MAPPING = "admin/plugins/library/modify_mapping.html";
 
+    @Inject
+    private LibraryMediaTemplateService _mediaTemplateService;
+
     /**
      * Get the manage library page
      * @param request The request
@@ -158,6 +164,7 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     {
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_MEDIA_LIST, LibraryMediaHome.findAllMedia( getPlugin(  ) ) );
+        model.put( MARK_LEGACY_MEDIA_IDS, _mediaTemplateService.getMediaIdsWithLegacyStylesheet( getPlugin(  ) ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_LIBRARY, getLocale(  ), model );
 
@@ -173,7 +180,10 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     {
         setPageTitleProperty( PROPERTY_PAGE_TITLE_MEDIA_CREATION );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CREATE_MEDIA, getLocale(  ), null );
+        Map<String, Object> model = new HashMap<String, Object>(  );
+        model.put( MARK_MEDIA_TEMPLATE, _mediaTemplateService.getDefaultTemplateSource(  ) );
+
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CREATE_MEDIA, getLocale(  ), model );
 
         return getAdminPage( template.getHtml(  ) );
     }
@@ -187,11 +197,9 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     {
         String strName = request.getParameter( PARAMETER_MEDIA_NAME );
         String strDescription = request.getParameter( PARAMETER_MEDIA_DESCRIPTION );
+        String strTemplate = request.getParameter( PARAMETER_MEDIA_TEMPLATE );
 
-        MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
-        MultipartItem item = mRequest.getFile( PARAMETER_MEDIA_STYLESHEET );
-
-        if ( ( strName.length(  ) == 0 ) || ( strDescription.length(  ) == 0 ) || ( item.getSize(  ) == 0 ) )
+        if ( StringUtils.isAnyBlank( strName, strDescription, strTemplate ) )
         {
             return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
@@ -199,7 +207,7 @@ public class LibraryJspBean extends PluginAdminPageJspBean
         LibraryMedia media = new LibraryMedia(  );
         media.setName( strName );
         media.setDescription( strDescription );
-        media.setStyleSheetBytes( item.get(  ) );
+        media.setTemplate( strTemplate );
         media.setIsMultipleMedia( Boolean.parseBoolean( request.getParameter( MARK_MEDIA_MULTIPLE ) ) );
 
         LibraryMediaHome.create( media, getPlugin(  ) );
@@ -232,8 +240,6 @@ public class LibraryJspBean extends PluginAdminPageJspBean
     {
         String strMediaId = request.getParameter( PARAMETER_MEDIA_ID );
         int nMediaId = Integer.parseInt( strMediaId );
-
-        XmlTransformerService.clearXslCache(  );
 
         // remove media definition
         LibraryMediaHome.remove( nMediaId, getPlugin(  ) );
@@ -268,8 +274,18 @@ public class LibraryJspBean extends PluginAdminPageJspBean
         Collection<MediaAttribute> attributeList = MediaAttributeHome.findAllAttributesForMedia( nMediaId, getPlugin(  ) );
         media.setMediaAttributeList( I18nService.localizeCollection( attributeList, getLocale(  ) ) );
 
+        String strLegacyStylesheet = _mediaTemplateService.getLegacyStylesheet( nMediaId, getPlugin(  ) );
+        String strTemplate = media.getTemplate(  );
+
+        if ( StringUtils.isBlank( strTemplate ) )
+        {
+            strTemplate = ( strLegacyStylesheet == null ) ? _mediaTemplateService.getDefaultTemplateSource(  ) : StringUtils.EMPTY;
+        }
+
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_MEDIA, media );
+        model.put( MARK_MEDIA_TEMPLATE, strTemplate );
+        model.put( MARK_LEGACY_STYLESHEET, strLegacyStylesheet );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_MEDIA, getLocale(  ), model );
 
@@ -286,31 +302,43 @@ public class LibraryJspBean extends PluginAdminPageJspBean
         String strMediaId = request.getParameter( PARAMETER_MEDIA_ID );
         String strName = request.getParameter( PARAMETER_MEDIA_NAME );
         String strDescription = request.getParameter( PARAMETER_MEDIA_DESCRIPTION );
+        String strTemplate = request.getParameter( PARAMETER_MEDIA_TEMPLATE );
 
-        MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
-        MultipartItem item = mRequest.getFile( PARAMETER_MEDIA_STYLESHEET );
-
-        if ( ( strName.length(  ) == 0 ) || ( strDescription.length(  ) == 0 ) || ( strMediaId.length(  ) == 0 ) )
+        if ( StringUtils.isAnyBlank( strName, strDescription, strMediaId ) )
         {
             return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
 
         int nMediaId = Integer.parseInt( strMediaId );
+        boolean bKeepLegacyStylesheet = StringUtils.isBlank( strTemplate );
 
-        LibraryMedia media = LibraryMediaHome.findByPrimaryKey( nMediaId, getPlugin(  ) );
-        media.setMediaId( nMediaId );
-        media.setName( strName );
-        media.setDescription( strDescription );
-
-        if ( ( item != null ) && ( item.getSize(  ) > 0 ) )
+        if ( bKeepLegacyStylesheet && ( _mediaTemplateService.getLegacyStylesheet( nMediaId, getPlugin(  ) ) == null ) )
         {
-            XmlTransformerService.clearXslCache(  );
-            media.setStyleSheetBytes( item.get(  ) );
+            return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
 
+        LibraryMedia media = LibraryMediaHome.findByPrimaryKey( nMediaId, getPlugin(  ) );
+        media.setMediaAttributeList( MediaAttributeHome.findAllAttributesForMedia( nMediaId, getPlugin(  ) ) );
+
+        String strError = _mediaTemplateService.validateTemplate( media, strTemplate, getLocale(  ) );
+
+        if ( strError != null )
+        {
+            return AdminMessageService.getMessageUrl( request, PROPERTY_MESSAGE_TEMPLATE_ERROR, new Object[] { strError },
+                AdminMessage.TYPE_STOP );
+        }
+
+        media.setName( strName );
+        media.setDescription( strDescription );
+        media.setTemplate( bKeepLegacyStylesheet ? null : strTemplate );
         media.setIsMultipleMedia( Boolean.parseBoolean( request.getParameter( MARK_MEDIA_MULTIPLE ) ) );
 
         LibraryMediaHome.update( media, getPlugin(  ) );
+
+        if ( !bKeepLegacyStylesheet )
+        {
+            _mediaTemplateService.discardLegacyStylesheet( nMediaId, getPlugin(  ) );
+        }
 
         return getHomeUrl( request );
     }

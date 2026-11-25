@@ -1,14 +1,30 @@
-<@div class='row row-cols-4 mt-3 p-5' id='insert-service'>    
-<#list mediatypes as mediatype>
-    <@columns class='mb-3'>
-		<@div class='d-flex flex-column justify-content-center'>
-			<@tform method='post' name='fenvoi' action='jsp/admin/plugins/library/SelectMedia.jsp' class=''>
-			<@input type='hidden' name='plugin_name' value='${plugin_name}' />
-			<@input type='hidden' name='input' value='${.data_model.input}' />
-			<@input type='hidden' name='media_type' value='${mediatype.mediaId?c}' />
-			<@button type='submit' color='default p-5 border-2 border-solid border-dark' title='${mediatype.name}' />
+<#--
+ # Choice of the media type to insert from the library: one tile per type, each posting its type to SelectMedia.jsp.
+ # Styles: insert_service.css (InsertServiceHeader.jsp).
+-->
+<#assign mediaTypeIcons = { '1': 'photo', '3': 'file-type-pdf', '7': 'slideshow' } />
+<#assign mediaTypeTints = { '1': '1', '3': '4', '7': '2' } />
+<div class="lutece-insert">
+	<div class="lutece-insert-head">
+		<span class="lutece-insert-badge lutece-insert-tint-2" aria-hidden="true"><i class="ti ti-books"></i></span>
+		<h2>#i18n{library.insertservice.selectMediaType}</h2>
+	</div>
+	<ul class="lutece-insert-tiles">
+	<#list mediatypes as mediatype>
+		<li>
+			<@tform method='post' name='fenvoi' action='jsp/admin/plugins/library/SelectMedia.jsp' class='h-100'>
+				<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+				<@input type='hidden' name='input' value='${.data_model.input}' />
+				<@input type='hidden' name='media_type' value='${mediatype.mediaId?c}' />
+				<button type="submit" class="lutece-insert-tile">
+					<span class="lutece-insert-illu lutece-insert-tint-${mediaTypeTints[ mediatype.mediaId?c ]!'5'}" aria-hidden="true"><i class="ti ti-${mediaTypeIcons[ mediatype.mediaId?c ]!'file'}"></i></span>
+					<span class="lutece-insert-text">
+						<span class="lutece-insert-title">${mediatype.name?cap_first}</span>
+						<#if mediatype.description?has_content><span class="lutece-insert-summary">${mediatype.description}</span></#if>
+					</span>
+				</button>
 			</@tform>
-		</@div>
-	</@columns>
-</#list>
-</@div>
+		</li>
+	</#list>
+	</ul>
+</div>

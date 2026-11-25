@@ -36,17 +36,70 @@ package fr.paris.lutece.plugins.library.business;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 
 import java.util.Collection;
+import java.util.List;
 
 
+/**
+ * DAO interface of the media types
+ */
 public interface ILibraryMediaDAO
 {
+    /**
+     * Loads all the media types, without their attributes
+     * @param plugin the plugin
+     * @return the media types
+     */
     Collection<LibraryMedia> selectAll( Plugin plugin );
 
+    /**
+     * Loads a media type, without its attributes
+     * @param nMediaId the identifier of the media type
+     * @param plugin the plugin
+     * @return the media type, null if it does not exist
+     */
     LibraryMedia load( int nMediaId, Plugin plugin );
 
+    /**
+     * Creates a media type and sets its new identifier
+     * @param media the media type
+     * @param plugin the plugin
+     */
     void insert( LibraryMedia media, Plugin plugin );
 
+    /**
+     * Updates a media type
+     * @param media the media type
+     * @param plugin the plugin
+     */
     void store( LibraryMedia media, Plugin plugin );
 
+    /**
+     * Removes a media type
+     * @param nMediaId the identifier of the media type
+     * @param plugin the plugin
+     */
     void delete( int nMediaId, Plugin plugin );
+
+    /**
+     * Loads the XSL stylesheet a media type had before the FreeMarker templates. The stylesheet column exists only until every legacy
+     * stylesheet has been rewritten
+     * @param nMediaId the identifier of the media type
+     * @param plugin the plugin
+     * @return the source of the stylesheet, null if the media type has none
+     */
+    String selectLegacyStylesheet( int nMediaId, Plugin plugin );
+
+    /**
+     * Lists the media types that still have a legacy XSL stylesheet
+     * @param plugin the plugin
+     * @return the identifiers of the media types
+     */
+    List<Integer> selectIdsWithLegacyStylesheet( Plugin plugin );
+
+    /**
+     * Discards the legacy XSL stylesheet of a media type
+     * @param nMediaId the identifier of the media type
+     * @param plugin the plugin
+     */
+    void deleteLegacyStylesheet( int nMediaId, Plugin plugin );
 }

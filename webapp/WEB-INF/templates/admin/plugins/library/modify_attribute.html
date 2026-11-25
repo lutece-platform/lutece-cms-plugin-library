@@ -1,44 +1,43 @@
+<#include "/admin/plugins/library/macros_library.html" />
 <#assign typeIdWithDefaultValue = 0 />
-<@row>
-	<@columns>
-		<@box>
-			<@boxHeader title='#i18n{library.modify_attribute.form.label}' />
-			<@boxBody>
-				<@tform method='post' action='jsp/admin/plugins/library/DoModifyAttribute.jsp' name='modify_attribute'>
-					<@input type='hidden' id='media_id' name='media_id' value='${attribute.mediaId}' />
-					<@input type='hidden' id='attribute_id' name='attribute_id' value='${attribute.attributeId}' />
-					<@formGroup labelFor='attribute_code' labelKey='#i18n{library.modify_attribute.code}' mandatory=true>
-						<@input type='text' name='attribute_code' id='attribute_code' value='${attribute.code}' maxlength=250 />
-					</@formGroup>
-					<@formGroup labelFor='attribute_description' labelKey='#i18n{library.modify_attribute.description}' mandatory=true>
-						<@input type='text' name='attribute_description' id='attribute_description' value='${attribute.description}' maxlength=250 />
-					</@formGroup>	
-					<@formGroup labelFor='attribute_type' labelKey='#i18n{library.modify_attribute.type}' mandatory=true>
-						<@select name='attribute_type' default_value='${attribute.typeId?c}' items=attribute_type_list />
-					</@formGroup>
-					<@formGroup labelFor='attribute_default_value' labelKey='#i18n{library.create_attribute.defaultValue}' mandatory=true>
-						<@input type='text' name='attribute_default_value' id='attribute_default_value' value='${attribute.defaultValue}' maxlength=100 disabled=(attribute.typeId != typeIdWithDefaultValue) />
-					</@formGroup>
-					<@formGroup>
-						<@button type='submit' title='#i18n{library.modify_attribute.button.validate}' buttonIcon='save' />
-						<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${attribute.mediaId}' title='#i18n{library.modify_attribute.button.cancel}' buttonIcon='times' color='default' />
-					</@formGroup>
-				</@tform>	
-			</@boxBody>
-		</@box>
-	</@columns>
-</@row>
-
-<script type="text/javascript">
-function displayDefaultValue(  ){
-var attribute_type = document.getElementById("attribute_type");
-var attribute_default_value = document.getElementById("attribute_default_value");
-if( attribute_type.options[attribute_type.selectedIndex].value == "${typeIdWithDefaultValue?c}"){
-	attribute_default_value.disabled = false;
-} else {
-	attribute_default_value.value = "";
-	attribute_default_value.disabled = true;
-    }
-}
-document.getElementById( 'attribute_type' ).addEventListener( 'change', displayDefaultValue );
+<#assign bc><@libraryBreadcrumb items=[ { 'label': '#i18n{library.manage_media.form.modify.title}', 'url': 'jsp/admin/plugins/library/ManageMedia.jsp?media_id=${attribute.mediaId}' }, { 'label': '#i18n{library.modify_attribute.form.label}' } ] /></#assign>
+<@pageContainer>
+	<@pageColumn>
+		<@libraryPageHeader title='#i18n{library.modify_attribute.form.label}' breadcrumb=bc>
+			<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${attribute.mediaId}' title='#i18n{portal.util.labelBack}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] />
+		</@libraryPageHeader>
+		<@tform method='post' action='jsp/admin/plugins/library/DoModifyAttribute.jsp' name='modify_attribute' boxed=true>
+			<@input type='hidden' id='media_id' name='media_id' value='${attribute.mediaId}' />
+			<@input type='hidden' id='attribute_id' name='attribute_id' value='${attribute.attributeId}' />
+			<@formGroup labelFor='attribute_code' labelKey='#i18n{library.modify_attribute.code}' mandatory=true>
+				<@input type='text' name='attribute_code' id='attribute_code' value='${attribute.code}' maxlength=250 mandatory=true />
+			</@formGroup>
+			<@formGroup labelFor='attribute_description' labelKey='#i18n{library.modify_attribute.description}' mandatory=true>
+				<@input type='text' name='attribute_description' id='attribute_description' value='${attribute.description}' maxlength=250 mandatory=true />
+			</@formGroup>
+			<@formGroup labelFor='attribute_type' labelKey='#i18n{library.modify_attribute.type}' mandatory=true>
+				<@select name='attribute_type' id='attribute_type' default_value='${attribute.typeId}' items=attribute_type_list mandatory=true />
+			</@formGroup>
+			<@formGroup labelFor='attribute_default_value' labelKey='#i18n{library.create_attribute.defaultValue}'>
+				<@input type='text' name='attribute_default_value' id='attribute_default_value' value='${attribute.defaultValue!}' maxlength=100 disabled=(attribute.typeId != typeIdWithDefaultValue) />
+			</@formGroup>
+			<@formGroup>
+				<@button type='submit' title='#i18n{library.modify_attribute.button.validate}' buttonIcon='check' color='primary' />
+				<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${attribute.mediaId}' title='#i18n{library.modify_attribute.button.cancel}' buttonIcon='x' color='light' />
+			</@formGroup>
+		</@tform>
+	</@pageColumn>
+</@pageContainer>
+<script>
+document.addEventListener( 'DOMContentLoaded', () => {
+	const attributeType = document.getElementById( 'attribute_type' );
+	const defaultValue = document.getElementById( 'attribute_default_value' );
+	// Only the attributes typed by the user carry a default value
+	attributeType.addEventListener( 'change', () => {
+		defaultValue.disabled = attributeType.value !== '${typeIdWithDefaultValue}';
+		if ( defaultValue.disabled ) {
+			defaultValue.value = '';
+		}
+	} );
+} );
 </script>

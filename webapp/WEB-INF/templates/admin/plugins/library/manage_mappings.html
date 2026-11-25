@@ -1,63 +1,66 @@
-<@row>
-	<@columns>
-		<@box>
-			<@boxHeader title='#i18n{library.manage_mappings.table.title}'>
-				<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}' title='#i18n{library.manage_mappings.action.back}' hideTitle=['xs','sm'] size='sm' />
-			</@boxHeader>
-			<@boxBody>
-				<#if mapping_list?has_content>
-				<@table>
-					<@tr>
-						<@th>#i18n{library.manage_mappings.table.column.title.type}</@th>
-						<@th>#i18n{library.manage_mappings.table.column.title.mappings}</@th>
-						<@th>#i18n{library.manage_mappings.table.column.title.comments}</@th>
-						<@th>#i18n{library.manage_mappings.table.column.title.actions}</@th>
-					</@tr>
-					<#list mapping_list as mapping>
-					<@tr>
-						<@td>${mapping.codeDocumentType}</@td>
-						<@td>
+<#include "/admin/plugins/library/macros_library.html" />
+<#assign nbAttributesToMap = 0>
+<#list media.mediaAttributeList as attribute>
+	<#if attribute.associableWithDocument>
+		<#assign nbAttributesToMap = nbAttributesToMap + 1>
+	</#if>
+</#list>
+<#assign bc><@libraryBreadcrumb items=[ { 'label': media.name, 'url': 'jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}' }, { 'label': '#i18n{library.manage_mappings.table.title}' } ] /></#assign>
+<@pageContainer>
+	<@pageColumn>
+		<@libraryPageHeader title='#i18n{library.manage_mappings.table.title}' iconName='arrows-exchange' breadcrumb=bc>
+			<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}' title='#i18n{library.manage_mappings.action.back}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] class='me-1' />
+			<#if document_type_list?has_content>
+				<@button type='button' title='#i18n{library.manage_mappings.form.create.title}' buttonIcon='plus' color='primary' hideTitle=['xs','sm','md'] params={"data-bs-toggle": "modal", "data-bs-target": "#create-mapping"} />
+			</#if>
+		</@libraryPageHeader>
+		<#if mapping_list?has_content>
+			<@manageFeature layout='list' id='library-mappings'>
+				<#list mapping_list as mapping>
+				<#assign modifyUrl = 'jsp/admin/plugins/library/ModifyMapping.jsp?mapping_id=${mapping.idMapping}' />
+				<@manageFeatureItem id='mapping_${mapping.idMapping}'>
+					<@manageFeatureItemColumn class='d-flex align-items-center gap-2 text-truncate'>
+						<span class="avatar avatar-sm bg-pink-lt" aria-hidden="true"><@icon style='arrows-exchange' /></span>
+						<@div class='text-truncate'>
+							<@link href=modifyUrl class='text-reset fw-semibold' title='#i18n{portal.util.labelModify} ${mapping.codeDocumentType}'>${mapping.codeDocumentType}</@link>
+							<#if ( mapping.attributeAssociationList?size ) lt nbAttributesToMap><@tag color='' class='bg-yellow-lt ms-1' tagIcon='alert-triangle'>#i18n{library.manage_mappings.control.title} : #i18n{library.manage_mappings.control.text}</@tag></#if>
 							<#if mapping.attributeAssociationList?has_content>
-								 <#assign attributeAssociationLength = mapping.attributeAssociationList?size />
-								 <#list mapping.attributeAssociationList as mappingAttribute>
-									${association_labels[mapping.idMapping?c + '-' + mappingAttribute.idMediaAttribute?c]}<br/>
-								 </#list> 	
-								 <#else>
-								  <#assign attributeAssociationLength = 0 />
+								<@div class='text-secondary small'>
+									<#list mapping.attributeAssociationList as mappingAttribute>${association_labels[mapping.idMapping?c + '-' + mappingAttribute.idMediaAttribute?c]}<#sep> &middot; </#sep></#list>
+								</@div>
 							</#if>
-						</@td>
-						<@td>
-							<#assign nbAttributesToMap = 0>  
-							<#list media.mediaAttributeList as attribute>
-								 <#if attribute.associableWithDocument>
-										<#assign nbAttributesToMap = nbAttributesToMap + 1>
-								  </#if>
-							</#list> 
-							<#if attributeAssociationLength < nbAttributesToMap>
-								 <@tag color='warning'>#i18n{library.manage_mappings.control.title} : #i18n{library.manage_mappings.control.text}</@tag>
-							</#if>
-						</@td>
-						<@td>
-							<@aButton href='jsp/admin/plugins/library/ModifyMapping.jsp?mapping_id=${mapping.idMapping}' title='#i18n{portal.util.labelModify} ${mapping.codeDocumentType}' hideTitle=['all'] buttonIcon='edit' size='sm' />
-							<@aButton href='jsp/admin/plugins/library/RemoveMapping.jsp?mapping_id=${mapping.idMapping}' title='#i18n{portal.util.labelDelete} ${mapping.codeDocumentType}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
-						</@td>
-					</@tr>
-					</#list>
-				</@table>
-				</#if>
-				
-				<@tform action='jsp/admin/plugins/library/CreateMapping.jsp' method='post'>
-					<@input type='hidden' name='media_id' value='${media.mediaId}' />
-					<@fieldSet legend='#i18n{library.manage_mappings.form.create.title}'>
-						<@formGroup labelFor='document_type' labelKey='#i18n{library.manage_mappings.form.create.documentType}'>
-							<@select name='document_type' default_value='' items=document_type_list />
-						</@formGroup>
-						<@formGroup>
-							<@button type='submit' title='#i18n{library.manage_mappings.form.create.validate}' buttonIcon='save' />
-						</@formGroup>
-					</@fieldSet>
-				</@tform>
-			</@boxBody>
-		</@box>
-    </@columns>
-</@row>
+						</@div>
+					</@manageFeatureItemColumn>
+					<@manageFeatureItemColumn auto=true align='end'>
+						<@div class='btn-actions'>
+							<@aButton href=modifyUrl style='btn-action' color='' buttonIcon='pencil' title='#i18n{portal.util.labelModify} ${mapping.codeDocumentType}' hideTitle=['all'] />
+							<@aButton href='jsp/admin/plugins/library/RemoveMapping.jsp?mapping_id=${mapping.idMapping}' style='btn-action text-danger' color='' buttonIcon='trash' title='#i18n{portal.util.labelDelete} ${mapping.codeDocumentType}' hideTitle=['all'] />
+						</@div>
+					</@manageFeatureItemColumn>
+				</@manageFeatureItem>
+				</#list>
+			</@manageFeature>
+		<#else>
+			<@card>
+				<@empty title='#i18n{library.manage_mappings.noData}' iconName='arrows-exchange' subtitle=' ' />
+			</@card>
+		</#if>
+	</@pageColumn>
+</@pageContainer>
+<#if document_type_list?has_content>
+<@modal id='create-mapping'>
+	<@tform action='jsp/admin/plugins/library/CreateMapping.jsp' method='post'>
+		<@modalHeader modalTitle='#i18n{library.manage_mappings.form.create.title}' />
+		<@modalBody>
+			<@input type='hidden' name='media_id' value='${media.mediaId}' />
+			<@formGroup labelFor='document_type' labelKey='#i18n{library.manage_mappings.form.create.documentType}' rows=2 mandatory=true>
+				<@select name='document_type' default_value='' items=document_type_list mandatory=true />
+			</@formGroup>
+		</@modalBody>
+		<@modalFooter>
+			<@button type='button' title='#i18n{portal.util.labelCancel}' color='light' params={"data-bs-dismiss": "modal"} />
+			<@button type='submit' title='#i18n{library.manage_mappings.form.create.validate}' buttonIcon='check' color='primary' />
+		</@modalFooter>
+	</@tform>
+</@modal>
+</#if>

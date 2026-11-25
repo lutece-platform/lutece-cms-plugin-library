@@ -1,3 +1,9 @@
+<#include "/admin/plugins/document/spaces/spaces_tree_select.html" />
+<#--
+ # Choice of a document for a media type: the media types as tabs, the spaces as a tree, the documents of the space as a grid or a list (remembered
+ # by media type in the browser, the list by default for the types without image), a search on the titles of the page. A click selects a document,
+ # Insérer or a double click goes on to its edition (EditSelectedMedia.jsp). Styles: insert_service.css, behaviours: lutece-insert.js.
+-->
 <#switch mediatype.mediaId>
 	<#case 1>
 		<#assign btnTitle='#i18n{library.insertservice.add} #i18n{library.insertservice.someY} ${mediatype.name?cap_first}' />
@@ -11,63 +17,103 @@
 		<#assign btnTitle='#i18n{library.insertservice.add} #i18n{library.insertservice.someX} #i18n{library.insertservice.defaultTitle}' />
 		<#assign btnIcon='plus' />
 </#switch>
-<@box>
-	<@boxHeader title='#i18n{library.insertservice.selectMedia} ${mediatype.name}' class='d-flex' boxTools=true>
-	<#if is_document_creation_allowed?? && is_document_creation_allowed >
-		<@aButton href='jsp/admin/plugins/library/CreateMediaByInsert.jsp?plugin_name=${plugin_name?url}&media_type=${mediatype.mediaId?c}&browser_id_space=${selected_space?c}&space_id=${selected_space?c}&input=${.data_model.input?url}' buttonIcon=btnIcon title=btnTitle size='sm' />
+<#-- The documents of an image type have a thumbnail; the others show the icon of their type -->
+<#assign isImage = mediatype.mediaId = 1 />
+<#assign mediaTypeIcons = { '1': 'photo', '3': 'file-type-pdf', '7': 'slideshow' } />
+<div class="lutece-insert">
+	<div class="lutece-insert-head">
+		<span class="lutece-insert-badge lutece-insert-tint-${isImage?then( '1', '4' )}" aria-hidden="true"><i class="ti ti-${mediaTypeIcons[ mediatype.mediaId?c ]!'file'}"></i></span>
+		<h2>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h2>
+		<#if is_document_creation_allowed?? && is_document_creation_allowed>
+		<@aButton href='jsp/admin/plugins/library/CreateMediaByInsert.jsp?plugin_name=${plugin_name?url("UTF-8")}&media_type=${mediatype.mediaId?c}&browser_id_space=${selected_space?c}&space_id=${selected_space?c}&input=${.data_model.input?url("UTF-8")}' buttonIcon=btnIcon title=btnTitle size='sm' color='light' />
+		</#if>
+	</div>
+	<#if mediatypes?? && mediatypes?size gt 1>
+	<nav class="lutece-insert-tabs" aria-label="#i18n{library.insertservice.selectMediaType}">
+		<#list mediatypes as type>
+		<a href="jsp/admin/plugins/library/SelectMedia.jsp?plugin_name=${plugin_name?url("UTF-8")}&amp;media_type=${type.mediaId?c}&amp;input=${.data_model.input?url("UTF-8")}"<#if type.mediaId = mediatype.mediaId> aria-current="page"</#if>><i class="ti ti-${mediaTypeIcons[ type.mediaId?c ]!'file'}" aria-hidden="true"></i>${type.name?cap_first}</a>
+		</#list>
+	</nav>
 	</#if>
-	</@boxHeader>
-	<@boxBody>
-		<@div class='row row-cols-4 mt-3' id='insert-service'>
-			<@div class="col-12 col-md-4 col-lg-3">
-				<@tform name='filter' action='jsp/admin/plugins/library/SelectMedia.jsp' class="form">
-					<@input type="hidden" name="plugin_name" value="${plugin_name}" />
-					<@input type="hidden" name="input" value="${.data_model.input}" />
-					<@input type="hidden" name="media_type" value="${mediatype.mediaId}" />
-					<@input type="hidden" name="space_id" value="${selected_space}" />
-					<@div class="form-group">
-						${spaces_browser}
-					</@div>
-				</@tform>
-			</@div>
+	<div class="lutece-insert-browser">
+		<@tform name='filter' action='jsp/admin/plugins/library/SelectMedia.jsp' class='lutece-insert-aside'>
+			<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+			<@input type='hidden' name='input' value='${.data_model.input}' />
+			<@input type='hidden' name='media_type' value='${mediatype.mediaId?c}' />
+			<@input type='hidden' name='space_id' value='${selected_space?c}' />
+			<@spacesTreeSelect id='library_browse_spaces_tree' nodes=spaces_tree selectedId=selected_space?c label='#i18n{library.insertservice.browseSpace}' />
+		</@tform>
+		<@tform name='fenvoi' id='library_media_form' action='jsp/admin/plugins/library/EditSelectedMedia.jsp' class='lutece-insert-main' params={"data-lutece-insert-select": true}>
+			<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+			<@input type='hidden' name='input' value='${.data_model.input}' />
+			<@input type='hidden' name='media' value='${mediatype.mediaId?c}' />
+			<@input type='hidden' name='id_document' value='' />
+			<@input type='hidden' name='id_mapping' value='' />
+			<@input type='hidden' name='space_id' value='${selected_space?c}' />
+			<@input type='hidden' name='browser_id_space' value='${selected_space?c}' />
+			<#if all_documents?has_content>
+			<div class="lutece-insert-tools">
+				<label class="lutece-insert-search" for="library_media_search"><i class="ti ti-search" aria-hidden="true"></i><span class="visually-hidden">#i18n{library.insertservice.searchTitle}</span><input type="search" id="library_media_search" placeholder="#i18n{library.insertservice.searchTitle}" autocomplete="off" data-lutece-insert-search data-target="#library_media_items" data-count="#library_media_count" data-nomatch="#library_media_nomatch"></label>
+				<span class="lutece-insert-count" id="library_media_count" aria-live="polite" data-text-one="1 #i18n{library.insertservice.document}" data-text-many="%n #i18n{library.insertservice.documents}"></span>
+				<span class="btn-group btn-group-sm lutece-insert-views" role="group" aria-label="#i18n{library.insertservice.viewLabel}" data-lutece-insert-views data-target="#library_media_items" data-storage-key="lutece.library.view.${mediatype.mediaId?c}" data-default-view="${isImage?then( 'grid', 'list' )}" hidden>
+					<button type="button" class="btn btn-outline-secondary" data-view="grid" aria-pressed="false"><i class="ti ti-layout-grid me-1" aria-hidden="true"></i>#i18n{library.insertservice.viewGrid}</button>
+					<button type="button" class="btn btn-outline-secondary" data-view="list" aria-pressed="false"><i class="ti ti-list me-1" aria-hidden="true"></i>#i18n{library.insertservice.viewList}</button>
+				</span>
+			</div>
+			<ul class="lutece-insert-items" id="library_media_items" data-view="${isImage?then( 'grid', 'list' )}">
 			<#list all_documents as mappingdocument>
 				<#assign mapping_id = mappingdocument.first />
 				<#assign document = mappingdocument.second />
-				<@columns>
-					<@tform name='fenvoi' action='jsp/admin/plugins/library/EditSelectedMedia.jsp'>
-						<@input type='hidden' name='plugin_name' value='${plugin_name}' />
-						<@input type='hidden' name='input' value='${.data_model.input}' />
-						<@input type='hidden' name='media' value='${mediatype.mediaId}' />
-						<@input type='hidden' name='id_document' id='id_document' value='${document.id}' />
-						<@input type='hidden' name='id_mapping' id='id_mapping' value='${mapping_id}' />
-						<@input type='hidden' name='space_id' value='${selected_space}' />
-						<@input type='hidden' name='browser_id_space' value='${selected_space}' />
-						<div class="card align-items-center pt-2">
-						<#if mediatype.mediaId=1>
-							<img src="${document.thumbnail}&nocache" class="card-img-top rounded-circle" style="width:100px;height: 100px;object-fit: cover;" data-src="${document.thumbnail}&nocache" alt="">
+				<li data-search="${document.title?lower_case}">
+					<button type="button" class="lutece-insert-item" aria-pressed="false" data-lutece-insert-item data-label="${document.title}" data-fields='{"id_document":"${document.id?c}","id_mapping":"${mapping_id?js_string}"}'>
+						<#if isImage>
+						<span class="lutece-insert-thumb"><img src="${document.thumbnail}&amp;nocache" alt="" loading="lazy"></span>
 						<#else>
-							<figure class="text-white bg-dark rounded-circle p-2">
-								<svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-									<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-									<path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
-									<path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
-									<path d="M12 17v-6"></path>
-									<path d="M9.5 14.5l2.5 2.5l2.5 -2.5"></path>
-								</svg>
-							</figure>
+						<span class="lutece-insert-thumb lutece-insert-tint-4" aria-hidden="true"><i class="ti ti-${mediaTypeIcons[ mediatype.mediaId?c ]!'file'}"></i></span>
 						</#if>
-							<div class="card-body">
-								<h3 class="h5 card-title text-center"><#if document.title?length &gt; 20>${document.title?substring(0,20)}...<#else>${document.title}</#if></h3>
-								<p>${mediatype.name!}</p>
-							</div>
-							<div class="card-body text-center">
-								<@button type="submit" title="#i18n{library.manage_media.add.attribute}" />
-							</div>
-						</div>
-					</@tform>
-				</@columns>
+						<span class="lutece-insert-text">
+							<span class="lutece-insert-title">${document.title}</span>
+							<#if document.summary?has_content && document.summary != document.title><span class="lutece-insert-summary">${document.summary}</span></#if>
+							<#if document.dateModification??><span class="lutece-insert-date">${document.dateModification?string( 'dd/MM/yyyy' )}</span></#if>
+						</span>
+					</button>
+				</li>
 			</#list>
-		</@div>
-	</@boxBody>
-</@box>
-<@paginationAdmin paginator=paginator combo=1 />
+			</ul>
+			<p class="lutece-insert-nomatch" id="library_media_nomatch" hidden>#i18n{library.insertservice.noMatch}</p>
+			<div class="lutece-insert-footer">
+				<span class="lutece-insert-selection" aria-live="polite" data-lutece-insert-selection data-text-none="#i18n{library.insertservice.noSelection}" data-text-selected="#i18n{library.insertservice.selectedDocument}">#i18n{library.insertservice.noSelection}</span>
+				<@button type='submit' buttonIcon='check' title='#i18n{library.insertservice.insertlink.button}' color='primary' disabled=true params={"data-lutece-insert-submit": true} />
+			</div>
+			<#else>
+			<@empty title='#i18n{library.insertservice.label.noFiles}' subtitle='#i18n{library.insertservice.label.noFilesHint}' iconName='files-off' />
+			</#if>
+		</@tform>
+		<#-- The pagination has a form of its own (the number of documents per page): after the form of the documents -->
+		<#if all_documents?has_content><div class="lutece-insert-pagination"><@paginationAdmin paginator=paginator combo=1 /></div></#if>
+	</div>
+</div>
+<script>
+<#-- Only a space allowing a document type mapped to this media can be browsed, and choosing one reloads the page on it -->
+( ( tree ) => {
+	if ( !tree ) {
+		return;
+	}
+	const documentTypes = [ <#list document_types as documentType>'${documentType?js_string}'<#sep>, </#list> ];
+	tree.querySelectorAll( 'input[data-document-types]' ).forEach( ( radio ) => {
+		if ( !radio.dataset.documentTypes.split( ',' ).some( ( type ) => documentTypes.includes( type ) ) ) {
+			radio.disabled = true;
+			radio.nextElementSibling?.classList.add( 'text-muted' );
+		}
+		radio.addEventListener( 'change', ( ) => radio.form.submit( ) );
+	} );
+	<#-- The tree fills the height left down to the bottom of the modal's frame, however few its nodes, and scrolls inside it -->
+	const fit = ( ) => {
+		const top = tree.getBoundingClientRect( ).top + window.scrollY;
+		tree.style.height = tree.style.maxHeight = Math.max( 192, window.innerHeight - top - 16 ) + 'px';
+	};
+	fit( );
+	window.addEventListener( 'resize', fit );
+} )( document.getElementById( 'library_browse_spaces_tree' ) );
+
+</script>

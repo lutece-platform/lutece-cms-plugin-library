@@ -1,17 +1,32 @@
-<@row>
-	<@columns>
-		<@tform method='post' name='fenvoi' action='jsp/admin/plugins/library/SelectSpaceForUpload.jsp'>
-			<@fieldSet legend='#i18n{library.insertservice.selectMediaType}'>
-				<@input type='hidden' name='plugin_name' value='${plugin_name}' />
-				<@input type='hidden' name='input' value='${.data_model.input}' />
-				<ul class="list-unstyled">
-					<#list mediatypes as mediatype>
-					<li>
-						<@button type='submit' name='media_type' value='${mediatype.mediaId?c}' color='link' class='px-0' title=mediatype.description buttonIcon='chevron-right' />
-					</li>	
-					</#list>
-				</ul>
-			</@fieldSet>
-		</@tform>
-	</@columns>
-</@row>
+<#--
+ # Choice of the type of the media to upload: one tile per type; each button posts its media_type to SelectSpaceForUpload.jsp.
+ # Styles: insert_service.css (InsertServiceHeader.jsp).
+-->
+<#assign mediaTypeIcons = { '1': 'photo', '3': 'file-type-pdf', '7': 'slideshow' } />
+<#assign mediaTypeTints = { '1': '1', '3': '4', '7': '2' } />
+<div class="lutece-insert">
+	<div class="lutece-insert-head">
+		<span class="lutece-insert-badge lutece-insert-tint-2" aria-hidden="true"><i class="ti ti-upload"></i></span>
+		<h2>#i18n{library.insertservice.selectMediaType}</h2>
+	</div>
+	<@tform method='post' name='fenvoi' action='jsp/admin/plugins/library/SelectSpaceForUpload.jsp'>
+		<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+		<@input type='hidden' name='input' value='${.data_model.input}' />
+		<ul class="lutece-insert-tiles">
+		<#list mediatypes as mediatype>
+			<li>
+				<button type="submit" name="media_type" value="${mediatype.mediaId?c}" class="lutece-insert-tile">
+					<span class="lutece-insert-illu lutece-insert-tint-${mediaTypeTints[ mediatype.mediaId?c ]!'5'}" aria-hidden="true">
+						<i class="ti ti-${mediaTypeIcons[ mediatype.mediaId?c ]!'file'}"></i>
+						<span class="lutece-insert-kind"><i class="ti ti-upload"></i></span>
+					</span>
+					<span class="lutece-insert-text">
+						<span class="lutece-insert-title">${mediatype.name?cap_first}</span>
+						<#if mediatype.description?has_content><span class="lutece-insert-summary">${mediatype.description}</span></#if>
+					</span>
+				</button>
+			</li>
+		</#list>
+		</ul>
+	</@tform>
+</div>

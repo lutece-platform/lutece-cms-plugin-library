@@ -1,79 +1,87 @@
-<@row id='select'>
-	<@columns>
-		<@box>
-			<@boxHeader title='${document.title}' />
-			<@boxBody>
-				<@tform method='post' name='fenvoi' action='${jsp_insert}'>
-				<@input type='hidden' name='plugin_name' value='${plugin_name}' />
-				<@input type='hidden' name='input' value='${.data_model.input}' />
-				<@input type='hidden' name='media' value='${mediatype.mediaId?c}' />
-				<@input type='hidden' name='id_document' value='' />
-				<#list document_list as selectedDocument>
-					<#assign document = selectedDocument.document>
-					<#assign document_index = selectedDocument_index>
-					<@formGroup labelKey='#i18n{library.insertservice.preview}'>
-						<img class="thumbnail img-fluid" src="${document.thumbnail}" alt="${document.title}" />
-					</@formGroup>
+<#-- The form is submitted as soon as the page loads: it carries the values of the selected documents to the insertion. Without script, it shows
+     as the options of each document: its fields and its preview, then Insérer. Styles: insert_service.css (InsertServiceHeader.jsp). -->
+<div class="lutece-insert">
+	<div class="lutece-insert-status" role="status">
+		<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+		<span>#i18n{library.insertservice.insertInProgress}</span>
+	</div>
+	<div id="select">
+		<div class="lutece-insert-head">
+			<span class="lutece-insert-badge lutece-insert-tint-2" aria-hidden="true"><i class="ti ti-slideshow"></i></span>
+			<h2>${mediatype.name!}</h2>
+		</div>
+		<@tform method='post' name='fenvoi' action='${jsp_insert}'>
+			<@input type='hidden' name='plugin_name' value='${plugin_name}' />
+			<@input type='hidden' name='input' value='${.data_model.input}' />
+			<@input type='hidden' name='media' value='${mediatype.mediaId?c}' />
+			<@input type='hidden' name='id_document' value='' />
+			<#list document_list as selectedDocument>
+				<#assign document = selectedDocument.document>
+				<#assign document_index = selectedDocument_index>
+			<div class="lutece-insert-form lutece-insert-form-group">
+				<div class="lutece-insert-fields">
 					<#list media_attributes as attribute>
-						<#assign field_name = attribute.code>
+						<#assign field_name = attribute.code + document_index>
 						<#if attribute.typeId = 0>
-							<!-- ATTRIBUTE_TYPE_TEXT_USER -->
-							<@formGroup labelFor='${field_name}${document_index}' labelKey='${attribute.description}'>
-								<@input type='text' name='${field_name}${document_index}' id='${field_name}${document_index}' value='${attribute.defaultValue}' />
-							</@formGroup>	
+							<#-- ATTRIBUTE_TYPE_TEXT_USER -->
+							<@formGroup labelFor='${field_name}' labelKey='${attribute.description}' rows=2>
+								<@input type='text' name='${field_name}' id='${field_name}' value='${attribute.defaultValue!}' />
+							</@formGroup>
 						<#elseif attribute.typeId = 3>
+							<#-- ATTRIBUTE_TYPE_TITLE_DOCUMENT -->
 							<#if document.title?has_content>
-								<!-- ATTRIBUTE_TYPE_TITLE_DOCUMENT -->
-								<@formGroup labelFor='${field_name}${document_index}' labelKey='${attribute.description}'>
-									<@input type='text' name='${field_name}${document_index}' id='${field_name}${document_index}' value='${document.title}' />
+								<@formGroup labelFor='${field_name}' labelKey='${attribute.description}' rows=2>
+									<@input type='text' name='${field_name}' id='${field_name}' value='${document.title}' />
 								</@formGroup>
 							</#if>
 						<#elseif attribute.typeId = 4>
-							<!-- ATTRIBUTE_TYPE_SUMMARY_DOCUMENT -->
+							<#-- ATTRIBUTE_TYPE_SUMMARY_DOCUMENT -->
 							<#if document.summary?has_content>
-								<@formGroup labelFor='${field_name}${document_index}' labelKey='${attribute.description}'>
-									<@input type='textarea' name='${field_name}${document_index}' id='${field_name}${document_index}' cols=60 rows=2>${document.summary}</@input>
+								<@formGroup labelFor='${field_name}' labelKey='${attribute.description}' rows=2>
+									<@input type='textarea' name='${field_name}' id='${field_name}' rows=2>${document.summary}</@input>
 								</@formGroup>
-							<#else>
-								- 
 							</#if>
 						<#elseif selectedDocument.attributesFromMapping[attribute.code]?has_content>
 							<#assign doctype_code = selectedDocument.attributesFromMapping[attribute.code]>
 							<#if attribute.typeId = 1>
-								<!-- ATTRIBUTE_TYPE_TEXT_DOCUMENT -->
+								<#-- ATTRIBUTE_TYPE_TEXT_DOCUMENT -->
 								<#if document.getAttribute(doctype_code)?exists && document.getAttribute(doctype_code).textValue?has_content>
-									<@formGroup labelFor='${field_name}${document_index}' labelKey='${attribute.description}'>
-										<@input type='textarea' name='${field_name}${document_index}' id='${field_name}${document_index}'>${document.getAttribute(doctype_code).textValue}</@input>
-									</@formGroup>	
+									<@formGroup labelFor='${field_name}' labelKey='${attribute.description}' rows=2>
+										<@input type='textarea' name='${field_name}' id='${field_name}'>${document.getAttribute(doctype_code).textValue}</@input>
+									</@formGroup>
 								</#if>
 							<#elseif attribute.typeId = 2>
-								<!-- ATTRIBUTE_TYPE_BINARY -->
+								<#-- ATTRIBUTE_TYPE_BINARY -->
 								<#if document.getAttribute(doctype_code)?has_content>
 									<#assign attributeId = document.getAttribute(doctype_code).id>
-									<#assign url = "document?id=" + document.id?c + "&id_attribute=" + attributeId?c>
-									<@formGroup labelKey='#i18n{library.insertservice.label.viewDocument}'>
-										<@input type='hidden' name='${field_name}${document_index}' id='${field_name}${document_index}' value='${url}' />
-										<@link href='${url}' target='_blank' title='#i18n{library.insertservice.label.viewDocument}'>
-											${url}
-										</@link>
+									<#assign url = "servlet/plugins/document/resource?id=" + document.id?c + "&id_attribute=" + attributeId?c>
+									<@formGroup labelKey='#i18n{library.insertservice.label.viewDocument}' rows=2>
+										<@input type='hidden' name='${field_name}' id='${field_name}' value='${url}' />
+										<@link href='${url}' target='_blank' title='#i18n{library.insertservice.label.viewDocument}'>${url}</@link>
 									</@formGroup>
 								</#if>
 							</#if>
 						</#if>
 					</#list>
-				</#list>
-				<@formGroup>
-					<@button type='submit' title='#i18n{library.insertservice.insertlink.button}' buttonIcon='save' />
-					<@aButton href='jsp/admin/plugins/library/SelectMedia.jsp?plugin_name=${plugin_name?url}&media_type=${mediatype.mediaId?c}&input=${.data_model.input?url}' params={"data-lutece-action": "back"} title='#i18n{library.insertservice.cancel.button}' size='sm' color='default' />
-				</@formGroup>
-				</@tform>
-			</@boxBody>
-		</@box>
-	</@columns>
-</@row>
+				</div>
+				<aside class="lutece-insert-preview" aria-label="#i18n{library.insertservice.preview}">
+					<@img url='${document.thumbnail}' alt='${document.title}' />
+					<span class="lutece-insert-title">${document_index + 1}. ${document.title}</span>
+				</aside>
+			</div>
+			</#list>
+			<div class="lutece-insert-footer">
+				<div class="lutece-insert-actions">
+					<@aButton href='jsp/admin/plugins/library/SelectMedia.jsp?plugin_name=${plugin_name?url("UTF-8")}&media_type=${mediatype.mediaId?c}&input=${.data_model.input?url("UTF-8")}' params={"data-lutece-action": "back"} title='#i18n{library.insertservice.cancel.button}' buttonIcon='arrow-left' color='light' />
+					<@button type='submit' title='#i18n{library.insertservice.insertlink.button}' buttonIcon='check' color='primary' />
+				</div>
+			</div>
+		</@tform>
+	</div>
+</div>
 <#-- the insert service pages do not load the admin scripts: data-lutece-action="back" needs lutece-actions.js -->
 <script src="themes/admin/shared/js/util/lutece-actions.js"></script>
 <script>
-document.querySelector('#select').classList.add('visually-hidden')
+document.querySelector( '#select' ).classList.add( 'visually-hidden' );
 document.forms[0].submit();
 </script>

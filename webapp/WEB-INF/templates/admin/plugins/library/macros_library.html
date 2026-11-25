@@ -1,0 +1,36 @@
+<#-- Macros shared by the templates of the library plugin -->
+
+<#--
+ Prints a template source HTML-escaped, with its i18n markers neutralised (# written &#35;) so that the localisation of the page leaves them as written.
+ The marker is built by concatenation: the template source itself is localised when it is loaded, so it must never hold the marker literally.
+-->
+<#macro sourceText value><#local i18nMarker = '#' + 'i18n{'><#list value?split(i18nMarker) as part>${part}<#sep>&#35;i18n{</#list></#macro>
+
+<#--
+ # Breadcrumb of the screens of the library, passed to the breadcrumb parameter of pageHeader.
+ # param items  the screens below the media list, links: [ { 'label': '...', 'url': '...' } ]; the last one is the current screen (url ignored)
+-->
+<#macro libraryBreadcrumb items=[]>
+<@breadcrumbs class='mb-1'>
+	<#if items?has_content>
+		<@breadcrumbItem><@link href='jsp/admin/plugins/library/ManageLibrary.jsp' label='#i18n{library.adminFeature.library_management.name}' linkIcon='books' /></@breadcrumbItem>
+	<#else>
+		<@breadcrumbItem class='active' params={"aria-current": "page"}><@icon style='books' class='me-1' />#i18n{library.adminFeature.library_management.name}</@breadcrumbItem>
+	</#if>
+	<#list items as item>
+		<#if item?has_next && item.url?has_content>
+			<@breadcrumbItem><@link href=item.url>${item.label}</@link></@breadcrumbItem>
+		<#else>
+			<@breadcrumbItem class='active' params={"aria-current": "page"}>${item.label}</@breadcrumbItem>
+		</#if>
+	</#list>
+</@breadcrumbs>
+</#macro>
+
+<#-- Page header of the library: the title is preceded by the avatar of the feature. The nested content is the tools of the header. -->
+<#macro libraryPageHeader title breadcrumb='' description='' iconName='books'>
+<#local pageTitle><span class="avatar avatar-sm bg-pink-lt me-2" aria-hidden="true"><@icon style=iconName /></span>${title}</#local>
+<@pageHeader title=pageTitle breadcrumb=breadcrumb description=description>
+<#nested>
+</@pageHeader>
+</#macro>

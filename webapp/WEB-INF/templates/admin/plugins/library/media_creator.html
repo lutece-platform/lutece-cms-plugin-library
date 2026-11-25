@@ -1,3 +1,5 @@
+<#-- The upload of a media into a space: the fields of its document type, a preview of the chosen file, the Dublin Core metadata on demand.
+     Styles: insert_service.css (InsertServiceHeader.jsp). -->
 <#switch document_type>
 	<#case 'image'>
 		<#assign boxTitle='#i18n{library.insertservice.add} #i18n{library.insertservice.someY} ${document_type?cap_first}' />
@@ -11,95 +13,130 @@
 		<#assign boxTitle='#i18n{library.insertservice.add} #i18n{library.insertservice.someX} #i18n{library.insertservice.defaultTitle}' />
 		<#assign btnIcon='plus' />
 </#switch>
-<@row>
-	<@columns>
-		<@box>
-			<@boxHeader title=boxTitle class='d-flex' boxTools=true>
-			<@button type='button' id='dbc' title='Dublin-core' buttonIcon='pencil-cog' params={"aria-controls": "dublin_core_meta", "aria-expanded": "false"} />
-			</@boxHeader>
-			<@boxBody>
-				<#if is_image>
-					<#assign formAction = 'jsp/admin/plugins/library/DoUploadImage.jsp' />
-				<#else>
-					<#assign formAction = 'jsp/admin/plugins/library/DoUploadDocument.jsp' />
-				</#if>
-				<@tform method='post' enctype='multipart/form-data' action=formAction>
-					<@input type='hidden' name='media' value='${media?c}' />
-					<@input type='hidden' name='input' value='${.data_model.input}' />
-					<@input type='hidden' name='space_id' value='${space_id?c}' />
-					<@input type='hidden' name='document_type_code' value='${document_type}' />    
-					<@input type='hidden' name='document_summary' id='document_summary' value='${document_type}'/>
-					<@formGroup labelFor='document_title' labelKey='#i18n{document.create_document.labelDocumentTitle}' helpKey='#i18n{document.create_document.helpDocumentTitle}' mandatory=true>
-						<@input type='text' name='document_title' id='document_title' inputSize=72 maxlength=255 title='#i18n{document.create_document.helpDocumentTitle}' />
-					</@formGroup>
-					${fields}
-					<@div id='dublin_core_meta'>
-						<@formGroup labelFor='dc_title' labelKey='#i18n{module.document.metadatadublincore.labelTitle}' helpKey='#i18n{module.document.metadatadublincore.labelHelpTitle}'>
-							<@input type='text' name='dc_title' id='dc_title' inputSize=50 value='${metadata.title!}' />
+<#if is_image>
+	<#assign formAction = 'jsp/admin/plugins/library/DoUploadImage.jsp' />
+<#else>
+	<#assign formAction = 'jsp/admin/plugins/library/DoUploadDocument.jsp' />
+</#if>
+<div class="lutece-insert">
+	<div class="lutece-insert-head">
+		<span class="lutece-insert-badge lutece-insert-tint-${is_image?then( '1', '4' )}" aria-hidden="true"><i class="ti ti-${btnIcon}"></i></span>
+		<h2>${boxTitle}</h2>
+		<@button type='button' id='dbc' title='#i18n{library.insertservice.label.dublinCore}' buttonIcon='pencil-cog' color='light' size='sm' params={"aria-controls": "dublin_core_meta", "aria-expanded": "false"} />
+	</div>
+	<@tform method='post' enctype='multipart/form-data' action=formAction>
+		<@input type='hidden' name='media' value='${media?c}' />
+		<@input type='hidden' name='input' value='${.data_model.input}' />
+		<@input type='hidden' name='space_id' value='${space_id?c}' />
+		<@input type='hidden' name='document_type_code' value='${document_type}' />
+		<@input type='hidden' name='document_summary' id='document_summary' value='${document_type}'/>
+		<div class="lutece-insert-form">
+			<div class="lutece-insert-fields" id="library_media_fields">
+				<@formGroup labelFor='document_title' labelKey='#i18n{document.create_document.labelDocumentTitle}' helpKey='#i18n{document.create_document.helpDocumentTitle}' mandatory=true rows=2>
+					<@input type='text' name='document_title' id='document_title' maxlength=255 title='#i18n{document.create_document.helpDocumentTitle}' mandatory=true />
+				</@formGroup>
+				${fields}
+				<@div id='dublin_core_meta'>
+						<@formGroup labelFor='dc_title' labelKey='#i18n{module.document.metadatadublincore.labelTitle}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpTitle}'>
+							<@input type='text' name='dc_title' id='dc_title' value='${metadata.title!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_creator' labelKey='#i18n{module.document.metadatadublincore.labelCreator}' helpKey='#i18n{module.document.metadatadublincore.labelHelpCreator}'>
-							<@input type='text' name='dc_creator' id='dc_creator' inputSize=50 value='${metadata.creator!}' />
+						<@formGroup labelFor='dc_creator' labelKey='#i18n{module.document.metadatadublincore.labelCreator}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpCreator}'>
+							<@input type='text' name='dc_creator' id='dc_creator' value='${metadata.creator!}' />
 						 </@formGroup>
-						<@formGroup labelFor='dc_subject' labelKey='#i18n{module.document.metadatadublincore.labelSubject}' helpKey='#i18n{module.document.metadatadublincore.labelHelpSubject}'>
-							<@input type='text' name='dc_subject' id='dc_subject' inputSize=50 value='${metadata.subject!}' />
+						<@formGroup labelFor='dc_subject' labelKey='#i18n{module.document.metadatadublincore.labelSubject}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpSubject}'>
+							<@input type='text' name='dc_subject' id='dc_subject' value='${metadata.subject!}' />
 						</@formGroup>
-						 <@formGroup labelFor='dc_description' labelKey='#i18n{module.document.metadatadublincore.labelDescription}' helpKey='#i18n{module.document.metadatadublincore.labelDescription}'>
-							<@input type='text' name='dc_description' id='dc_description' inputSize=50 value='${metadata.description!}' />
+						 <@formGroup labelFor='dc_description' labelKey='#i18n{module.document.metadatadublincore.labelDescription}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelDescription}'>
+							<@input type='text' name='dc_description' id='dc_description' value='${metadata.description!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_publisher' labelKey='#i18n{module.document.metadatadublincore.labelPublisher}' helpKey='#i18n{module.document.metadatadublincore.labelHelpPublisher}'>
-							<@input type='text' name='dc_publisher' id='dc_publisher' inputSize=50 value='${metadata.publisher!}' />
+						<@formGroup labelFor='dc_publisher' labelKey='#i18n{module.document.metadatadublincore.labelPublisher}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpPublisher}'>
+							<@input type='text' name='dc_publisher' id='dc_publisher' value='${metadata.publisher!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_contributor' labelKey='#i18n{module.document.metadatadublincore.labelContributor}' helpKey='#i18n{module.document.metadatadublincore.labelHelpContributor}'>
-							<@input type='text' name='dc_contributor' id='dc_contributor' inputSize=50 value='${metadata.contributor!}' />
+						<@formGroup labelFor='dc_contributor' labelKey='#i18n{module.document.metadatadublincore.labelContributor}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpContributor}'>
+							<@input type='text' name='dc_contributor' id='dc_contributor' value='${metadata.contributor!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_date' labelKey='#i18n{module.document.metadatadublincore.labelDate}' helpKey='#i18n{module.document.metadatadublincore.labelHelpDate}'>
-							<@input type='text' name='dc_date' id='dc_date' inputSize=50 value='${metadata.date!}' />
+						<@formGroup labelFor='dc_date' labelKey='#i18n{module.document.metadatadublincore.labelDate}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpDate}'>
+							<@input type='text' name='dc_date' id='dc_date' value='${metadata.date!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_type' labelKey='#i18n{module.document.metadatadublincore.labelType}' helpKey='#i18n{module.document.metadatadublincore.labelHelpType}'>
-							<@input type='text' name='dc_type' id='dc_type' inputSize=50 value='${metadata.type!}' />
+						<@formGroup labelFor='dc_type' labelKey='#i18n{module.document.metadatadublincore.labelType}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpType}'>
+							<@input type='text' name='dc_type' id='dc_type' value='${metadata.type!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_format' labelKey='#i18n{module.document.metadatadublincore.labelFormat}' helpKey='#i18n{module.document.metadatadublincore.labelHelpFormat}'>
-							<@input type='text' name='dc_format' id='dc_format' inputSize=50 value='${metadata.format!}' />
+						<@formGroup labelFor='dc_format' labelKey='#i18n{module.document.metadatadublincore.labelFormat}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpFormat}'>
+							<@input type='text' name='dc_format' id='dc_format' value='${metadata.format!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_identifier' labelKey='#i18n{module.document.metadatadublincore.labelIdentifier}' helpKey='#i18n{module.document.metadatadublincore.labelHelpIdentifier}'>
-							<@input type='text' name='dc_identifier' id='dc_identifier' inputSize=50 value='${metadata.identifier!}' />
+						<@formGroup labelFor='dc_identifier' labelKey='#i18n{module.document.metadatadublincore.labelIdentifier}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpIdentifier}'>
+							<@input type='text' name='dc_identifier' id='dc_identifier' value='${metadata.identifier!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_source' labelKey='#i18n{module.document.metadatadublincore.labelSource}' helpKey='#i18n{module.document.metadatadublincore.labelHelpSource}'>
-							<@input type='text' name='dc_source' id='dc_source' inputSize=50 value='${metadata.source!}' />
+						<@formGroup labelFor='dc_source' labelKey='#i18n{module.document.metadatadublincore.labelSource}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpSource}'>
+							<@input type='text' name='dc_source' id='dc_source' value='${metadata.source!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_language' labelKey='#i18n{module.document.metadatadublincore.labelLanguage}' helpKey='#i18n{module.document.metadatadublincore.labelHelpLanguage}' >
-							<@input type='text' name='dc_language' id='dc_language' inputSize=50 value='${metadata.language!}' />
+						<@formGroup labelFor='dc_language' labelKey='#i18n{module.document.metadatadublincore.labelLanguage}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpLanguage}' >
+							<@input type='text' name='dc_language' id='dc_language' value='${metadata.language!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_relation' labelKey='#i18n{module.document.metadatadublincore.labelRelation} :' helpKey='#i18n{module.document.metadatadublincore.labelHelpRelation}'>
-							<@input type='text' name='dc_relation' id='dc_relation' inputSize=50 value='${metadata.relation!}' />
+						<@formGroup labelFor='dc_relation' labelKey='#i18n{module.document.metadatadublincore.labelRelation}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpRelation}'>
+							<@input type='text' name='dc_relation' id='dc_relation' value='${metadata.relation!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_coverage' labelKey='#i18n{module.document.metadatadublincore.labelCoverage}' helpKey='#i18n{module.document.metadatadublincore.labelHelpCoverage}'>
-							<@input type='text' name='dc_coverage' id='dc_coverage' inputSize=50 value='${metadata.coverage!}' />
+						<@formGroup labelFor='dc_coverage' labelKey='#i18n{module.document.metadatadublincore.labelCoverage}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpCoverage}'>
+							<@input type='text' name='dc_coverage' id='dc_coverage' value='${metadata.coverage!}' />
 						</@formGroup>
-						<@formGroup labelFor='dc_rights' labelKey='#i18n{module.document.metadatadublincore.labelRights}' helpKey='#i18n{module.document.metadatadublincore.labelHelpRights}'>
-							<@input type='text' name='dc_rights' id='dc_rights' inputSize=50 value='${metadata.rights!}' />
+						<@formGroup labelFor='dc_rights' labelKey='#i18n{module.document.metadatadublincore.labelRights}' rows=2 helpKey='#i18n{module.document.metadatadublincore.labelHelpRights}'>
+							<@input type='text' name='dc_rights' id='dc_rights' value='${metadata.rights!}' />
 						</@formGroup>
 					</@div>
-					<@formGroup class='mt-3'>
-						<@button type='submit' title='#i18n{document.create_document.buttonCreate}' buttonIcon='plus' />
-						<@aButton href='jsp/admin/plugins/library/SelectSpaceForUpload.jsp?plugin_name=${plugin_name?url}&media_type=${media?c}&input=${.data_model.input?url}' params={"data-lutece-action": "back"} title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' />
-					</@formGroup>
-				</@tform>
-			</@boxBody>
-		</@box>
-	</@columns>
-</@row>
+			</div>
+			<aside class="lutece-insert-preview" aria-label="#i18n{library.insertservice.preview}" aria-live="polite">
+				<span class="lutece-insert-preview-media lutece-insert-tint-${is_image?then( '1', '4' )}" id="library_media_preview"><i class="ti ti-${btnIcon}" aria-hidden="true"></i></span>
+				<span class="lutece-insert-title" id="library_media_preview_name">#i18n{library.insertservice.noFileChosen}</span>
+				<span class="lutece-insert-summary" id="library_media_preview_size"></span>
+			</aside>
+		</div>
+		<div class="lutece-insert-footer">
+			<div class="lutece-insert-actions">
+				<@aButton href='jsp/admin/plugins/library/SelectSpaceForUpload.jsp?plugin_name=${plugin_name?url("UTF-8")}&media_type=${media?c}&input=${.data_model.input?url("UTF-8")}' params={"data-lutece-action": "back"} title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='arrow-left' color='light' />
+				<@button type='submit' title='#i18n{document.create_document.buttonCreate}' buttonIcon='plus' color='primary' />
+			</div>
+		</div>
+	</@tform>
+</div>
 <#-- the insert service pages do not load the admin scripts: data-lutece-action="back" needs lutece-actions.js -->
 <script src="themes/admin/shared/js/util/lutece-actions.js"></script>
 <script>
 document.addEventListener( "DOMContentLoaded", function(){
 	const dcm = document.querySelector('#dublin_core_meta')
-	const dbc = document.querySelector( "#dbc" )
+	const dcb = document.querySelector( "#dbc" )
 	dcm.classList.add('d-none')
-	dbc.addEventListener( "click", (e) => {
+	dcb.addEventListener( "click", (e) => {
 		const hidden = dcm.classList.toggle('d-none')
-		dbc.setAttribute( 'aria-expanded', hidden ? 'false' : 'true' )
+		dcb.setAttribute( 'aria-expanded', String( !hidden ) )
 	});
 
+	<#-- The preview of the file chosen in the field of the document type -->
+	const preview = document.querySelector( '#library_media_preview' )
+	const name = document.querySelector( '#library_media_preview_name' )
+	const size = document.querySelector( '#library_media_preview_size' )
+	const icon = preview.innerHTML
+	const noFile = name.textContent
+	const unit = ( value, unitName ) => new Intl.NumberFormat( document.documentElement.lang || undefined, { style: 'unit', unit: unitName, maximumFractionDigits: 1 } ).format( value )
+	document.querySelectorAll( '#library_media_fields input[type="file"]' ).forEach( ( input ) => {
+		input.addEventListener( 'change', ( ) => {
+			const file = input.files && input.files[ 0 ]
+			if ( !file ) {
+				preview.innerHTML = icon
+				name.textContent = noFile
+				size.textContent = ''
+				return
+			}
+			name.textContent = file.name
+			size.textContent = file.size < 1048576 ? unit( Math.max( 1, Math.round( file.size / 1024 ) ), 'kilobyte' ) : unit( file.size / 1048576, 'megabyte' )
+			if ( file.type.startsWith( 'image/' ) ) {
+				const img = document.createElement( 'img' )
+				img.alt = ''
+				img.src = URL.createObjectURL( file )
+				preview.replaceChildren( img )
+			} else {
+				preview.innerHTML = icon
+			}
+		} )
+	} )
 } );
 </script>
