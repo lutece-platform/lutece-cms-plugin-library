@@ -37,39 +37,102 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import jakarta.enterprise.inject.spi.CDI;
 
 import java.util.Collection;
+import java.util.List;
 
 
+/**
+ * Home of the media types
+ */
 public final class LibraryMediaHome
 {
-    // Static variable pointed at the DAO instance
     private static ILibraryMediaDAO _dao = CDI.current( ).select( ILibraryMediaDAO.class ).get( );
 
+    /**
+     * Private constructor
+     */
     private LibraryMediaHome(  )
     {
     }
 
+    /**
+     * Finds all the media types, without their attributes
+     * @param plugin the plugin
+     * @return the media types
+     */
     public static Collection<LibraryMedia> findAllMedia( Plugin plugin )
     {
         return _dao.selectAll( plugin );
     }
 
+    /**
+     * Finds a media type, without its attributes
+     * @param nMediaId the identifier of the media type
+     * @param plugin the plugin
+     * @return the media type, null if it does not exist
+     */
     public static LibraryMedia findByPrimaryKey( int nMediaId, Plugin plugin )
     {
         return _dao.load( nMediaId, plugin );
     }
 
+    /**
+     * Creates a media type
+     * @param media the media type
+     * @param plugin the plugin
+     */
     public static void create( LibraryMedia media, Plugin plugin )
     {
         _dao.insert( media, plugin );
     }
 
+    /**
+     * Updates a media type
+     * @param media the media type
+     * @param plugin the plugin
+     */
     public static void update( LibraryMedia media, Plugin plugin )
     {
         _dao.store( media, plugin );
     }
 
+    /**
+     * Removes a media type
+     * @param nMediaId the identifier of the media type
+     * @param plugin the plugin
+     */
     public static void remove( int nMediaId, Plugin plugin )
     {
         _dao.delete( nMediaId, plugin );
+    }
+
+    /**
+     * Finds the legacy XSL stylesheet of a media type. To be called only while legacy stylesheets are pending: the column exists only on a site upgraded from a version with stylesheets
+     * @param nMediaId the identifier of the media type
+     * @param plugin the plugin
+     * @return the source of the stylesheet, null if the media type has none
+     */
+    public static String findLegacyStylesheet( int nMediaId, Plugin plugin )
+    {
+        return _dao.selectLegacyStylesheet( nMediaId, plugin );
+    }
+
+    /**
+     * Finds the media types that still have a legacy XSL stylesheet. To be called only while legacy stylesheets are pending
+     * @param plugin the plugin
+     * @return the identifiers of the media types
+     */
+    public static List<Integer> findIdsWithLegacyStylesheet( Plugin plugin )
+    {
+        return _dao.selectIdsWithLegacyStylesheet( plugin );
+    }
+
+    /**
+     * Discards the legacy XSL stylesheet of a media type. To be called only while legacy stylesheets are pending
+     * @param nMediaId the identifier of the media type
+     * @param plugin the plugin
+     */
+    public static void removeLegacyStylesheet( int nMediaId, Plugin plugin )
+    {
+        _dao.deleteLegacyStylesheet( nMediaId, plugin );
     }
 }

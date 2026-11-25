@@ -34,7 +34,7 @@ CREATE TABLE library_media (
   id_media int DEFAULT '0' NOT NULL,
   name varchar(45) DEFAULT '' NOT NULL,
   description varchar(100) DEFAULT '' NOT NULL,
-  stylesheet long varbinary,
+  template long varchar,
   is_multiple_media SMALLINT DEFAULT 0,
   PRIMARY KEY  (id_media)
 );

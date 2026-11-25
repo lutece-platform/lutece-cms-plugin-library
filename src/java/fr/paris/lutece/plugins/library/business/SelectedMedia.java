@@ -35,16 +35,23 @@ package fr.paris.lutece.plugins.library.business;
 
 import fr.paris.lutece.plugins.document.business.Document;
 
+import java.io.Serializable;
 import java.util.Map;
 
 
-public class SelectedMedia implements Comparable<SelectedMedia>
+/**
+ * A media selected in the insert service. It is kept in the session, where it is serialized: the document, which is not serializable, is not kept
+ * and is reloaded from its identifier
+ */
+public class SelectedMedia implements Comparable<SelectedMedia>, Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     private int _nMediaTypeId;
     private int _nDocumentId;
     private int _nMappingId;
     private int _nOrder;
-    private Document _document;
+    private transient Document _document;
     private Map<String, String> _attributesFromMapping;
 
     /**

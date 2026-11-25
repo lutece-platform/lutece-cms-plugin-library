@@ -1,30 +1,37 @@
-<@row>
-	<@columns>
-		<@box>
-			<@boxHeader title='#i18n{library.manage_library.table.title}'>
-				<@tform type='inline' method='post' action='jsp/admin/plugins/library/CreateMedia.jsp'>
-					<@button type='submit' title='#i18n{library.manage_library.button.create}' hideTitle=['xs','sm'] buttonIcon='plus-circle' size='sm' />
-				</@tform>
-			</@boxHeader>
-			<@boxBody>
-				<@table>
-					<@tr>
-					  <@th>#i18n{library.manage_library.table.column.title.code}</@th>
-					  <@th>#i18n{library.manage_library.table.column.title.description}</@th>
-					  <@th>#i18n{library.manage_library.table.column.title.actions}</@th>
-					</@tr>
-					<#list media_list as media>
-					<@tr>
-						<@td>${media.name}</@td>
-						<@td>${media.description}</@td>
-						<@td>
-							<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}' title='#i18n{portal.util.labelModify} ${media.name}' hideTitle=['all'] buttonIcon='edit' size='sm' />
-							<@aButton href='jsp/admin/plugins/library/RemoveMedia.jsp?media_id=${media.mediaId}' title='#i18n{portal.util.labelDelete} ${media.name}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
-						</@td>
-					</@tr>
-					</#list>
-				</@table>
-			</@boxBody>
-		</@box>
-    </@columns>
-</@row>
+<#include "/admin/plugins/library/macros_library.html" />
+<#assign bc><@libraryBreadcrumb /></#assign>
+<#assign createUrl = 'jsp/admin/plugins/library/CreateMedia.jsp' />
+<@pageContainer>
+	<@pageColumn>
+		<@libraryPageHeader title='#i18n{library.manage_library.table.title}' breadcrumb=bc>
+			<@aButton href=createUrl title='#i18n{library.manage_library.button.create}' buttonIcon='plus' color='primary' hideTitle=['xs','sm','md'] />
+		</@libraryPageHeader>
+		<#if media_list?has_content>
+			<@manageFeature layout='list' id='library-media'>
+				<#list media_list as media>
+				<#assign modifyUrl = 'jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}' />
+				<@manageFeatureItem id='media_${media.mediaId}'>
+					<@manageFeatureItemColumn class='d-flex align-items-center gap-2 text-truncate'>
+						<span class="avatar avatar-sm bg-pink-lt" aria-hidden="true"><@icon style='photo' /></span>
+						<@div class='text-truncate'>
+							<@link href=modifyUrl class='text-reset fw-semibold' title='#i18n{portal.util.labelModify} ${media.name}'>${media.name}</@link>
+							<#if legacy_media_ids?seq_contains( media.mediaId )><@tag color='' class='bg-yellow-lt ms-1' tagIcon='alert-triangle'>#i18n{library.manage_library.label.legacyStylesheet}</@tag></#if>
+							<@div class='text-secondary small text-truncate'>${media.description}</@div>
+						</@div>
+					</@manageFeatureItemColumn>
+					<@manageFeatureItemColumn auto=true align='end'>
+						<@div class='btn-actions'>
+							<@aButton href=modifyUrl style='btn-action' color='' buttonIcon='pencil' title='#i18n{portal.util.labelModify} ${media.name}' hideTitle=['all'] />
+							<@aButton href='jsp/admin/plugins/library/RemoveMedia.jsp?media_id=${media.mediaId}' style='btn-action text-danger' color='' buttonIcon='trash' title='#i18n{portal.util.labelDelete} ${media.name}' hideTitle=['all'] />
+						</@div>
+					</@manageFeatureItemColumn>
+				</@manageFeatureItem>
+				</#list>
+			</@manageFeature>
+		<#else>
+			<@card>
+				<@empty title='#i18n{library.manage_library.noData}' iconName='photo-off' subtitle=' ' actionTitle='#i18n{library.manage_library.button.create}' actionUrl=createUrl />
+			</@card>
+		</#if>
+	</@pageColumn>
+</@pageContainer>

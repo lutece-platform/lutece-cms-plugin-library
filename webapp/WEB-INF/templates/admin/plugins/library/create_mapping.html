@@ -1,35 +1,33 @@
-<@row>
-	<@columns>
-		<@box>
-			<#assign boxHeaderTitle>
-				#i18n{library.create_mapping.form.label} #i18n{library.create_mapping.documentType.label} : <strong>${document_type.code} (${document_type.name})</strong>
-			</#assign>
-			<@boxHeader title=boxHeaderTitle />
-			<@boxBody>
-				<@tform method='post' action='jsp/admin/plugins/library/DoCreateMapping.jsp' name='create_mapping'>
-					<@input type='hidden' name='media_id' value='${media.mediaId}' />
-					<@input type='hidden' name='document_type' value='${document_type.code}' />
-					<#list media.mediaAttributeList as attribute>
-						<#if attribute.associableWithDocument>
-							<@formGroup labelFor='document_attribute_id_${attribute.attributeId}' labelKey='${attribute.code}'>
-								<@select id='document_attribute_id_${attribute.attributeId}' name='document_attribute_id_${attribute.attributeId}'>			
-									<#list document_type.attributes as documentAttribute>	
-										<option value="${documentAttribute.id}">${documentAttribute.name}</option>
-									</#list>		
-								</@select>
-							</@formGroup>
-						<#else>
-							<@formGroup labelKey='${attribute.code}'>
-								<@staticText>#i18n{library.create_mapping.attribute.text.noChoiceAvailable}</@staticText>
-							</@formGroup>
-						</#if>	
-					</#list>
-					<@formGroup>
-						<@button type='submit' title='#i18n{library.create_mapping.button.validate}' buttonIcon='save' />
-						<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp' title='#i18n{library.create_mapping.button.cancel}' buttonIcon='times' color='default' />
+<#include "/admin/plugins/library/macros_library.html" />
+<#assign documentTypeDescription>#i18n{library.create_mapping.documentType.label} : <strong>${document_type.code} (${document_type.name})</strong></#assign>
+<#assign bc><@libraryBreadcrumb items=[ { 'label': media.name, 'url': 'jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}' }, { 'label': '#i18n{library.manage_mappings.table.title}', 'url': 'jsp/admin/plugins/library/ManageMappings.jsp?media_id=${media.mediaId}' }, { 'label': '#i18n{library.create_mapping.form.label}' } ] /></#assign>
+<@pageContainer>
+	<@pageColumn>
+		<@libraryPageHeader title='#i18n{library.create_mapping.form.label}' iconName='arrows-exchange' breadcrumb=bc description=documentTypeDescription>
+			<@aButton href='jsp/admin/plugins/library/ManageMappings.jsp?media_id=${media.mediaId}' title='#i18n{portal.util.labelBack}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] />
+		</@libraryPageHeader>
+		<@tform method='post' action='jsp/admin/plugins/library/DoCreateMapping.jsp' name='create_mapping' boxed=true>
+			<@input type='hidden' name='media_id' value='${media.mediaId}' />
+			<@input type='hidden' name='document_type' value='${document_type.code}' />
+			<#list media.mediaAttributeList as attribute>
+				<#if attribute.associableWithDocument>
+					<@formGroup labelFor='document_attribute_id_${attribute.attributeId}' labelKey='${attribute.code}'>
+						<@select id='document_attribute_id_${attribute.attributeId}' name='document_attribute_id_${attribute.attributeId}'>
+							<#list document_type.attributes as documentAttribute>
+								<@option value='${documentAttribute.id}' label='${documentAttribute.name}' />
+							</#list>
+						</@select>
 					</@formGroup>
-				</@tform>
-			</@boxBody>
-		</@box>
-	</@columns>
-</@row>
+				<#else>
+					<@formGroup labelKey='${attribute.code}'>
+						<@staticText>#i18n{library.create_mapping.attribute.text.noChoiceAvailable}</@staticText>
+					</@formGroup>
+				</#if>
+			</#list>
+			<@formGroup>
+				<@button type='submit' title='#i18n{library.create_mapping.button.validate}' buttonIcon='check' color='primary' />
+				<@aButton href='jsp/admin/plugins/library/ManageMappings.jsp?media_id=${media.mediaId}' title='#i18n{library.create_mapping.button.cancel}' buttonIcon='x' color='light' />
+			</@formGroup>
+		</@tform>
+	</@pageColumn>
+</@pageContainer>

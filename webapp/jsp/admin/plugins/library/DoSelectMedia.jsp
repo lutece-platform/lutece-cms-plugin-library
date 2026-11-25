@@ -1,3 +1,4 @@
-<%@ page errorPage="../../ErrorPage.jsp" trimDirectiveWhitespaces="true" %>
+<%@ page errorPage="../../ErrorPage.jsp" %>
+<jsp:include page="../../insert/InsertServiceHeader.jsp" />
 
-${ pageContext.response.sendRedirect( libraryInsertServiceJspBean.doSelectMedia( pageContext.request )) }
+${ libraryInsertServiceJspBean.doSelectMedia( pageContext.request ) }

@@ -1,69 +1,71 @@
-<@row>
-	<@columns>
-		<@box>
-			<@boxHeader title='#i18n{library.manage_media.form.modify.title} "${media.name}"' />
-			<@boxBody>
-				<@tform method='post' action='jsp/admin/plugins/library/DoModifyMedia.jsp' name='modify_media' enctype='multipart/form-data'>
+<#include "/admin/plugins/library/macros_library.html" />
+<#assign bc><@libraryBreadcrumb items=[ { 'label': media.name } ] /></#assign>
+<@pageContainer>
+	<@pageColumn>
+		<@libraryPageHeader title='#i18n{library.manage_media.form.modify.title} "${media.name}"' breadcrumb=bc>
+			<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp' title='#i18n{portal.util.labelBack}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] class='me-1' />
+			<@aButton href='jsp/admin/plugins/library/ManageMappings.jsp?media_id=${media.mediaId}' title='#i18n{library.manage_media.mapping.management.link}' buttonIcon='arrows-exchange' color='light' hideTitle=['xs','sm','md'] />
+		</@libraryPageHeader>
+		<@row>
+			<@columns lg=6>
+				<@tform method='post' action='jsp/admin/plugins/library/DoModifyMedia.jsp' name='modify_media' enctype='multipart/form-data' boxed=true>
 					<@input type='hidden' name='media_id' value='${media.mediaId}' />
-					
 					<@formGroup labelFor='media_name' labelKey='#i18n{library.manage_media.form.modify.code}' mandatory=true>
-						<@input type='text' name='media_name' id='media_name' value='${media.name}' maxlength=250 />
+						<@input type='text' name='media_name' id='media_name' value='${media.name}' maxlength=250 mandatory=true />
 					</@formGroup>
-					
 					<@formGroup labelFor='media_description' labelKey='#i18n{library.manage_media.form.modify.description}' mandatory=true>
-						<@input type='text' id='media_description' name='media_description' value='${media.description}' inputSize=100 maxlength=250 />
+						<@input type='text' id='media_description' name='media_description' value='${media.description}' maxlength=250 mandatory=true />
 					</@formGroup>
-					
-					<@formGroup labelFor='media_stylesheet' labelKey='#i18n{library.media.creation.label.stylesheet}'>
-						<@input type='file' id='media_stylesheet' name='media_stylesheet' value='' />
+					<#if legacy_stylesheet??>
+						<@alert color='warning' iconTitle='alert-triangle' title='#i18n{library.manage_media.help.legacyStylesheet}' />
+						<@accordion id='legacy-stylesheet' title='#i18n{library.manage_media.label.showLegacyStylesheet}' collapsed=true class='mb-3'>
+							<@input type='textarea' name='legacy_stylesheet' id='legacy_stylesheet' rows=12 class='font-monospace' readonly=true><@sourceText value=legacy_stylesheet /></@input>
+						</@accordion>
+					</#if>
+					<@formGroup labelFor='media_template' labelKey='#i18n{library.media.creation.label.template}' helpKey='#i18n{library.media.creation.help.template}' mandatory=!(legacy_stylesheet??)>
+						<@input type='textarea' id='media_template' name='media_template' rows=16 class='font-monospace' mandatory=!(legacy_stylesheet??)><@sourceText value=media_template /></@input>
 					</@formGroup>
-					
-					<@formGroup mandatory=true>
-						<@checkBox labelFor='media_stylesheet' labelKey='#i18n{library.media.creation.label.multiple}' id='media-multiple' name='media-multiple' value='true' checked=media.isMultipleMedia />
-					</@formGroup>
-					
 					<@formGroup>
-						<@button type='submit' title='#i18n{library.manage_media.form.modify.button.validate}' buttonIcon='save' />
-						<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp' title='#i18n{library.create_attribute.button.cancel}' buttonIcon='times' color='default' />
+						<@checkBox orientation='switch' labelKey='#i18n{library.media.creation.label.multiple}' id='media-multiple' name='media-multiple' value='true' checked=media.isMultipleMedia />
+					</@formGroup>
+					<@formGroup>
+						<@button type='submit' title='#i18n{library.manage_media.form.modify.button.validate}' buttonIcon='check' color='primary' />
+						<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp' title='#i18n{library.create_attribute.button.cancel}' buttonIcon='x' color='light' />
 					</@formGroup>
 				</@tform>
-			</@boxBody>
-		</@box>
-		<@box>
-			<@boxHeader title='#i18n{library.manage_media.table.attributes.title} "${media.name}"'>
-				<@tform type='inline' action='jsp/admin/plugins/library/ManageMappings.jsp' method='post'>
-					<@input type='hidden' name='media_id' value='${media.mediaId}' />
-					<@button type='submit' title='#i18n{library.manage_media.mapping.management.link}' hideTitle=['xs','sm'] size='sm' />
-				</@tform>
-				
-				<@tform action='jsp/admin/plugins/library/CreateAttribute.jsp' method='post'>
-					<@input type='hidden' name='media_id' value='${media.mediaId}' />
-					<@button type='submit' title='#i18n{library.manage_media.add.attribute}' hideTitle=['xs','sm'] buttonIcon='plus-circle' size='sm' />
-				</@tform>
-			</@boxHeader>
-			<@boxBody>
-				<#if media.mediaAttributeList?has_content>
-				<@table>
-					<@tr>
-						<@th>#i18n{library.manage_media.table.attributes.column.code}</@th>
-						<@th>#i18n{library.manage_media.table.attributes.column.description}</@th>
-						<@th>#i18n{library.manage_media.table.attributes.column.type}</@th>
-						<@th>#i18n{library.manage_media.table.attributes.column.actions}</@th>
-					</@tr>
-					<#list media.mediaAttributeList as attribute>
-					<@tr>
-						<@td>${attribute.code}</@td> 
-						<@td>${attribute.description}</@td>
-						<@td>${attribute.typeLabel}</@td>
-						<@td>
-							<@aButton href='jsp/admin/plugins/library/ModifyAttribute.jsp?attribute_id=${attribute.attributeId}' title='#i18n{portal.util.labelModify} ${attribute.code}' hideTitle=['all'] buttonIcon='edit' size='sm' />
-							<@aButton href='jsp/admin/plugins/library/RemoveAttribute.jsp?media_id=${media.mediaId}&attribute_id=${attribute.attributeId}' title='#i18n{portal.util.labelDelete} ${attribute.code}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
-						</@td>
-					</@tr>
-					</#list>
-				</@table>
-				</#if>
-			</@boxBody>
-		</@box>
-    </@columns>
-</@row>
+			</@columns>
+			<@columns lg=6>
+				<@box>
+					<@boxHeader title='#i18n{library.manage_media.table.attributes.title} "${media.name}"' boxTools=true>
+						<@aButton href='jsp/admin/plugins/library/CreateAttribute.jsp?media_id=${media.mediaId}' title='#i18n{library.manage_media.add.attribute}' buttonIcon='plus' color='primary' hideTitle=['xs','sm','md'] />
+					</@boxHeader>
+					<#if media.mediaAttributeList?has_content>
+						<@listGroup class='list-group-flush'>
+							<#list media.mediaAttributeList as attribute>
+							<@listGroupItem>
+								<@div class='row g-2 align-items-center'>
+									<@div class='col text-truncate'>
+										<@div class='fw-semibold'>${attribute.code}</@div>
+										<@div class='text-secondary small text-truncate'>${attribute.description}</@div>
+									</@div>
+									<@div class='col-auto'>
+										<@tag color='' class='bg-pink-lt'>${attribute.typeLabel}</@tag>
+									</@div>
+									<@div class='col-auto'>
+										<@div class='btn-actions'>
+											<@aButton href='jsp/admin/plugins/library/ModifyAttribute.jsp?attribute_id=${attribute.attributeId}' style='btn-action' color='' buttonIcon='pencil' title='#i18n{portal.util.labelModify} ${attribute.code}' hideTitle=['all'] />
+											<@aButton href='jsp/admin/plugins/library/RemoveAttribute.jsp?media_id=${media.mediaId}&attribute_id=${attribute.attributeId}' style='btn-action text-danger' color='' buttonIcon='trash' title='#i18n{portal.util.labelDelete} ${attribute.code}' hideTitle=['all'] />
+										</@div>
+									</@div>
+								</@div>
+							</@listGroupItem>
+							</#list>
+						</@listGroup>
+					<#else>
+						<@empty title='#i18n{library.manage_media.noAttribute}' iconName='list-details' subtitle=' ' actionTitle='#i18n{library.manage_media.add.attribute}' actionUrl='jsp/admin/plugins/library/CreateAttribute.jsp?media_id=${media.mediaId}' />
+					</#if>
+				</@box>
+			</@columns>
+		</@row>
+	</@pageColumn>
+</@pageContainer>

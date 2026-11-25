@@ -33,81 +33,124 @@
  */
 package fr.paris.lutece.plugins.library.business;
 
-import fr.paris.lutece.portal.business.stylesheet.StyleSheet;
-
 import java.util.Collection;
 
 
+/**
+ * A media type of the library: its attributes, and the FreeMarker template that renders the HTML inserted in the editor
+ */
 public class LibraryMedia
 {
     private int _nMediaId;
     private String _strName;
     private String _strDescription;
     private Collection<MediaAttribute> _colMediaAttribute;
-    private StyleSheet _stylesheet;
+    private String _strTemplate;
     private boolean _bIsMultipleMedia;
 
+    /**
+     * Returns the attributes of the media type
+     * @return the attributes
+     */
     public Collection<MediaAttribute> getMediaAttributeList(  )
     {
         return _colMediaAttribute;
     }
 
+    /**
+     * Sets the attributes of the media type
+     * @param colMediaAttribute the attributes
+     */
     public void setMediaAttributeList( Collection<MediaAttribute> colMediaAttribute )
     {
         _colMediaAttribute = colMediaAttribute;
     }
 
+    /**
+     * Returns the identifier of the media type
+     * @return the identifier
+     */
     public int getMediaId(  )
     {
         return _nMediaId;
     }
 
+    /**
+     * Sets the identifier of the media type
+     * @param nMediaId the identifier
+     */
     public void setMediaId( int nMediaId )
     {
         _nMediaId = nMediaId;
     }
 
+    /**
+     * Returns the description of the media type
+     * @return the description
+     */
     public String getDescription(  )
     {
         return _strDescription;
     }
 
+    /**
+     * Sets the description of the media type
+     * @param strDescription the description
+     */
     public void setDescription( String strDescription )
     {
         _strDescription = strDescription;
     }
 
+    /**
+     * Returns the name of the media type
+     * @return the name
+     */
     public String getName(  )
     {
         return _strName;
     }
 
+    /**
+     * Sets the name of the media type
+     * @param strName the name
+     */
     public void setName( String strName )
     {
         _strName = strName;
     }
 
-    public StyleSheet getStyleSheet(  )
+    /**
+     * Returns the FreeMarker template of the media type, null when the default template of the plugin is used
+     * @return the template source
+     */
+    public String getTemplate(  )
     {
-        return _stylesheet;
+        return _strTemplate;
     }
 
-    public void setStyleSheet( StyleSheet stylesheet )
+    /**
+     * Sets the FreeMarker template of the media type
+     * @param strTemplate the template source, null for the default template of the plugin
+     */
+    public void setTemplate( String strTemplate )
     {
-        _stylesheet = stylesheet;
+        _strTemplate = strTemplate;
     }
 
-    public void setStyleSheetBytes( byte[] bytes )
-    {
-        _stylesheet = new StyleSheet(  );
-        _stylesheet.setSource( bytes );
-    }
-
+    /**
+     * Tells whether several documents are inserted at once
+     * @return true for a multiple media type
+     */
     public boolean getIsMultipleMedia(  )
     {
         return _bIsMultipleMedia;
     }
 
+    /**
+     * Sets whether several documents are inserted at once
+     * @param bIsMultipleMedia true for a multiple media type
+     */
     public void setIsMultipleMedia( boolean bIsMultipleMedia )
     {
         this._bIsMultipleMedia = bIsMultipleMedia;

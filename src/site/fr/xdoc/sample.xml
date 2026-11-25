@@ -35,19 +35,13 @@ définissons quatre attributs:</p>
 </li>
 </ul>
 <p>Ces attributs sont utilisés pour créer la représentation HTML du media.
-Cette représentation est basée sur la feuille de style XSL fournie à la
-création du média. Voici un exemple de feuille de style pour notre
-media:</p>
-<source>&lt;?xml version=&quot;1.0&quot;?&gt;
-&lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
-
-&lt;xsl:template match=&quot;media&quot;&gt;
-        &lt;img src=&quot;{src}&quot; alt=&quot;{alt}&quot; height=&quot;{height}&quot; width=&quot;{width}&quot;/&gt;
-&lt;/xsl:template&gt;
-
-&lt;/xsl:stylesheet&gt;</source>
-<p>Notez que les variables {src}, {alt}, {height} et {width} correspondent aux
-codes des attributs du media.</p>
+Cette représentation est construite par le modèle FreeMarker du média.
+Voici un exemple de modèle pour notre media :</p>
+<source>&lt;#ftl output_format=&quot;HTML&quot;&gt;
+&lt;img src=&quot;${media.src!}&quot; alt=&quot;${media.alt!}&quot; height=&quot;${media.height!}&quot; width=&quot;${media.width!}&quot;/&gt;</source>
+<p>Notez que les variables media.src, media.alt, media.height et media.width correspondent aux
+codes des attributs du media. Une valeur non renseignée est absente, d'où le <code>!</code> après chaque variable.
+Pour un media composé de plusieurs documents, <code>media_list</code> contient les valeurs de chaque document.</p>
 </subsection>
 <subsection name="Définition d'un mapping"><p>Il faut maintenant créer un ou
 plusieurs mappings afin d'associer les attributs de notre media avec des

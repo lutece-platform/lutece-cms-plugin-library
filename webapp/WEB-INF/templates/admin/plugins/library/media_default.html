@@ -1,0 +1,18 @@
+<#ftl output_format="HTML">
+<#--
+ # Default template of a media type, used when the media type has no template of its own, or when its template fails.
+ # It inserts a link to each selected document.
+ #
+ # Model of a media template (the values are HTML-escaped by the HTML output format declared above):
+ #   media        the values of the first selected document, keyed by the codes of the attributes of the media type
+ #   media_list   the values of every selected document, in their order (a single item for a media type that is not multiple)
+ #   mediatype    the media type (mediaId, name, description, isMultipleMedia)
+ #
+ # A value that was not filled in is absent: write ${media.code!} or test it with ?has_content.
+-->
+<#list media_list as item>
+<#if item.src?has_content>
+<#if item.title?has_content><#assign label = item.title><#elseif item.alt?has_content><#assign label = item.alt><#else><#assign label = item.src></#if>
+<a href="${item.src}">${label}</a>
+</#if>
+</#list>
