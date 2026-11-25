@@ -37,12 +37,13 @@ import fr.paris.lutece.plugins.library.service.EditorUploadService;
 import fr.paris.lutece.plugins.library.service.EditorUploadService.Kind;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AdminUserService;
-import fr.paris.lutece.portal.service.security.SecurityTokenService;
+import fr.paris.lutece.portal.service.security.SecurityTokenHandler;
 import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.ResponseBody;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
 import fr.paris.lutece.portal.web.insert.InsertServiceSelectorJspBean;
 import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
 
@@ -88,6 +89,8 @@ public class EditorUploadJspBean extends MVCAdminJspBean
 
     @Inject
     private EditorUploadService _editorUploadService;
+    @Inject
+    private Models _models;
 
     /**
      * Tells the editor which kinds of file it may upload, with a token for the next upload. A view, read with a GET: it changes nothing, and
@@ -97,7 +100,7 @@ public class EditorUploadJspBean extends MVCAdminJspBean
      *            the request
      * @return image and pdf, true when the user may upload them, and token
      */
-    @View( VIEW_GET_UPLOAD_CONFIG )
+    @View( value = VIEW_GET_UPLOAD_CONFIG, securityTokenAction = ACTION_UPLOAD )
     @ResponseBody
     public Map<String, Object> getUploadConfig( HttpServletRequest request )
     {
@@ -105,7 +108,7 @@ public class EditorUploadJspBean extends MVCAdminJspBean
         Map<String, Object> config = new LinkedHashMap<>( );
         config.put( KEY_IMAGE, _editorUploadService.isAvailable( Kind.IMAGE, user ) );
         config.put( KEY_PDF, _editorUploadService.isAvailable( Kind.PDF, user ) );
-        config.put( KEY_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_UPLOAD ) );
+        config.put( KEY_TOKEN, _models.get( SecurityTokenHandler.MARK_CSRF_TOKEN ) );
 
         return config;
     }

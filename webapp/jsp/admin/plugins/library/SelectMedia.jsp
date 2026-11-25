@@ -1,3 +1,7 @@
+<%@ page errorPage="../../ErrorPage.jsp" %>
+
+${ pageContext.setAttribute( 'strContent', libraryInsertServiceJspBean.processController( pageContext.request , pageContext.response ) ) }
+
 <jsp:include page="../../insert/InsertServiceHeader.jsp" />
 
-${ libraryInsertServiceJspBean.getSelectMedia( pageContext.request ) }
+${ pageContext.getAttribute( 'strContent' ) }

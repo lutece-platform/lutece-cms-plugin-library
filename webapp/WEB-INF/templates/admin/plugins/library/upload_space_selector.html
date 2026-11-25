@@ -1,6 +1,6 @@
 <#include "/admin/plugins/document/spaces/spaces_tree_select.html" />
 <#--
- # Choice of the space where the uploaded media is created: the spaces allowing the document type of the media, then Valider (CreateMediaByInsert.jsp).
+ # Choice of the space where the uploaded media is created: the spaces allowing the document type of the media, then Valider (view createMedia of SelectSpaceForUpload.jsp).
  # Styles: insert_service.css (InsertServiceHeader.jsp).
 -->
 <#assign documentTypeIcons = { 'image': 'photo', 'pdf': 'file-type-pdf' } />
@@ -10,7 +10,8 @@
 		<span class="lutece-insert-badge lutece-insert-tint-${documentTypeTints[ document_type ]!'5'}" aria-hidden="true"><i class="ti ti-${documentTypeIcons[ document_type ]!'file-upload'}"></i></span>
 		<h2>#i18n{library.insertservice.selectSpace}</h2>
 	</div>
-	<@tform method='post' action='jsp/admin/plugins/library/CreateMediaByInsert.jsp' class='lutece-insert-main'>
+	<@tform method='post' action='jsp/admin/plugins/library/SelectSpaceForUpload.jsp' class='lutece-insert-main'>
+		<@input type='hidden' name='view' value='createMedia' />
 		<@input type='hidden' name='plugin_name' value='${plugin_name}' />
 		<@input type='hidden' name='input' value='${.data_model.input}' />
 		<@input type='hidden' name='media_type' value='${mediatype}' />

@@ -1,3 +1,7 @@
+<%@ page errorPage="../../ErrorPage.jsp" %>
+
+${ pageContext.setAttribute( 'strContent', libraryUploadInsertServiceJspBean.processController( pageContext.request , pageContext.response ) ) }
+
 <jsp:include page="../../insert/InsertServiceHeader.jsp" />
 
-${ libraryUploadInsertServiceJspBean.getSelectSpace( pageContext.request ) }
+${ pageContext.getAttribute( 'strContent' ) }

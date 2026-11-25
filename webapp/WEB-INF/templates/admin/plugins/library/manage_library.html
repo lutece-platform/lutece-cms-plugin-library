@@ -1,6 +1,8 @@
 <#include "/admin/plugins/library/macros_library.html" />
 <#assign bc><@libraryBreadcrumb /></#assign>
-<#assign createUrl = 'jsp/admin/plugins/library/CreateMedia.jsp' />
+<#assign createUrl = 'jsp/admin/plugins/library/ManageLibrary.jsp?view=createMedia' />
+<#-- The icon of the media types the plugin ships, the same as in the insert services; a media type created on the site gets the generic one -->
+<#assign mediaTypeIcons = { '1': 'photo', '3': 'file-type-pdf', '7': 'slideshow', '8': 'layout-grid', '9': 'zoom-in' } />
 <@pageContainer>
 	<@pageColumn>
 		<@libraryPageHeader title='#i18n{library.manage_library.table.title}' breadcrumb=bc>
@@ -9,10 +11,10 @@
 		<#if media_list?has_content>
 			<@manageFeature layout='list' id='library-media'>
 				<#list media_list as media>
-				<#assign modifyUrl = 'jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}' />
+				<#assign modifyUrl = 'jsp/admin/plugins/library/ManageLibrary.jsp?view=manageMedia&media_id=${media.mediaId}' />
 				<@manageFeatureItem id='media_${media.mediaId}'>
 					<@manageFeatureItemColumn class='d-flex align-items-center gap-2 text-truncate'>
-						<span class="avatar avatar-sm bg-pink-lt" aria-hidden="true"><@icon style='photo' /></span>
+						<span class="avatar avatar-sm bg-pink-lt" aria-hidden="true"><@icon style=mediaTypeIcons[ media.mediaId?c ]!'file' /></span>
 						<@div class='text-truncate'>
 							<@link href=modifyUrl class='text-reset fw-semibold' title='#i18n{portal.util.labelModify} ${media.name}'>${media.name}</@link>
 							<#if legacy_media_ids?seq_contains( media.mediaId )><@tag color='' class='bg-yellow-lt ms-1' tagIcon='alert-triangle'>#i18n{library.manage_library.label.legacyStylesheet}</@tag></#if>
@@ -22,7 +24,7 @@
 					<@manageFeatureItemColumn auto=true align='end'>
 						<@div class='btn-actions'>
 							<@aButton href=modifyUrl style='btn-action' color='' buttonIcon='pencil' title='#i18n{portal.util.labelModify} ${media.name}' hideTitle=['all'] />
-							<@aButton href='jsp/admin/plugins/library/RemoveMedia.jsp?media_id=${media.mediaId}' style='btn-action text-danger' color='' buttonIcon='trash' title='#i18n{portal.util.labelDelete} ${media.name}' hideTitle=['all'] />
+							<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp?view=confirmRemoveMedia&media_id=${media.mediaId}' style='btn-action text-danger' color='' buttonIcon='trash' title='#i18n{portal.util.labelDelete} ${media.name}' hideTitle=['all'] />
 						</@div>
 					</@manageFeatureItemColumn>
 				</@manageFeatureItem>

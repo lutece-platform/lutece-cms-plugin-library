@@ -1,12 +1,13 @@
 <#include "/admin/plugins/library/macros_library.html" />
 <#assign typeIdWithDefaultValue = 0 />
-<#assign bc><@libraryBreadcrumb items=[ { 'label': '#i18n{library.manage_media.form.modify.title}', 'url': 'jsp/admin/plugins/library/ManageMedia.jsp?media_id=${mediaId}' }, { 'label': '#i18n{library.create_attribute.form.label}' } ] /></#assign>
+<#assign bc><@libraryBreadcrumb items=[ { 'label': ( media.name )!'#i18n{library.manage_media.form.modify.title}', 'url': 'jsp/admin/plugins/library/ManageLibrary.jsp?view=manageMedia&media_id=${mediaId}' }, { 'label': '#i18n{library.create_attribute.form.label}' } ] /></#assign>
 <@pageContainer>
 	<@pageColumn>
 		<@libraryPageHeader title='#i18n{library.create_attribute.form.label}' breadcrumb=bc>
-			<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${mediaId}' title='#i18n{portal.util.labelBack}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] />
+			<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp?view=manageMedia&media_id=${mediaId}' title='#i18n{portal.util.labelBack}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] />
 		</@libraryPageHeader>
-		<@tform method='post' action='jsp/admin/plugins/library/DoCreateAttribute.jsp' name='create_attribute' boxed=true>
+		<@tform method='post' action='jsp/admin/plugins/library/ManageLibrary.jsp' name='create_attribute' boxed=true>
+			<@input type='hidden' name='action' value='createAttribute' />
 			<@input type='hidden' id='media_id' name='media_id' value='${mediaId}' />
 			<@formGroup labelFor='attribute_code' labelKey='#i18n{library.create_attribute.code}' mandatory=true>
 				<@input type='text' id='attribute_code' name='attribute_code' value='' maxlength=250 mandatory=true />
@@ -22,7 +23,7 @@
 			</@formGroup>
 			<@formGroup>
 				<@button type='submit' title='#i18n{library.create_attribute.button.validate}' buttonIcon='check' color='primary' />
-				<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${mediaId}' title='#i18n{library.create_attribute.button.cancel}' buttonIcon='x' color='light' />
+				<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp?view=manageMedia&media_id=${mediaId}' title='#i18n{library.create_attribute.button.cancel}' buttonIcon='x' color='light' />
 			</@formGroup>
 		</@tform>
 	</@pageColumn>
