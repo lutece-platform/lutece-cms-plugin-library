@@ -65,14 +65,19 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.template.HtmlMarkup;
 import fr.paris.lutece.portal.service.util.AppPathService;
-import fr.paris.lutece.portal.web.insert.InsertServiceJspBean;
+import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
+import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
 import fr.paris.lutece.portal.web.insert.InsertServiceSelectionBean;
+import fr.paris.lutece.portal.web.insert.InsertServiceSelectorJspBean;
 import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.IOException;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -83,19 +88,29 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 
 /**
- * UploadInsertServiceJspBean
- * Used for uploading document
- *
+ * Upload insert service of the library: the choice of a media type, of the space where its document is created, the form of the
+ * document, then the insertion into the editor of the HTML the template of the media type renders. The core instantiates the class
+ * by reflection for its first screen (getInsertServiceSelectorUI), the screens after it are the views and actions of this controller.
  */
 @RequestScoped
 @Named( "libraryUploadInsertServiceJspBean" )
-public class UploadInsertServiceJspBean extends InsertServiceJspBean implements InsertServiceSelectionBean
+@Controller( controllerJsp = UploadInsertServiceJspBean.CONTROLLER_JSP, controllerPath = UploadInsertServiceJspBean.CONTROLLER_PATH, right = InsertServiceSelectorJspBean.RIGHT_MANAGE_LINK_SERVICE, securityTokenEnabled = true )
+public class UploadInsertServiceJspBean extends MVCAdminJspBean implements InsertServiceSelectionBean
 {
+    static final String CONTROLLER_JSP = "SelectSpaceForUpload.jsp";
+    static final String CONTROLLER_PATH = "jsp/admin/plugins/library/";
     private static final long serialVersionUID = -7071548876864568789L;
+
+    // Views
+    private static final String VIEW_SELECT_SPACE = "selectSpace";
+    private static final String VIEW_CREATE_MEDIA = "createMedia";
+
+    // Actions
+    private static final String ACTION_CREATE_DOCUMENT = "createDocument";
+    private static final String ACTION_INSERT_MEDIA = "insertMedia";
     private static final String PARAMETER_PLUGIN_NAME = "plugin_name";
     private static final String PLUGIN_NAME = "library";
 
@@ -106,7 +121,7 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     private static final String TEMPLATE_EDIT_MEDIA = "admin/plugins/library/mediaedition_selector.html";
 
     //JSP
-    private static final String JSP_INSERT_MEDIA = "jsp/admin/plugins/library/DoInsertMediaByUpload.jsp";
+    private static final String JSP_INSERT_MEDIA = CONTROLLER_PATH + CONTROLLER_JSP;
 
     //MARKS
     private static final String MARK_FIELDS = "fields";
@@ -161,182 +176,233 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
     @Override
     public String getInsertServiceSelectorUI( HttpServletRequest request )
     {
-        init( request );
+        initService( request );
 
-        Collection<LibraryMedia> libraryMedia = LibraryMediaHome.findAllMedia( _plugin );
-        HashMap<String, Object> model = getDefaultModel(  );
-        model.put( MARK_MEDIA_TYPES, libraryMedia );
+        return getMediaTypeSelectorPage( null );
+    }
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MEDIATYPE_SELECTOR, _user.getLocale(  ), model );
+    /**
+     * The insert services list of the core reads the sub categories of each service
+     * @return an empty list: the service has none
+     */
+    public ReferenceList getSubCategories(  )
+    {
+        return new ReferenceList(  );
+    }
+
+    /**
+     * {@inheritDoc}
+     * The bean serves the library whatever the request carries
+     */
+    @Override
+    public Plugin getPlugin(  )
+    {
+        return PluginService.getPlugin( PLUGIN_NAME );
+    }
+
+    /**
+     * Returns the page choosing the type of the media to upload
+     * @param model the model of the view, null when the core asks for the first screen outside the controller
+     * @return the page
+     */
+    private String getMediaTypeSelectorPage( Models model )
+    {
+        Map<String, Object> mapModel = getDefaultModel(  );
+        mapModel.put( MARK_MEDIA_TYPES, LibraryMediaHome.findAllMedia( _plugin ) );
+
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MEDIATYPE_SELECTOR, _user.getLocale(  ), toModel( model, mapModel ) );
 
         return template.getHtml(  );
     }
 
-    private void init( HttpServletRequest request )
+    /**
+     * Sets the user, the plugin and the editor field of the insertion
+     * @param request the request
+     */
+    private void initService( HttpServletRequest request )
     {
-        String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
         _user = AdminUserService.getAdminUser( request );
-        // The multipart forms of the upload (media_creator.html) do not carry plugin_name, and the multipart servlet keeps only their fields
-        _plugin = PluginService.getPlugin( StringUtils.defaultIfEmpty( strPluginName, PLUGIN_NAME ) );
+        _plugin = PluginService.getPlugin( PLUGIN_NAME );
         _input = request.getParameter( PARAMETER_INPUT );
     }
 
-    private HashMap<String, Object> getDefaultModel(  )
+    /**
+     * Returns the values shared by the pages of the service
+     * @return the values
+     */
+    private Map<String, Object> getDefaultModel(  )
     {
-        HashMap<String, Object> model = new HashMap<String, Object>(  );
-        model.put( PARAMETER_PLUGIN_NAME, _plugin.getName(  ) );
+        Map<String, Object> model = new HashMap<String, Object>(  );
+        model.put( PARAMETER_PLUGIN_NAME, PLUGIN_NAME );
         model.put( PARAMETER_INPUT, _input );
 
         return model;
     }
 
     /**
-     * Return the form for creating a document
-     * @param request The request
-     * @return a form with needed fields
+     * Returns the model a template of the service is rendered with: the model of the view, which carries the token of its forms, filled
+     * with the values of the page; the values alone outside a view
+     * @param model the model of the view, null outside a view
+     * @param mapValues the values of the page
+     * @return the model
      */
-    public String getCreateMedia( HttpServletRequest request )
+    private static Object toModel( Models model, Map<String, Object> mapValues )
     {
-        init( request );
-
-        String strMediaType = request.getParameter( PARAMETER_MEDIA_TYPE );
-
-        String strSpaceId = StringUtils.defaultIfEmpty( request.getParameter( PARAMETER_SPACE_ID ),
-                request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID ) );
-        int nSpaceId = -1;
-
-        if ( ( strSpaceId != null ) && ( strSpaceId.length(  ) > 0 ) )
+        if ( model == null )
         {
-            nSpaceId = Integer.parseInt( strSpaceId );
+            return mapValues;
+        }
+
+        mapValues.forEach( model::put );
+
+        return model;
+    }
+
+    /**
+     * Returns the media type the request names by its media_type, else by its media
+     * @param request the request
+     * @return the media type, null when the identifier is missing, not a number or unknown
+     */
+    private LibraryMedia findMediaType( HttpServletRequest request )
+    {
+        String strMediaTypeId = StringUtils.defaultIfBlank( request.getParameter( PARAMETER_MEDIA_TYPE ), request.getParameter( PARAMETER_MEDIA_ID ) );
+        int nMediaTypeId = NumberUtils.toInt( strMediaTypeId, -1 );
+
+        return ( nMediaTypeId < 0 ) ? null : LibraryMediaHome.findByPrimaryKey( nMediaTypeId, _plugin );
+    }
+
+    /**
+     * Returns the document type a media type uploads: the one of its mapping
+     * @param mediaType the media type
+     * @return the document type, null when the media type has no mapping
+     */
+    private DocumentType findDocumentType( LibraryMedia mediaType )
+    {
+        Collection<LibraryMapping> listMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ), _plugin );
+
+        return listMappings.isEmpty(  ) ? null : DocumentTypeHome.findByPrimaryKey( listMappings.iterator(  ).next(  ).getCodeDocumentType(  ) );
+    }
+
+    /**
+     * Returns the space the request names, else the one kept in the session, and keeps it there
+     * @param request the request
+     * @param strSpaceId the identifier of the space the request carries, may be null
+     * @return the identifier, -1 when there is none
+     */
+    private static int getSpaceId( HttpServletRequest request, String strSpaceId )
+    {
+        if ( NumberUtils.isDigits( strSpaceId ) )
+        {
+            int nSpaceId = NumberUtils.toInt( strSpaceId, -1 );
             request.getSession(  ).setAttribute( SPACE_ID_SESSION, nSpaceId );
+
+            return nSpaceId;
         }
-        else
+
+        Integer nSpaceIdSession = (Integer) request.getSession(  ).getAttribute( SPACE_ID_SESSION );
+
+        return ( nSpaceIdSession == null ) ? -1 : nSpaceIdSession;
+    }
+
+    /**
+     * Returns the form creating the document of the media, in the space chosen; its token is the one of the creation
+     * @param model the model of the view
+     * @param request The request, carrying the media type and the space
+     * @return the form, or the choice of the space when none is chosen or when the user may not create the document there
+     */
+    @View( value = VIEW_CREATE_MEDIA, securityTokenAction = ACTION_CREATE_DOCUMENT )
+    public String getCreateMedia( Models model, HttpServletRequest request )
+    {
+        initService( request );
+
+        LibraryMedia mediaType = findMediaType( request );
+        DocumentType documentType = ( mediaType == null ) ? null : findDocumentType( mediaType );
+
+        if ( documentType == null )
         {
-            Integer nSpaceIdTmp = (Integer) request.getSession(  ).getAttribute( SPACE_ID_SESSION );
-
-            if ( nSpaceIdTmp != null )
-            {
-                nSpaceId = nSpaceIdTmp.intValue(  );
-            }
+            return getMediaTypeSelectorPage( model );
         }
 
-        LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaType ), _plugin );
-        Collection<LibraryMapping> libraryMappingList  = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ), _plugin);
-        
-        // there should be only one mapping per media
-        LibraryMapping mapping = null;
-        for (LibraryMapping libMap : libraryMappingList) 
-        {
-            mapping = LibraryMappingHome.findByPrimaryKey( libMap.getIdMapping( ), _plugin );
-        }
-
-        DocumentType documentType = DocumentTypeHome.findByPrimaryKey( mapping.getCodeDocumentType(  ) );
+        int nSpaceId = getSpaceId( request, StringUtils.defaultIfEmpty( request.getParameter( PARAMETER_SPACE_ID ),
+                request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID ) ) );
 
         if ( ( nSpaceId == -1 ) ||
                 ( !_documentService.isAuthorizedAdminDocument( nSpaceId, documentType.getCode(  ),
                     DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) ) )
         {
-            return getSelectSpace( request );
+            return redirect( request, VIEW_SELECT_SPACE, PARAMETER_MEDIA_TYPE, mediaType.getMediaId(  ) );
         }
 
-        HashMap<String, Object> model = getDefaultModel(  );
-        model.put( MARK_DOCUMENT_TYPE, documentType.getCode(  ) );
-        model.put( MARK_FIELDS, HtmlMarkup.of(
+        Map<String, Object> mapModel = getDefaultModel(  );
+        mapModel.put( MARK_DOCUMENT_TYPE, documentType.getCode(  ) );
+        mapModel.put( MARK_FIELDS, HtmlMarkup.of(
             _documentService.getCreateForm( documentType.getCode(  ), _user.getLocale(  ),
                 AppPathService.getBaseUrl( request ) ) ) );
-        model.put( MARK_METADATA, new DublinCoreMetadata(  ) );
-        model.put( MARK_MEDIA, mediaType.getMediaId(  ) );
-        model.put( MARK_INPUT, _input );
-        model.put( MARK_SPACE_ID, nSpaceId );
-        model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
-        model.put( MARK_LOCALE, _user.getLocale(  ).getLanguage(  ) );
-        model.put( MARK_IS_IMAGE, Document.CODE_DOCUMENT_TYPE_IMAGE.equals( mediaType.getName() ) ) ;
-        model.put( MARK_USER_LAST_NAME, _user.getLastName( ) );
+        mapModel.put( MARK_METADATA, new DublinCoreMetadata(  ) );
+        mapModel.put( MARK_MEDIA, mediaType.getMediaId(  ) );
+        mapModel.put( MARK_INPUT, _input );
+        mapModel.put( MARK_SPACE_ID, nSpaceId );
+        mapModel.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
+        mapModel.put( MARK_LOCALE, _user.getLocale(  ).getLanguage(  ) );
+        mapModel.put( MARK_IS_IMAGE, isImage( mediaType ) );
+        mapModel.put( MARK_USER_LAST_NAME, _user.getLastName( ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MEDIA_CREATOR, _user.getLocale(  ), model );
-
-        return template.getHtml(  );
-    }
-
-    /**
-     * Return a page with space for selection
-     * @param request the request
-     * @return the page
-     */
-    public String getSelectSpace( HttpServletRequest request )
-    {
-        init( request );
-
-        String strMediaType = request.getParameter( PARAMETER_MEDIA_TYPE );
-
-        LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaType ), _plugin );
-        Collection<LibraryMapping> libraryMappingList  = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ), _plugin);
-        
-        // there should be only one mapping per media
-        LibraryMapping mapping = null;
-        for (LibraryMapping libMap : libraryMappingList) 
-        {
-            mapping = LibraryMappingHome.findByPrimaryKey( libMap.getIdMapping( ), _plugin );
-        }
-        DocumentType documentType = DocumentTypeHome.findByPrimaryKey( mapping.getCodeDocumentType(  ) );
-
-        String strSpaceIdRequest = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID );
-        int nSpaceId = -1;
-
-        if ( ( strSpaceIdRequest != null ) && ( strSpaceIdRequest.length(  ) > 0 ) )
-        {
-            nSpaceId = Integer.parseInt( strSpaceIdRequest );
-            request.getSession(  ).setAttribute( SPACE_ID_SESSION, nSpaceId );
-        }
-        else
-        {
-            Integer nSpaceIdTmp = (Integer) request.getSession(  ).getAttribute( SPACE_ID_SESSION );
-
-            if ( nSpaceIdTmp != null )
-            {
-                nSpaceId = nSpaceIdTmp.intValue(  );
-            }
-        }
-
-        DocumentSpace currentSpace = DocumentSpaceHome.findByPrimaryKey( nSpaceId );
-
-        HashMap<String, Object> model = getDefaultModel(  );
-
-        model.put( MARK_INPUT, _input );
-        model.put( MARK_SPACES_TREE, _documentSpacesService.getSpacesTreeRoots( _user ) );
-        model.put( MARK_SELECTED_SPACE_ID, String.valueOf( nSpaceId ) );
-        model.put( MARK_DOCUMENT_TYPE, documentType.getCode(  ) );
-        model.put( MARK_SPACE, currentSpace );
-        model.put( MARK_MEDIA_TYPE, strMediaType );
-
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_SPACE_SELECTOR, _user.getLocale(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MEDIA_CREATOR, _user.getLocale(  ), toModel( model, mapModel ) );
 
         return template.getHtml(  );
     }
 
     /**
-     * creation of a document
-     * @param request The HTTP request
-     * @return The URL to go after performing the action
+     * Returns the page choosing the space where the document of the media is created
+     * @param model the model of the view
+     * @param request the request, carrying the media type
+     * @return the page, or the choice of the media type when the media type is missing, unknown or has no mapping
      */
-    public String createDocument( HttpServletRequest request , Document document )
+    @View( value = VIEW_SELECT_SPACE, defaultView = true )
+    public String getSelectSpace( Models model, HttpServletRequest request )
     {
-        init (request );
+        initService( request );
+
+        LibraryMedia mediaType = findMediaType( request );
+        DocumentType documentType = ( mediaType == null ) ? null : findDocumentType( mediaType );
+
+        if ( documentType == null )
+        {
+            return getMediaTypeSelectorPage( model );
+        }
+
+        int nSpaceId = getSpaceId( request, request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID ) );
+
+        Map<String, Object> mapModel = getDefaultModel(  );
+        mapModel.put( MARK_INPUT, _input );
+        mapModel.put( MARK_SPACES_TREE, _documentSpacesService.getSpacesTreeRoots( _user ) );
+        mapModel.put( MARK_SELECTED_SPACE_ID, String.valueOf( nSpaceId ) );
+        mapModel.put( MARK_DOCUMENT_TYPE, documentType.getCode(  ) );
+        mapModel.put( MARK_SPACE, DocumentSpaceHome.findByPrimaryKey( nSpaceId ) );
+        mapModel.put( MARK_MEDIA_TYPE, String.valueOf( mediaType.getMediaId(  ) ) );
+
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_SPACE_SELECTOR, _user.getLocale(  ), toModel( model, mapModel ) );
+
+        return template.getHtml(  );
+    }
+
+    /**
+     * Creates and publishes a document from the form of its type
+     * @param request The HTTP request, multipart
+     * @param document the document to fill
+     * @return The URL of the error message, null when the document is created
+     */
+    private String createDocument( HttpServletRequest request, Document document )
+    {
+        if ( !( request instanceof MultipartHttpServletRequest ) )
+        {
+            return AdminMessageService.getMessageUrl( request, MESSAGE_NOT_AUTHORIZED, AdminMessage.TYPE_ERROR );
+        }
 
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
         String strDocumentTypeCode = request.getParameter( PARAMETER_DOCUMENT_TYPE_CODE );
-        String strSpaceIdRequest = request.getParameter( PARAMETER_SPACE_ID );
-        int nSpaceId;
-
-        try
-        {
-            nSpaceId = Integer.parseInt( strSpaceIdRequest );
-        }
-        catch ( NumberFormatException e )
-        {
-            nSpaceId = -1;
-        }
+        int nSpaceId = NumberUtils.toInt( request.getParameter( PARAMETER_SPACE_ID ), -1 );
 
         if ( !_documentService.isAuthorizedAdminDocument( nSpaceId, strDocumentTypeCode,
                     DocumentTypeResourceIdService.PERMISSION_CREATE, _user ) )
@@ -369,78 +435,81 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
             return AdminMessageService.getMessageUrl( request, MESSAGE_DOCUMENT_ERROR,
                 new String[] { I18nService.getLocalizedString( e.getI18nMessage(  ), _user.getLocale(  ) ) },
                 AdminMessage.TYPE_ERROR );
-        }   
-        
-        
+        }
+
         return null;
     }
     
     /**
-     * Creates a document, then shows the form of its media values
-     * @param request The HTTP request
-     * @param response The HTTP response, redirected to the error message when the document can not be created
-     * @return the page of the media values, empty when the response is redirected
-     * @throws IOException if the redirection fails
+     * Creates the document of the media: an image is inserted at once into the editor, any other document shows the form of the
+     * values of its media first
+     * @param request The HTTP request, multipart: its action and its fields come in its body
+     * @return the page inserting the image or the form of the values, rendered in the response to the form; or the redirection to the
+     *         error message when the document can not be created
      */
-    public String doCreateDocument( HttpServletRequest request, HttpServletResponse response ) throws IOException
+    @Action( ACTION_CREATE_DOCUMENT )
+    public String doCreateDocument( HttpServletRequest request )
     {
-        Document document = new Document( ) ;
-        String url = createDocument(request, document) ;
+        initService( request );
 
-        if ( url != null ) 
+        LibraryMedia mediaType = findMediaType( request );
+
+        if ( ( mediaType == null ) || ( findDocumentType( mediaType ) == null ) )
         {
-            response.sendRedirect( url );
+            return redirectView( request, VIEW_SELECT_SPACE );
+        }
 
-            return StringUtils.EMPTY;
-        } 
+        Document document = new Document( );
+        String strErrorUrl = createDocument( request, document );
 
-        return getEditSelectedMedia( request, document );
+        if ( strErrorUrl != null )
+        {
+            return redirect( request, strErrorUrl );
+        }
+
+        return isImage( mediaType ) ? getInsertMedia( request, mediaType, document ) : getEditSelectedMedia( mediaType, document );
     }
 
     /**
-     * Creates an image, then inserts it into the current editor without the page of the media values
-     * @param request The HTTP request
-     * @param response The HTTP response, redirected to the error message when the image can not be created
-     * @return the page inserting the image, empty when the response is redirected
-     * @throws IOException if the redirection fails
-     */
-    public String doCreateImage( HttpServletRequest request, HttpServletResponse response ) throws IOException
-    {
-        Document document = new Document( ) ;
-        String url = createDocument(request, document) ;
-
-        if ( url != null ) 
-        {
-            response.sendRedirect( url );
-
-            return StringUtils.EMPTY;
-        } 
-
-        return getInsertMedia( request, document );
-    }
-
-    /**
-     * Inserts the document into the current editor
+     * Inserts the document into the current editor, with the values of its media the form carries
      * @param request the request
-     * @return the page inserting the document, rendered in the response to the form rather than reached through a redirect
+     * @return the page inserting the document, rendered in the response to the form rather than reached through a redirect; it writes
+     *         nothing, so it takes no token (the values page that posts it is sent by its own script)
      */
+    @Action( value = ACTION_INSERT_MEDIA, securityTokenDisabled = true )
     public String doInsertMedia( HttpServletRequest request )
     {
-        return getInsertMedia( request, null );
+        initService( request );
+
+        LibraryMedia mediaType = findMediaType( request );
+
+        if ( ( mediaType == null ) || ( findDocumentType( mediaType ) == null ) )
+        {
+            return redirectView( request, VIEW_SELECT_SPACE );
+        }
+
+        return getInsertMedia( request, mediaType, null );
+    }
+
+    /**
+     * Tells whether a media type inserts an image, uploaded and inserted without the form of its values
+     * @param mediaType the media type
+     * @return true for the image media type
+     */
+    private static boolean isImage( LibraryMedia mediaType )
+    {
+        return Document.CODE_DOCUMENT_TYPE_IMAGE.equals( mediaType.getName(  ) );
     }
 
     /**
      * Returns the page inserting the document into the current editor
      * @param request the request
+     * @param mediaType the media type, which has a mapping
      * @param document the document in case of "quick image insertion" without the "media_edition" page
      * @return the page inserting the document
      */
-    private String getInsertMedia( HttpServletRequest request, Document document )
+    private String getInsertMedia( HttpServletRequest request, LibraryMedia mediaType, Document document )
     {
-        init( request );
-
-        String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
-        LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaTypeId ), _plugin );
         mediaType.setMediaAttributeList( MediaAttributeHome.findAllAttributesForMedia( mediaType.getMediaId(  ), _plugin ) );
 
         Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ), _plugin );
@@ -498,15 +567,12 @@ public class UploadInsertServiceJspBean extends InsertServiceJspBean implements 
 
     /**
      * Return the page for edition of the created document
-     * @param request the request
+     * @param mediaType the media type, which has a mapping
      * @param document the document just created
      * @return the form with document parameters
      */
-    public String getEditSelectedMedia( HttpServletRequest request, Document document )
+    private String getEditSelectedMedia( LibraryMedia mediaType, Document document )
     {
-        String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
-
-        LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaTypeId ), _plugin );
         mediaType.setMediaAttributeList( MediaAttributeHome.findAllAttributesForMedia( mediaType.getMediaId(  ), _plugin ) );
 
         Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ),

@@ -214,7 +214,7 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
         String strHtml = render( "admin/plugins/library/generate_mapping_association_label.html", model );
         assertTrue( strHtml, strHtml.contains( TEXT_ESCAPED ) );
         assertFalse( strHtml, strHtml.contains( TEXT_UNESCAPED ) );
-        assertTrue( strHtml, strHtml.contains( "height=\"10\"" ) );
+        assertTrue( strHtml, strHtml.contains( "ti-arrows-left-right" ) );
     }
 
     /**
@@ -303,7 +303,7 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
 
         strHtml = render( "admin/plugins/library/media_selector_multiple.html", model );
         assertTrue( strHtml, strHtml.contains( "name=\"browser_selected_space_id\"" ) );
-        assertTrue( strHtml, strHtml.contains( "formaction=\"jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=" + ID_DOCUMENT + "&amp;id_mapping=3\"" ) );
+        assertTrue( strHtml, strHtml.contains( "formaction=\"jsp/admin/plugins/library/SelectMedia.jsp?action=selectDocument&amp;id_document=" + ID_DOCUMENT + "&amp;id_mapping=3\"" ) );
         assertFalse( strHtml, strHtml.contains( TEXT_UNESCAPED ) );
         assertFalse( strHtml, strHtml.contains( "javascript:" ) );
     }
@@ -318,7 +318,7 @@ public class LibraryTemplatesRenderTest extends LuteceTestCase
         Map<String, String> associations = new HashMap<>( );
         associations.put( "file", "document_file" );
         Map<String, Object> model = insertModel( );
-        model.put( "jsp_insert", "jsp/admin/plugins/library/DoInsertMedia.jsp" );
+        model.put( "jsp_insert", "jsp/admin/plugins/library/SelectMedia.jsp" );
         model.put( "document", document( ) );
         model.put( "attributes_associations", associations );
 

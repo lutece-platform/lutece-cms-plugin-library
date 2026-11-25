@@ -11,6 +11,7 @@
 			<h2>${mediatype.name!}</h2>
 		</div>
 		<@tform method='post' name='fenvoi' action='${jsp_insert}'>
+			<@input type='hidden' name='action' value='insertMedia' />
 			<@input type='hidden' name='plugin_name' value='${plugin_name}' />
 			<@input type='hidden' name='input' value='${.data_model.input}' />
 			<@input type='hidden' name='media' value='${mediatype.mediaId?c}' />

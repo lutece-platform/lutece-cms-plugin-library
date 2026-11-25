@@ -2,7 +2,7 @@
 <#--
  # Choice of a document for a media type: the media types as tabs, the spaces as a tree, the documents of the space as a grid or a list (remembered
  # by media type in the browser, the list by default for the types without image), a search on the titles of the page. A click selects a document,
- # Insérer or a double click goes on to its edition (EditSelectedMedia.jsp). Styles: insert_service.css, behaviours: lutece-insert.js.
+ # Insérer or a double click goes on to its edition (view editSelectedMedia). Styles: insert_service.css, behaviours: lutece-insert.js.
 -->
 <#switch mediatype.mediaId>
 	<#case 1>
@@ -25,7 +25,7 @@
 		<span class="lutece-insert-badge lutece-insert-tint-${isImage?then( '1', '4' )}" aria-hidden="true"><i class="ti ti-${mediaTypeIcons[ mediatype.mediaId?c ]!'file'}"></i></span>
 		<h2>#i18n{library.insertservice.selectMedia} ${mediatype.name}</h2>
 		<#if is_document_creation_allowed?? && is_document_creation_allowed>
-		<@aButton href='jsp/admin/plugins/library/CreateMediaByInsert.jsp?plugin_name=${plugin_name?url("UTF-8")}&media_type=${mediatype.mediaId?c}&browser_id_space=${selected_space?c}&space_id=${selected_space?c}&input=${.data_model.input?url("UTF-8")}' buttonIcon=btnIcon title=btnTitle size='sm' color='light' />
+		<@aButton href='jsp/admin/plugins/library/SelectSpaceForUpload.jsp?view=createMedia&plugin_name=${plugin_name?url("UTF-8")}&media_type=${mediatype.mediaId?c}&browser_id_space=${selected_space?c}&space_id=${selected_space?c}&input=${.data_model.input?url("UTF-8")}' buttonIcon=btnIcon title=btnTitle size='sm' color='light' />
 		</#if>
 	</div>
 	<#if mediatypes?? && mediatypes?size gt 1>
@@ -43,7 +43,8 @@
 			<@input type='hidden' name='space_id' value='${selected_space?c}' />
 			<@spacesTreeSelect id='library_browse_spaces_tree' nodes=spaces_tree selectedId=selected_space?c label='#i18n{library.insertservice.browseSpace}' />
 		</@tform>
-		<@tform name='fenvoi' id='library_media_form' action='jsp/admin/plugins/library/EditSelectedMedia.jsp' class='lutece-insert-main' params={"data-lutece-insert-select": true}>
+		<@tform name='fenvoi' id='library_media_form' action='jsp/admin/plugins/library/SelectMedia.jsp' class='lutece-insert-main' params={"data-lutece-insert-select": true}>
+			<@input type='hidden' name='view' value='editSelectedMedia' />
 			<@input type='hidden' name='plugin_name' value='${plugin_name}' />
 			<@input type='hidden' name='input' value='${.data_model.input}' />
 			<@input type='hidden' name='media' value='${mediatype.mediaId?c}' />

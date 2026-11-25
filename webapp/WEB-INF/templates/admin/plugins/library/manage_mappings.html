@@ -5,11 +5,11 @@
 		<#assign nbAttributesToMap = nbAttributesToMap + 1>
 	</#if>
 </#list>
-<#assign bc><@libraryBreadcrumb items=[ { 'label': media.name, 'url': 'jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}' }, { 'label': '#i18n{library.manage_mappings.table.title}' } ] /></#assign>
+<#assign bc><@libraryBreadcrumb items=[ { 'label': media.name, 'url': 'jsp/admin/plugins/library/ManageLibrary.jsp?view=manageMedia&media_id=${media.mediaId}' }, { 'label': '#i18n{library.manage_mappings.table.title}' } ] /></#assign>
 <@pageContainer>
 	<@pageColumn>
 		<@libraryPageHeader title='#i18n{library.manage_mappings.table.title}' iconName='arrows-exchange' breadcrumb=bc>
-			<@aButton href='jsp/admin/plugins/library/ManageMedia.jsp?media_id=${media.mediaId}' title='#i18n{library.manage_mappings.action.back}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] class='me-1' />
+			<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp?view=manageMedia&media_id=${media.mediaId}' title='#i18n{library.manage_mappings.action.back}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] class='me-1' />
 			<#if document_type_list?has_content>
 				<@button type='button' title='#i18n{library.manage_mappings.form.create.title}' buttonIcon='plus' color='primary' hideTitle=['xs','sm','md'] params={"data-bs-toggle": "modal", "data-bs-target": "#create-mapping"} />
 			</#if>
@@ -17,13 +17,13 @@
 		<#if mapping_list?has_content>
 			<@manageFeature layout='list' id='library-mappings'>
 				<#list mapping_list as mapping>
-				<#assign modifyUrl = 'jsp/admin/plugins/library/ModifyMapping.jsp?mapping_id=${mapping.idMapping}' />
+				<#assign modifyUrl = 'jsp/admin/plugins/library/ManageLibrary.jsp?view=modifyMapping&mapping_id=${mapping.idMapping}' />
 				<@manageFeatureItem id='mapping_${mapping.idMapping}'>
 					<@manageFeatureItemColumn class='d-flex align-items-center gap-2 text-truncate'>
 						<span class="avatar avatar-sm bg-pink-lt" aria-hidden="true"><@icon style='arrows-exchange' /></span>
 						<@div class='text-truncate'>
 							<@link href=modifyUrl class='text-reset fw-semibold' title='#i18n{portal.util.labelModify} ${mapping.codeDocumentType}'>${mapping.codeDocumentType}</@link>
-							<#if ( mapping.attributeAssociationList?size ) lt nbAttributesToMap><@tag color='' class='bg-yellow-lt ms-1' tagIcon='alert-triangle'>#i18n{library.manage_mappings.control.title} : #i18n{library.manage_mappings.control.text}</@tag></#if>
+							<#if ( mapping.attributeAssociationList![] )?size lt nbAttributesToMap><@tag color='' class='bg-yellow-lt ms-1' tagIcon='alert-triangle'>#i18n{library.manage_mappings.control.title} : #i18n{library.manage_mappings.control.text}</@tag></#if>
 							<#if mapping.attributeAssociationList?has_content>
 								<@div class='text-secondary small'>
 									<#list mapping.attributeAssociationList as mappingAttribute>${association_labels[mapping.idMapping?c + '-' + mappingAttribute.idMediaAttribute?c]}<#sep> &middot; </#sep></#list>
@@ -34,7 +34,7 @@
 					<@manageFeatureItemColumn auto=true align='end'>
 						<@div class='btn-actions'>
 							<@aButton href=modifyUrl style='btn-action' color='' buttonIcon='pencil' title='#i18n{portal.util.labelModify} ${mapping.codeDocumentType}' hideTitle=['all'] />
-							<@aButton href='jsp/admin/plugins/library/RemoveMapping.jsp?mapping_id=${mapping.idMapping}' style='btn-action text-danger' color='' buttonIcon='trash' title='#i18n{portal.util.labelDelete} ${mapping.codeDocumentType}' hideTitle=['all'] />
+							<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp?view=confirmRemoveMapping&mapping_id=${mapping.idMapping}' style='btn-action text-danger' color='' buttonIcon='trash' title='#i18n{portal.util.labelDelete} ${mapping.codeDocumentType}' hideTitle=['all'] />
 						</@div>
 					</@manageFeatureItemColumn>
 				</@manageFeatureItem>
@@ -49,7 +49,8 @@
 </@pageContainer>
 <#if document_type_list?has_content>
 <@modal id='create-mapping'>
-	<@tform action='jsp/admin/plugins/library/CreateMapping.jsp' method='post'>
+	<@tform action='jsp/admin/plugins/library/ManageLibrary.jsp' method='post'>
+		<@input type='hidden' name='view' value='createMapping' />
 		<@modalHeader modalTitle='#i18n{library.manage_mappings.form.create.title}' />
 		<@modalBody>
 			<@input type='hidden' name='media_id' value='${media.mediaId}' />

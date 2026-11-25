@@ -1,12 +1,13 @@
 <#include "/admin/plugins/library/macros_library.html" />
 <#assign documentTypeDescription>#i18n{library.modify_mapping.documentType.label} : <strong>${mapping.codeDocumentType} (${document_type.name})</strong> #i18n{library.modify_mapping.documentType.text}</#assign>
-<#assign bc><@libraryBreadcrumb items=[ { 'label': media.name, 'url': 'jsp/admin/plugins/library/ManageMedia.jsp?media_id=${mapping.idMedia}' }, { 'label': '#i18n{library.manage_mappings.table.title}', 'url': 'jsp/admin/plugins/library/ManageMappings.jsp?media_id=${mapping.idMedia}' }, { 'label': '#i18n{library.modify_mapping.form.label}' } ] /></#assign>
+<#assign bc><@libraryBreadcrumb items=[ { 'label': media.name, 'url': 'jsp/admin/plugins/library/ManageLibrary.jsp?view=manageMedia&media_id=${mapping.idMedia}' }, { 'label': '#i18n{library.manage_mappings.table.title}', 'url': 'jsp/admin/plugins/library/ManageLibrary.jsp?view=manageMappings&media_id=${mapping.idMedia}' }, { 'label': '#i18n{library.modify_mapping.form.label}' } ] /></#assign>
 <@pageContainer>
 	<@pageColumn>
 		<@libraryPageHeader title='#i18n{library.modify_mapping.form.label}' iconName='arrows-exchange' breadcrumb=bc description=documentTypeDescription>
-			<@aButton href='jsp/admin/plugins/library/ManageMappings.jsp?media_id=${mapping.idMedia}' title='#i18n{portal.util.labelBack}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] />
+			<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp?view=manageMappings&media_id=${mapping.idMedia}' title='#i18n{portal.util.labelBack}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] />
 		</@libraryPageHeader>
-		<@tform method='post' action='jsp/admin/plugins/library/DoModifyMappingAssociations.jsp' name='modify_mapping' boxed=true>
+		<@tform method='post' action='jsp/admin/plugins/library/ManageLibrary.jsp' name='modify_mapping' boxed=true>
+			<@input type='hidden' name='action' value='modifyMapping' />
 			<@input type='hidden' name='mapping_id' value='${mapping.idMapping}' />
 			<@input type='hidden' name='media_id' value='${mapping.idMedia}' />
 			<@input type='hidden' name='document_type' value='${mapping.codeDocumentType}' />
@@ -14,7 +15,7 @@
 				<#if attribute.associableWithDocument>
 					<#-- The document attribute currently associated with this media attribute, if any -->
 					<#assign associationDocumentAttributeId = -1>
-					<#list mapping.attributeAssociationList as association>
+					<#list mapping.attributeAssociationList![] as association>
 						<#if attribute.attributeId = association.idMediaAttribute>
 							<#assign associationDocumentAttributeId = association.idDocumentAttribute>
 							<#break>
@@ -35,7 +36,7 @@
 			</#list>
 			<@formGroup>
 				<@button type='submit' title='#i18n{library.modify_mapping.button.validate}' buttonIcon='check' color='primary' />
-				<@aButton href='jsp/admin/plugins/library/ManageMappings.jsp?media_id=${mapping.idMedia}' title='#i18n{portal.util.labelCancel}' buttonIcon='x' color='light' />
+				<@aButton href='jsp/admin/plugins/library/ManageLibrary.jsp?view=manageMappings&media_id=${mapping.idMedia}' title='#i18n{portal.util.labelCancel}' buttonIcon='x' color='light' />
 			</@formGroup>
 		</@tform>
 	</@pageColumn>

@@ -13,11 +13,7 @@
 		<#assign boxTitle='#i18n{library.insertservice.add} #i18n{library.insertservice.someX} #i18n{library.insertservice.defaultTitle}' />
 		<#assign btnIcon='plus' />
 </#switch>
-<#if is_image>
-	<#assign formAction = 'jsp/admin/plugins/library/DoUploadImage.jsp' />
-<#else>
-	<#assign formAction = 'jsp/admin/plugins/library/DoUploadDocument.jsp' />
-</#if>
+<#assign formAction = 'jsp/admin/plugins/library/SelectSpaceForUpload.jsp' />
 <div class="lutece-insert">
 	<div class="lutece-insert-head">
 		<span class="lutece-insert-badge lutece-insert-tint-${is_image?then( '1', '4' )}" aria-hidden="true"><i class="ti ti-${btnIcon}"></i></span>
@@ -25,6 +21,8 @@
 		<@button type='button' id='dbc' title='#i18n{library.insertservice.label.dublinCore}' buttonIcon='pencil-cog' color='light' size='sm' params={"aria-controls": "dublin_core_meta", "aria-expanded": "false"} />
 	</div>
 	<@tform method='post' enctype='multipart/form-data' action=formAction>
+		<#-- a multipart body: the action comes as one of its fields -->
+		<@input type='hidden' name='action' value='createDocument' />
 		<@input type='hidden' name='media' value='${media?c}' />
 		<@input type='hidden' name='input' value='${.data_model.input}' />
 		<@input type='hidden' name='space_id' value='${space_id?c}' />

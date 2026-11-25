@@ -53,16 +53,21 @@ import fr.paris.lutece.portal.service.admin.AdminUserService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
-import fr.paris.lutece.portal.service.util.AppPathService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import fr.paris.lutece.portal.web.insert.InsertServiceJspBean;
+import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
+import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
 import fr.paris.lutece.portal.web.insert.InsertServiceSelectionBean;
+import fr.paris.lutece.portal.web.insert.InsertServiceSelectorJspBean;
 import fr.paris.lutece.portal.web.util.LocalizedPaginator;
 import fr.paris.lutece.util.html.HtmlTemplate;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.url.UrlItem;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,21 +76,38 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 
 /**
- * Library insert service JSP Bean
+ * Insert service of the library: the choice of a media type, of its documents in the spaces, of the values of the media, then
+ * the insertion into the editor of the HTML its template renders. The core instantiates the class by reflection for its first
+ * screen (getInsertServiceSelectorUI), the screens after it are the views and actions of this controller.
  */
 @SessionScoped
 @Named
-public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements InsertServiceSelectionBean
+@Controller( controllerJsp = LibraryInsertServiceJspBean.CONTROLLER_JSP, controllerPath = LibraryInsertServiceJspBean.CONTROLLER_PATH, right = InsertServiceSelectorJspBean.RIGHT_MANAGE_LINK_SERVICE, securityTokenEnabled = true )
+public class LibraryInsertServiceJspBean extends MVCAdminJspBean implements InsertServiceSelectionBean
 {
+    static final String CONTROLLER_JSP = "SelectMedia.jsp";
+    static final String CONTROLLER_PATH = "jsp/admin/plugins/library/";
     private static final long serialVersionUID = -7071548876864568789L;
+    private static final String PLUGIN_NAME = "library";
+
+    // Views
+    private static final String VIEW_SELECT_MEDIA = "selectMedia";
+    private static final String VIEW_EDIT_SELECTED_MEDIA = "editSelectedMedia";
+
+    // Actions
+    private static final String ACTION_SELECT_DOCUMENT = "selectDocument";
+    private static final String ACTION_INSERT_MEDIA = "insertMedia";
 
     // Templates
     private static final String TEMPLATE_MEDIATYPE_SELECTOR = "admin/plugins/library/mediatype_selector.html";
@@ -106,13 +128,11 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private static final String PARAMETER_PAGE_INDEX = "page_index";
     private static final String PARAMETER_REMOVE_SELECTED = "remove_selected";
     private static final String PARAMETER_MOVE_UP = "move_up";
-    private static final String PARAMETER_BROWSER_SPACE_ID = "browser_id_space";
+    private static final String PARAMETER_ADD_ALL = "add_all";
 
 
     // JSP
-    private static final String JSP_INSERT_MEDIA = "jsp/admin/plugins/library/DoInsertMedia.jsp";
-    private static final String JSP_MEDIA_TYPE_SELECTION = "jsp/admin/plugins/library/SelectMedia.jsp";
-    private static final String JSP_MEDIA_EDIT_SELECTED = "jsp/admin/plugins/library/EditSelectedMedia.jsp";
+    private static final String JSP_CONTROLLER = CONTROLLER_PATH + CONTROLLER_JSP;
 
     // Marks
     private static final String MARK_MEDIA_DOC = "document";
@@ -124,7 +144,6 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private static final String MARK_SPACES_TREE = "spaces_tree";
     private static final String MARK_DOCUMENT_TYPES = "document_types";
     private static final String MARK_SELECTED_SPACE = "selected_space";
-    private static final String MARK_PREVIEW_TYPE = "preview_type";
     private static final String MARK_PAGINATOR = "paginator";
     private static final String MARK_NB_ITEMS_PER_PAGE = "nb_items_per_page";
     private static final String MARK_SELECTED_MEDIAS = "selected_medias";
@@ -134,8 +153,6 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private static final String MARK_IS_DOCUMENT_CREATION_ALLOWED = "is_document_creation_allowed" ;
 
     // Constants
-    private static final String DEFAULT_RESULTS_PER_PAGE = "10";
-    private static final String PROPERTY_RESULTS_PER_PAGE = "library.nbdocsperpage";
     private static final String SPACE_ID_SESSION = "spaceIdSession";
     private static final String DEFAULT_PAGE_INDEX = "1";
     private static final int APPROVED_DOCUMENT_STATE = 3;
@@ -146,67 +163,84 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private LibraryMediaTemplateService _mediaTemplateService;
 
     // Local session variables
-    private AdminUser _user;
-    private Plugin _plugin;
+    private transient AdminUser _user;
+    private transient Plugin _plugin;
     private String _input;
     private String _strCurrentPageIndex;
     private List<SelectedMedia> _listSelectedMedia;
     private int _nItemsPerPage;
+    @Inject
+    @ConfigProperty( name = "library.nbdocsperpage", defaultValue = "10" )
     private int _nDefaultItemsPerPage;
 
+    /**
+     * {@inheritDoc}
+     * The core instantiates the bean by reflection to show the first screen: the choice of the media type
+     */
+    @Override
     public String getInsertServiceSelectorUI( HttpServletRequest request )
     {
-        init( request );
+        initService( request );
         _listSelectedMedia = null;
 
-        return getMediaTypeSelectorPage(  );
+        return getMediaTypeSelectorPage( null );
+    }
+
+    /**
+     * The insert services list of the core reads the sub categories of each service
+     * @return an empty list: the service has none
+     */
+    public ReferenceList getSubCategories(  )
+    {
+        return new ReferenceList(  );
+    }
+
+    /**
+     * {@inheritDoc}
+     * The bean serves the library whatever the request carries
+     */
+    @Override
+    public Plugin getPlugin(  )
+    {
+        return PluginService.getPlugin( PLUGIN_NAME );
     }
 
     /**
      * Returns the page choosing the media type, keeping the current selection
+     * @param model the model of the page, null when the core asks for the first screen outside the controller
      * @return the page
      */
-    private String getMediaTypeSelectorPage(  )
+    private String getMediaTypeSelectorPage( Models model )
     {
-        Collection<LibraryMedia> libraryMedia = LibraryMediaHome.findAllMedia( _plugin );
-        HashMap<String, Object> model = getDefaultModel(  );
-        model.put( MARK_MEDIA_TYPES, libraryMedia );
+        Map<String, Object> mapModel = getDefaultModel(  );
+        mapModel.put( MARK_MEDIA_TYPES, LibraryMediaHome.findAllMedia( _plugin ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MEDIATYPE_SELECTOR, _user.getLocale(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MEDIATYPE_SELECTOR, _user.getLocale(  ), toModel( model, mapModel ) );
 
         return template.getHtml(  );
     }
 
     /**
-     * Returns the page selecting the documents of a media type
+     * Returns the page selecting the documents of a media type; a missing or unknown media type (an editor whose insert service
+     * is not configured) leads back to the choice of the media type. Its token is the one of the selection of a document.
+     * @param model the model of the page
      * @param request the request, carrying the media type
      * @return the page
      */
-    public String getSelectMedia( HttpServletRequest request )
+    @View( value = VIEW_SELECT_MEDIA, defaultView = true, securityTokenAction = ACTION_SELECT_DOCUMENT )
+    public String getSelectMedia( Models model, HttpServletRequest request )
     {
-        init( request );
+        initService( request );
 
-        return getSelectMediaPage( request, request.getParameter( PARAMETER_MEDIA_TYPE ) );
-    }
-
-    /**
-     * Returns the page selecting the documents of a media type
-     * @param request the request
-     * @param strMediaType the identifier of the media type
-     * @return the page
-     */
-    private String getSelectMediaPage( HttpServletRequest request, String strMediaType )
-    {
-        // A missing or unknown media type (an editor whose insert service is not configured) leads back to the choice of the media type
+        String strMediaType = request.getParameter( PARAMETER_MEDIA_TYPE );
         LibraryMedia mediaType = StringUtils.isNumeric( strMediaType )
             ? LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaType ), _plugin ) : null;
 
         if ( mediaType == null )
         {
-            return getMediaTypeSelectorPage(  );
+            return getMediaTypeSelectorPage( model );
         }
 
-        // The space chosen in the tree, else the space carried by the forms and the links of the page
         String strSpaceIdRequest = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID );
 
         if ( StringUtils.isBlank( strSpaceIdRequest ) )
@@ -216,9 +250,9 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
         int nSpaceId = -1;
 
-        if ( ( strSpaceIdRequest != null ) && ( strSpaceIdRequest.length(  ) > 0 ) )
+        if ( NumberUtils.isDigits( strSpaceIdRequest ) )
         {
-            nSpaceId = Integer.parseInt( strSpaceIdRequest );
+            nSpaceId = NumberUtils.toInt( strSpaceIdRequest, -1 );
             request.getSession(  ).setAttribute( SPACE_ID_SESSION, nSpaceId );
         }
         else
@@ -270,7 +304,6 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
             }
         }
 
-        // get the selected space
         DocumentSpace selectedSpace = null ;
         if ( nSpaceId > 0 )
         {
@@ -286,43 +319,56 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
 
 
-        HashMap<String, Object> model = getDefaultModel(  );
-        model.put( MARK_PREVIEW_TYPE, "<img src='%SRC' alt='%ALT' />" );
-        model.put( MARK_MEDIA_TYPE, mediaType );
-        // the media types, as tabs of the page
-        model.put( MARK_MEDIA_TYPES, LibraryMediaHome.findAllMedia( _plugin ) );
-        model.put( MARK_MEDIA_TYPE_ATTRIBUTES, mediaType.getMediaAttributeList(  ) );
-        model.put( MARK_ALL_MEDIA_ATTRIBUTES_ASSOCIATIONS, mapAssociationAttributes );
-        model.put( MARK_ALL_DOCUMENTS, listDocuments );
-        model.put( MARK_SPACES_TREE, _documentSpacesService.getSpacesTreeRoots( _user ) );
-        model.put( MARK_DOCUMENT_TYPES, listDocumentTypes );
-        model.put( MARK_SELECTED_SPACE, nSpaceId );
-        model.put( MARK_PAGINATOR, paginator );
-        model.put( MARK_NB_ITEMS_PER_PAGE, Integer.toString( paginator.getItemsPerPage(  ) ) );
-        model.put( MARK_SELECTED_MEDIAS, _listSelectedMedia );
-        model.put( MARK_IS_DOCUMENT_CREATION_ALLOWED ,
-                ( selectedSpace!=null?selectedSpace.isDocumentCreationAllowed():false ) ) ;
+        Map<String, Object> mapModel = getDefaultModel(  );
+        mapModel.put( MARK_MEDIA_TYPE, mediaType );
+        mapModel.put( MARK_MEDIA_TYPES, LibraryMediaHome.findAllMedia( _plugin ) );
+        mapModel.put( MARK_MEDIA_TYPE_ATTRIBUTES, mediaType.getMediaAttributeList(  ) );
+        mapModel.put( MARK_ALL_MEDIA_ATTRIBUTES_ASSOCIATIONS, mapAssociationAttributes );
+        mapModel.put( MARK_ALL_DOCUMENTS, listDocuments );
+        mapModel.put( MARK_SPACES_TREE, _documentSpacesService.getSpacesTreeRoots( _user ) );
+        mapModel.put( MARK_DOCUMENT_TYPES, listDocumentTypes );
+        mapModel.put( MARK_SELECTED_SPACE, nSpaceId );
+        mapModel.put( MARK_PAGINATOR, paginator );
+        mapModel.put( MARK_NB_ITEMS_PER_PAGE, Integer.toString( paginator.getItemsPerPage(  ) ) );
+        mapModel.put( MARK_SELECTED_MEDIAS, _listSelectedMedia );
+        mapModel.put( MARK_IS_DOCUMENT_CREATION_ALLOWED, ( selectedSpace != null ) && selectedSpace.isDocumentCreationAllowed(  ) );
         HtmlTemplate template = AppTemplateService.getTemplate( mediaType.getIsMultipleMedia(  )
-                ? TEMPLATE_MEDIA_SELECTOR_MULTIPLE : TEMPLATE_MEDIA_SELECTOR, _user.getLocale(  ), model );
+                ? TEMPLATE_MEDIA_SELECTOR_MULTIPLE : TEMPLATE_MEDIA_SELECTOR, _user.getLocale(  ), toModel( model, mapModel ) );
 
         return template.getHtml(  );
     }
 
-    public String getEditSelectedMedia( HttpServletRequest request )
+    /**
+     * Returns the values of the media for the selected documents, a form the page sends at once to the insertion
+     * @param model the model of the page
+     * @param request the request, carrying the media type, and for a single media its document and its mapping
+     * @return the page, or the choice of the media type when the media type, the document or the selection is missing
+     */
+    @View( value = VIEW_EDIT_SELECTED_MEDIA, securityTokenAction = ACTION_INSERT_MEDIA )
+    public String getEditSelectedMedia( Models model, HttpServletRequest request )
     {
-        init( request );
+        initService( request );
 
-        String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
+        LibraryMedia mediaType = findMediaType( request );
 
-        LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaTypeId ), _plugin );
+        if ( mediaType == null )
+        {
+            return getMediaTypeSelectorPage( model );
+        }
+
         mediaType.setMediaAttributeList( MediaAttributeHome.findAllAttributesForMedia( mediaType.getMediaId(  ), _plugin ) );
 
-        Map<String, Object> model = getDefaultModel(  );
-        model.put( MARK_MEDIA_TYPE, mediaType );
-        model.put( MARK_MEDIA_TYPE_ATTRIBUTES, mediaType.getMediaAttributeList(  ) );
+        Map<String, Object> mapModel = getDefaultModel(  );
+        mapModel.put( MARK_MEDIA_TYPE, mediaType );
+        mapModel.put( MARK_MEDIA_TYPE_ATTRIBUTES, mediaType.getMediaAttributeList(  ) );
 
         if ( mediaType.getIsMultipleMedia(  ) )
         {
+            if ( ( _listSelectedMedia == null ) || _listSelectedMedia.isEmpty(  ) )
+            {
+                return redirect( request, VIEW_SELECT_MEDIA, PARAMETER_MEDIA_TYPE, mediaType.getMediaId(  ) );
+            }
+
             for ( SelectedMedia media : _listSelectedMedia )
             {
                 LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( media.getMappingId(  ), _plugin );
@@ -334,42 +380,62 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
                 }
             }
 
-            model.put( MARK_MEDIA_DOC_LIST, _listSelectedMedia );
+            mapModel.put( MARK_MEDIA_DOC_LIST, _listSelectedMedia );
         }
         else
         {
-            String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
-            Document doc = DocumentHome.findByPrimaryKey( Integer.parseInt( strDocumentId ) );
-            model.put( MARK_MEDIA_DOC, doc );
+            Document doc = DocumentHome.findByPrimaryKey( NumberUtils.toInt( request.getParameter( PARAMETER_DOCUMENT_ID ), -1 ) );
+            LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( NumberUtils.toInt( request.getParameter( PARAMETER_MAPPING_ID ), -1 ), _plugin );
 
-            String strMappingId = request.getParameter( PARAMETER_MAPPING_ID );
-            LibraryMapping mapping = LibraryMappingHome.findByPrimaryKey( Integer.parseInt( strMappingId ), _plugin );
-            model.put( MARK_MEDIA_ATTRIBUTES_ASSOCIATIONS, getAttributesFromMapping( mapping ) );
+            if ( ( doc == null ) || ( mapping == null ) )
+            {
+                return redirect( request, VIEW_SELECT_MEDIA, PARAMETER_MEDIA_TYPE, mediaType.getMediaId(  ) );
+            }
+
+            mapModel.put( MARK_MEDIA_DOC, doc );
+            mapModel.put( MARK_MEDIA_ATTRIBUTES_ASSOCIATIONS, getAttributesFromMapping( mapping ) );
         }
 
-        model.put( MARK_JSP_INSERT, JSP_INSERT_MEDIA );
+        mapModel.put( MARK_JSP_INSERT, JSP_CONTROLLER );
 
         HtmlTemplate template = AppTemplateService.getTemplate( mediaType.getIsMultipleMedia(  )
-                ? TEMPLATE_EDIT_MEDIA_MULTIPLE : TEMPLATE_EDIT_MEDIA, _user.getLocale(  ), model );
+                ? TEMPLATE_EDIT_MEDIA_MULTIPLE : TEMPLATE_EDIT_MEDIA, _user.getLocale(  ), toModel( model, mapModel ) );
 
         return template.getHtml(  );
     }
 
     /**
-     * Adds the documents selected on the screen to the selection of a multiple media type, or removes one from the selection
+     * Changes the selection of a multiple media type, the one action every form of the selection page posts (the token of the page is for
+     * it): adds every document of the space browsed (add_all), moves a document (move_up), removes one (remove_selected), or adds the
+     * documents selected on the screen, in the order of the grid; a document already in the selection is not added twice
      * @param request the request, carrying the documents and their mappings (one id_document and one id_mapping per document) and the media type
-     * @return the page selecting the documents, rendered in the response to the form rather than reached through a redirect
+     * @return the redirection to the page selecting the documents
      */
-    public String doSelectMedia( HttpServletRequest request )
+    @Action( ACTION_SELECT_DOCUMENT )
+    public String doSelectDocument( HttpServletRequest request )
     {
-        init( request );
+        initService( request );
 
-        String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
-        String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
+        LibraryMedia mediaType = findMediaType( request );
+
+        if ( mediaType == null )
+        {
+            return redirectView( request, VIEW_SELECT_MEDIA );
+        }
+
+        if ( Boolean.parseBoolean( request.getParameter( PARAMETER_ADD_ALL ) ) )
+        {
+            return addAllSpace( request, mediaType );
+        }
+
+        if ( request.getParameter( PARAMETER_MOVE_UP ) != null )
+        {
+            return moveDocument( request, mediaType );
+        }
 
         if ( Boolean.parseBoolean( request.getParameter( PARAMETER_REMOVE_SELECTED ) ) )
         {
-            int nIdDocument = Integer.parseInt( strDocumentId );
+            int nIdDocument = NumberUtils.toInt( request.getParameter( PARAMETER_DOCUMENT_ID ), -1 );
 
             if ( ( _listSelectedMedia != null ) && ( _listSelectedMedia.size(  ) > 0 ) )
             {
@@ -400,16 +466,15 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
                 }
             }
 
-            return getSelectMediaPage( request, strMediaTypeId );
+            return redirect( request, VIEW_SELECT_MEDIA, PARAMETER_MEDIA_TYPE, mediaType.getMediaId(  ) );
         }
 
-        // The documents selected together come as many id_document and id_mapping, in the order of the grid
         String[] arrayDocumentId = request.getParameterValues( PARAMETER_DOCUMENT_ID );
         String[] arrayMappingId = request.getParameterValues( PARAMETER_MAPPING_ID );
 
         if ( ( arrayDocumentId == null ) || ( arrayMappingId == null ) || ( arrayDocumentId.length != arrayMappingId.length ) )
         {
-            return getSelectMediaPage( request, strMediaTypeId );
+            return redirect( request, VIEW_SELECT_MEDIA, PARAMETER_MEDIA_TYPE, mediaType.getMediaId(  ) );
         }
 
         if ( _listSelectedMedia == null )
@@ -419,33 +484,43 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
         for ( int i = 0; i < arrayDocumentId.length; i++ )
         {
-            // A document already in the selection is not added twice: the screen shows it as selected and lets it be chosen only once removed
-            int nDocumentId = Integer.parseInt( arrayDocumentId[i] );
+            int nDocumentId = NumberUtils.toInt( arrayDocumentId[i], -1 );
+            int nMappingId = NumberUtils.toInt( arrayMappingId[i], -1 );
+            Document document = DocumentHome.findByPrimaryKeyWithoutBinaries( nDocumentId );
 
-            if ( _listSelectedMedia.stream(  ).anyMatch( selected -> selected.getDocumentId(  ) == nDocumentId ) )
+            if ( ( document == null ) || ( nMappingId < 0 ) ||
+                    _listSelectedMedia.stream(  ).anyMatch( selected -> selected.getDocumentId(  ) == nDocumentId ) )
             {
                 continue;
             }
 
-            SelectedMedia media = new SelectedMedia( Integer.parseInt( strMediaTypeId ), nDocumentId,
-                    Integer.parseInt( arrayMappingId[i] ) );
-            media.setDocument( DocumentHome.findByPrimaryKeyWithoutBinaries( media.getDocumentId(  ) ) );
+            SelectedMedia media = new SelectedMedia( mediaType.getMediaId(  ), nDocumentId, nMappingId );
+            media.setDocument( document );
             media.setOrder( _listSelectedMedia.isEmpty(  ) ? 1 : ( _listSelectedMedia.get( _listSelectedMedia.size(  ) - 1 ).getOrder(  ) + 1 ) );
             _listSelectedMedia.add( media );
         }
 
-        return getSelectMediaPage( request, strMediaTypeId );
+        return redirect( request, VIEW_SELECT_MEDIA, PARAMETER_MEDIA_TYPE, mediaType.getMediaId(  ) );
     }
 
-    public String addAllSpace( HttpServletRequest request )
+    /**
+     * Adds to the selection every document of the space browsed whose type has a mapping for the media type, then goes on to the
+     * values of the media
+     * @param request the request
+     * @param mediaType the media type
+     * @return the redirection to the values of the media, or to the selection when no space is browsed
+     */
+    private String addAllSpace( HttpServletRequest request, LibraryMedia mediaType )
     {
-        init( request );
+        Integer nSpaceIdSession = (Integer) request.getSession(  ).getAttribute( SPACE_ID_SESSION );
 
-        String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
+        if ( nSpaceIdSession == null )
+        {
+            return redirect( request, VIEW_SELECT_MEDIA, PARAMETER_MEDIA_TYPE, mediaType.getMediaId(  ) );
+        }
 
-        int nMediaTypeId = Integer.parseInt( strMediaTypeId );
-
-        int nIdSpace = (Integer) request.getSession(  ).getAttribute( SPACE_ID_SESSION );
+        int nMediaTypeId = mediaType.getMediaId(  );
+        int nIdSpace = nSpaceIdSession;
 
         List<Document> listDocuments = DocumentHome.findBySpaceKey( nIdSpace );
         int nCurrentOrder;
@@ -460,9 +535,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
             nCurrentOrder = _listSelectedMedia.get( _listSelectedMedia.size(  ) - 1 ).getOrder(  ) + 1;
         }
 
-        LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( nMediaTypeId, _plugin );
-        Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( mediaType.getMediaId(  ),
-                _plugin );
+        Collection<LibraryMapping> allMappings = LibraryMappingHome.findAllMappingsByMedia( nMediaTypeId, _plugin );
 
         for ( Document document : listDocuments )
         {
@@ -472,7 +545,7 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
             for ( LibraryMapping mapping : allMappings )
             {
-                if ( StringUtils.equals( mapping.getCodeDocumentType(  ), document.getCodeDocumentType(  ) ) )
+                if ( Objects.equals( mapping.getCodeDocumentType(  ), document.getCodeDocumentType(  ) ) )
                 {
                     selectedMapping = mapping;
                 }
@@ -482,37 +555,31 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
             {
                 SelectedMedia media = new SelectedMedia( nMediaTypeId, document.getId(  ),
                         selectedMapping.getIdMapping(  ) );
-                media.setOrder( nCurrentOrder );
+                media.setOrder( nCurrentOrder++ );
                 media.setDocument( document );
                 _listSelectedMedia.add( media );
             }
         }
 
-        UrlItem urlItem = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MEDIA_EDIT_SELECTED );
-        urlItem.addParameter( PARAMETER_MEDIA_ID, strMediaTypeId );
-
-        return urlItem.getUrl(  );
+        return redirect( request, VIEW_EDIT_SELECTED_MEDIA, PARAMETER_MEDIA_ID, nMediaTypeId );
     }
 
-    public String doMoveMedia( HttpServletRequest request )
+    /**
+     * Moves a document of the selection up or down
+     * @param request the request, carrying the document and the direction
+     * @param mediaType the media type
+     * @return the redirection to the page selecting the documents
+     */
+    private String moveDocument( HttpServletRequest request, LibraryMedia mediaType )
     {
-        init( request );
-
-        String strDocumentId = request.getParameter( PARAMETER_DOCUMENT_ID );
-        String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
-        String strIdSpaceFilter = request.getParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID );
-        String strIdSpace = request.getParameter( PARAMETER_BROWSER_SPACE_ID );
-
-
-        UrlItem urlItem = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MEDIA_TYPE_SELECTION );
-        urlItem.addParameter( PARAMETER_MEDIA_TYPE, strMediaTypeId );
-        urlItem.addParameter( DocumentSpacesService.PARAMETER_BROWSER_SELECTED_SPACE_ID, strIdSpaceFilter );
-        urlItem.addParameter( PARAMETER_BROWSER_SPACE_ID, strIdSpace );
-
+        if ( _listSelectedMedia == null )
+        {
+            return redirect( request, VIEW_SELECT_MEDIA, PARAMETER_MEDIA_TYPE, mediaType.getMediaId(  ) );
+        }
 
         boolean bMoveUp = Boolean.parseBoolean( request.getParameter( PARAMETER_MOVE_UP ) );
 
-        int nIdDocument = Integer.parseInt( strDocumentId );
+        int nIdDocument = NumberUtils.toInt( request.getParameter( PARAMETER_DOCUMENT_ID ), -1 );
 
         if ( bMoveUp )
         {
@@ -556,23 +623,30 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
         Collections.sort( _listSelectedMedia );
 
-        return urlItem.getUrl(  );
+        return redirect( request, VIEW_SELECT_MEDIA, PARAMETER_MEDIA_TYPE, mediaType.getMediaId(  ) );
     }
 
     /**
      * Renders the selected documents with the template of the media type, and inserts the HTML in the editor
      * @param request the request, carrying the value of each attribute of the media type (suffixed by the index of the document for a multiple media type)
-     * @return the page inserting the HTML, rendered in the response to the form rather than reached through a redirect
+     * @return the page inserting the HTML, rendered in the response to the form rather than reached through a redirect; it writes
+     *         nothing, so it takes no token (the values page that posts it is sent by its own script, and by the upload service too)
      */
+    @Action( value = ACTION_INSERT_MEDIA, securityTokenDisabled = true )
     public String doInsertMedia( HttpServletRequest request )
     {
-        init( request );
+        initService( request );
 
-        String strMediaTypeId = request.getParameter( PARAMETER_MEDIA_ID );
-        LibraryMedia mediaType = LibraryMediaHome.findByPrimaryKey( Integer.parseInt( strMediaTypeId ), _plugin );
+        LibraryMedia mediaType = findMediaType( request );
+
+        if ( mediaType == null )
+        {
+            return redirectView( request, VIEW_SELECT_MEDIA );
+        }
+
         mediaType.setMediaAttributeList( MediaAttributeHome.findAllAttributesForMedia( mediaType.getMediaId(  ), _plugin ) );
 
-        int nMediaCount = mediaType.getIsMultipleMedia(  ) ? _listSelectedMedia.size(  ) : 1;
+        int nMediaCount = mediaType.getIsMultipleMedia(  ) ? ( ( _listSelectedMedia == null ) ? 0 : _listSelectedMedia.size(  ) ) : 1;
         List<Map<String, String>> listMedia = new ArrayList<>(  );
 
         for ( int i = 0; i < nMediaCount; i++ )
@@ -590,7 +664,6 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
 
         String strHtml = _mediaTemplateService.render( mediaType, listMedia, _user.getLocale(  ) );
 
-        // We reset session parameters
         _nItemsPerPage = 0;
         _strCurrentPageIndex = "";
         _listSelectedMedia = null;
@@ -640,15 +713,14 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         return result;
     }
 
-    private void init( HttpServletRequest request )
+    /**
+     * Sets the user, the plugin and the editor field of the insertion; the field is kept in the session for the screens after the first
+     * @param request the request
+     */
+    private void initService( HttpServletRequest request )
     {
-        String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
         _user = AdminUserService.getAdminUser( request );
-
-        if ( StringUtils.isNotBlank( strPluginName ) )
-        {
-            _plugin = PluginService.getPlugin( strPluginName );
-        }
+        _plugin = PluginService.getPlugin( PLUGIN_NAME );
 
         String strInput = request.getParameter( PARAMETER_INPUT );
 
@@ -658,11 +730,47 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
         }
     }
 
-    private HashMap<String, Object> getDefaultModel(  )
+    /**
+     * Returns the media type the request names by its media_type, else by its media
+     * @param request the request
+     * @return the media type, null when the identifier is missing, not a number or unknown
+     */
+    private LibraryMedia findMediaType( HttpServletRequest request )
     {
-        HashMap<String, Object> model = new HashMap<String, Object>(  );
-        model.put( PARAMETER_PLUGIN_NAME, _plugin.getName(  ) );
+        String strMediaTypeId = StringUtils.defaultIfBlank( request.getParameter( PARAMETER_MEDIA_ID ), request.getParameter( PARAMETER_MEDIA_TYPE ) );
+        int nMediaTypeId = NumberUtils.toInt( strMediaTypeId, -1 );
+
+        return ( nMediaTypeId < 0 ) ? null : LibraryMediaHome.findByPrimaryKey( nMediaTypeId, _plugin );
+    }
+
+    /**
+     * Returns the values shared by the pages of the service
+     * @return the values
+     */
+    private Map<String, Object> getDefaultModel(  )
+    {
+        Map<String, Object> model = new HashMap<String, Object>(  );
+        model.put( PARAMETER_PLUGIN_NAME, PLUGIN_NAME );
         model.put( PARAMETER_INPUT, _input );
+
+        return model;
+    }
+
+    /**
+     * Returns the model a template of the service is rendered with: the model of the view, which carries the token of its forms, filled
+     * with the values of the page; the values alone for the first screen, which the core asks for outside the controller
+     * @param model the model of the view, null outside the controller
+     * @param mapValues the values of the page
+     * @return the model
+     */
+    private static Object toModel( Models model, Map<String, Object> mapValues )
+    {
+        if ( model == null )
+        {
+            return mapValues;
+        }
+
+        mapValues.forEach( model::put );
 
         return model;
     }
@@ -676,9 +784,9 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
      */
     private String getBaseUrl( String strMediaType, String selectedSpace )
     {
-        UrlItem url = new UrlItem( JSP_MEDIA_TYPE_SELECTION );
+        UrlItem url = new UrlItem( JSP_CONTROLLER );
         url.addParameter( PARAMETER_INPUT, _input );
-        url.addParameter( PARAMETER_PLUGIN_NAME, _plugin.getName(  ) );
+        url.addParameter( PARAMETER_PLUGIN_NAME, PLUGIN_NAME );
         url.addParameter( PARAMETER_SPACE_ID, selectedSpace );
         url.addParameter( PARAMETER_MEDIA_TYPE, strMediaType );
         url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, _nItemsPerPage );
@@ -689,7 +797,6 @@ public class LibraryInsertServiceJspBean extends InsertServiceJspBean implements
     private LocalizedPaginator<Integer> getPaginator( HttpServletRequest request,
     		List<Integer> listDocumentsId, String baseUrl )
     {
-        _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_RESULTS_PER_PAGE, 10 );
         _nItemsPerPage = AbstractPaginator.getItemsPerPage( request, AbstractPaginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, _nDefaultItemsPerPage );
 
         _strCurrentPageIndex = AbstractPaginator.getPageIndex( request, AbstractPaginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex );

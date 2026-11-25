@@ -2,9 +2,9 @@
 <#--
  # Choice of the documents of a media made of several documents (carousel), filling the frame of the dialog in three columns: the spaces as a
  # tree, the documents of the space as a grid or a list, and the selection being built. A click on a document adds it to the selection, a click
- # on a document already in it (marked by its position) removes it: each document is a submit button of its own (formaction to DoSelectMedia.jsp),
+ # on a document already in it (marked by its position) removes it: each document is a submit button of its own (formaction to the action selectDocument),
  # so no script is needed. The selection lists the documents in their order, moved up or down or removed, and Insérer goes on to the insertion
- # (EditSelectedMedia.jsp). The scroll of the documents and of the selection is kept across the reloads.
+ # (view editSelectedMedia). The scroll of the documents and of the selection is kept across the reloads.
  # Styles: insert_service.css, behaviours: lutece-insert.js (InsertServiceHeader.jsp).
 -->
 <#assign spaceParameters = 'browser_id_space=${selected_space?c}&browser_selected_space_id=${selected_space?c}'>
@@ -33,7 +33,8 @@
 		</@tform>
 		<div class="lutece-insert-main" id="library_media_column">
 			<#if all_documents?has_content>
-			<@tform method='post' name='fenvoi' id='fenvoi' action='jsp/admin/plugins/library/DoSelectMedia.jsp' class='lutece-insert-main'>
+			<@tform method='post' name='fenvoi' id='fenvoi' action='jsp/admin/plugins/library/SelectMedia.jsp' class='lutece-insert-main'>
+				<@input type='hidden' name='action' value='selectDocument' />
 				<@input type='hidden' name='plugin_name' value='${plugin_name}' />
 				<@input type='hidden' name='input' value='${.data_model.input}' />
 				<@input type='hidden' name='media' value='${mediatype.mediaId?c}' />
@@ -47,7 +48,7 @@
 						<button type="button" class="btn btn-outline-secondary" data-view="grid" aria-pressed="false"><i class="ti ti-layout-grid me-1" aria-hidden="true"></i>#i18n{library.insertservice.viewGrid}</button>
 						<button type="button" class="btn btn-outline-secondary" data-view="list" aria-pressed="false"><i class="ti ti-list me-1" aria-hidden="true"></i>#i18n{library.insertservice.viewList}</button>
 					</span>
-					<@aButton href='jsp/admin/plugins/library/DoAddAllSpace.jsp?media=${mediatype.mediaId?c}' title='#i18n{library.insertservice.label.addAllSpace}' buttonIcon='checks' color='light' size='sm' />
+					<button type="submit" class="btn btn-sm btn-light" formaction="jsp/admin/plugins/library/SelectMedia.jsp?action=selectDocument&amp;add_all=true"><i class="ti ti-checks" aria-hidden="true"></i> #i18n{library.insertservice.label.addAllSpace}</button>
 				</div>
 				<ul class="lutece-insert-items" id="library_media_items" data-view="grid">
 				<#list all_documents as mappingdocument>
@@ -56,9 +57,9 @@
 					<#assign position = selectedPositions[ document.id?c ]!0 />
 					<li data-search="${document.title?lower_case}">
 						<#if position gt 0>
-						<button type="submit" class="lutece-insert-item" aria-pressed="true" formaction="jsp/admin/plugins/library/DoSelectMedia.jsp?remove_selected=true&amp;id_document=${document.id?c}" title="#i18n{library.insertservice.removeFromSelection} : ${document.title}">
+						<button type="submit" class="lutece-insert-item" aria-pressed="true" formaction="jsp/admin/plugins/library/SelectMedia.jsp?action=selectDocument&amp;remove_selected=true&amp;id_document=${document.id?c}" title="#i18n{library.insertservice.removeFromSelection} : ${document.title}">
 						<#else>
-						<button type="submit" class="lutece-insert-item" aria-pressed="false" formaction="jsp/admin/plugins/library/DoSelectMedia.jsp?id_document=${document.id?c}&amp;id_mapping=${mapping_id?url('UTF-8')}" title="#i18n{library.insertservice.addToSelection} : ${document.title}">
+						<button type="submit" class="lutece-insert-item" aria-pressed="false" formaction="jsp/admin/plugins/library/SelectMedia.jsp?action=selectDocument&amp;id_document=${document.id?c}&amp;id_mapping=${mapping_id?url('UTF-8')}" title="#i18n{library.insertservice.addToSelection} : ${document.title}">
 						</#if>
 							<span class="lutece-insert-thumb">
 								<img src="${document.thumbnail}&amp;nocache" alt="" loading="lazy">
@@ -91,6 +92,9 @@
 		<section class="lutece-insert-tray" aria-labelledby="library_selected_medias">
 			<h3 id="library_selected_medias"><i class="ti ti-stack-2" aria-hidden="true"></i>#i18n{library.insertservice.selectedMedia} <span class="lutece-insert-count">${( selected_medias![] )?size}</span></h3>
 			<#if selected_medias?has_content>
+			<#-- Every change of the selection posts the action selectDocument, the one action the token of the page is for -->
+			<@tform method='post' id='library_tray_form' action='jsp/admin/plugins/library/SelectMedia.jsp'>
+			<@input type='hidden' name='action' value='selectDocument' />
 			<ol class="lutece-insert-rows" id="library_selected_list">
 			<#list selected_medias as media>
 				<#assign document = media.document>
@@ -101,32 +105,33 @@
 						<span class="lutece-insert-thumb lutece-insert-row-thumb"><img src="${document.thumbnail}&amp;nocache" alt="" loading="lazy"></span>
 						<span class="lutece-insert-text">
 							<span class="lutece-insert-title" title="${document.title}">${document.title}</span>
-							<span class="lutece-insert-summary">#i18n{library.insertservice.label.idDocument} ${document.id}</span>
+							<span class="lutece-insert-summary"><span class="visually-hidden">#i18n{library.insertservice.label.idDocument} </span>#${document.id?c}</span>
 						</span>
 						<span class="lutece-insert-row-actions">
 							<#-- The first row has no up and the last no down: an empty slot keeps the buttons of every row in the same columns -->
 							<#if media?index gt 0>
-								<@aButton href='jsp/admin/plugins/library/DoMoveMedia.jsp?move_up=true&${mediaParameters}' title='#i18n{library.insertservice.label.moveUp} ${document.title}' hideTitle=['all'] buttonIcon='arrow-up' color='' class='lutece-insert-action' />
+								<button type="submit" class="lutece-insert-action" formaction="jsp/admin/plugins/library/SelectMedia.jsp?action=selectDocument&amp;move_up=true&amp;${mediaParameters}" title="#i18n{library.insertservice.label.moveUp} ${document.title}"><i class="ti ti-arrow-up" aria-hidden="true"></i><span class="visually-hidden">#i18n{library.insertservice.label.moveUp} ${document.title}</span></button>
 							<#else>
 								<span class="lutece-insert-action" aria-hidden="true"></span>
 							</#if>
 							<#if media?has_next>
-								<@aButton href='jsp/admin/plugins/library/DoMoveMedia.jsp?move_up=false&${mediaParameters}' title='#i18n{library.insertservice.label.moveDown} ${document.title}' hideTitle=['all'] buttonIcon='arrow-down' color='' class='lutece-insert-action' />
+								<button type="submit" class="lutece-insert-action" formaction="jsp/admin/plugins/library/SelectMedia.jsp?action=selectDocument&amp;move_up=false&amp;${mediaParameters}" title="#i18n{library.insertservice.label.moveDown} ${document.title}"><i class="ti ti-arrow-down" aria-hidden="true"></i><span class="visually-hidden">#i18n{library.insertservice.label.moveDown} ${document.title}</span></button>
 							<#else>
 								<span class="lutece-insert-action" aria-hidden="true"></span>
 							</#if>
-							<@aButton href='jsp/admin/plugins/library/DoSelectMedia.jsp?remove_selected=true&${mediaParameters}' title='#i18n{library.insertservice.removeFromSelection} ${document.title}' hideTitle=['all'] buttonIcon='x' color='' class='lutece-insert-action lutece-insert-action-danger' />
+							<button type="submit" class="lutece-insert-action lutece-insert-action-danger" formaction="jsp/admin/plugins/library/SelectMedia.jsp?action=selectDocument&amp;remove_selected=true&amp;${mediaParameters}" title="#i18n{library.insertservice.removeFromSelection} ${document.title}"><i class="ti ti-x" aria-hidden="true"></i><span class="visually-hidden">#i18n{library.insertservice.removeFromSelection} ${document.title}</span></button>
 						</span>
 					</div>
 				</li>
 			</#list>
 			</ol>
+			</@tform>
 			<#else>
 			<p class="lutece-insert-tray-empty"><i class="ti ti-hand-click" aria-hidden="true"></i>#i18n{library.insertservice.emptySelection}</p>
 			</#if>
 			<div class="lutece-insert-tray-footer">
 				<#if selected_medias?has_content>
-				<@aButton href='jsp/admin/plugins/library/EditSelectedMedia.jsp?media=${mediatype.mediaId?c}' title='#i18n{library.insertservice.insertlink.button} (${selected_medias?size})' buttonIcon='check' color='primary' />
+				<@aButton href='jsp/admin/plugins/library/SelectMedia.jsp?view=editSelectedMedia&media=${mediatype.mediaId?c}' title='#i18n{library.insertservice.insertlink.button} (${selected_medias?size})' buttonIcon='check' color='primary' />
 				<#else>
 				<@button type='button' title='#i18n{library.insertservice.insertlink.button}' buttonIcon='check' color='primary' disabled=true />
 				</#if>
